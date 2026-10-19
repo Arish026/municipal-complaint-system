@@ -65,9 +65,9 @@ erDiagram
 
 | Symbol | Syntax | Meaning | Cardinality / Modality |
 |---|---|---|---|
-| `\|\|` | Exactly One | Mandatory entity participation | $1..1$ |
-| `o{` or `>o` | Zero or Many | Optional entity participation (Crow's foot) | $0..N$ |
-| `\|{` | One or Many | Mandatory entity participation with multiple rows | $1..N$ |
+| `\|\|` | Exactly One | Mandatory entity participation | 1..1 |
+| `o{` or `>o` | Zero or Many | Optional entity participation (Crow's foot) | 0..N |
+| `\|{` | One or Many | Mandatory entity participation with multiple rows | 1..N |
 | **PK** | Primary Key | Unique, non-null row identifier | Unique |
 | **FK** | Foreign Key | References primary key of a parent entity | Referential |
 | **UK** | Unique Key | Unique constraint across table rows | Unique |
@@ -124,11 +124,11 @@ Represents job tickets dispatched to field staff.
 
 | Parent Entity | Verb | Child Entity | Cardinality | Parent Participation | Child Participation | Delete Rule |
 |---|---|---|---|---|---|---|
-| **CITIZEN** | *submits* | **COMPLAINT** | `1 : N` | Optional ($0..N$) | Mandatory ($1..1$) | `ON DELETE RESTRICT` |
-| **DEPARTMENT** | *handles* | **COMPLAINT** | `1 : N` | Optional ($0..N$) | Mandatory ($1..1$) | `ON DELETE RESTRICT` |
-| **DEPARTMENT** | *employs* | **STAFF** | `1 : N` | Optional ($0..N$) | Mandatory ($1..1$) | `ON DELETE RESTRICT` |
-| **COMPLAINT** | *generates* | **WORK_ORDER** | `1 : N` | Optional ($0..N$) | Mandatory ($1..1$) | `ON DELETE CASCADE` |
-| **STAFF** | *performs* | **WORK_ORDER** | `1 : N` | Optional ($0..N$) | Mandatory ($1..1$) | `ON DELETE RESTRICT` |
+| **CITIZEN** | *submits* | **COMPLAINT** | `1 : N` | Optional (0..N) | Mandatory (1..1) | `ON DELETE RESTRICT` |
+| **DEPARTMENT** | *handles* | **COMPLAINT** | `1 : N` | Optional (0..N) | Mandatory (1..1) | `ON DELETE RESTRICT` |
+| **DEPARTMENT** | *employs* | **STAFF** | `1 : N` | Optional (0..N) | Mandatory (1..1) | `ON DELETE RESTRICT` |
+| **COMPLAINT** | *generates* | **WORK_ORDER** | `1 : N` | Optional (0..N) | Mandatory (1..1) | `ON DELETE CASCADE` |
+| **STAFF** | *performs* | **WORK_ORDER** | `1 : N` | Optional (0..N) | Mandatory (1..1) | `ON DELETE RESTRICT` |
 
 ### Key Invariants
 1. **Mandatory Ownership**: Every complaint must trace back to exactly one registered citizen.

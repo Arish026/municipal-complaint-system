@@ -60,7 +60,7 @@ flowchart LR
 ### 5. Decision-Support Agent
 - **Capabilities**:
   - Flag overdue complaints based on SLA thresholds (> 72h).
-  - Identify workload imbalances across staff and departments ($\ge 4$ active tasks).
+  - Identify workload imbalances across staff and departments (>= 4 active tasks).
   - Detect repeated issues within the same geographical zone or category.
   - Highlight recurring failures or reopenings.
 - **Governance**:

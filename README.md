@@ -104,20 +104,20 @@ erDiagram
 ```
 
 ### Cardinality Matrix
-- **1 Citizen submits $N$ Complaints** (`1 : N`): Mandatory on Complaint side (`||` Exactly One).
-- **1 Department handles $N$ Complaints** (`1 : N`): Mandatory on Complaint side.
-- **1 Department employs $N$ Staff** (`1 : N`): Mandatory on Staff side.
-- **1 Complaint generates $N$ Work Orders** (`1 : N`): Optional on Complaint side ($0 \dots N$, work orders exist only after work is assigned).
-- **1 Staff member performs $N$ Work Orders** (`1 : N`): Mandatory on Work Order side.
+- **1 Citizen submits N Complaints** (`1 : N`): Mandatory on Complaint side (`||` Exactly One).
+- **1 Department handles N Complaints** (`1 : N`): Mandatory on Complaint side.
+- **1 Department employs N Staff** (`1 : N`): Mandatory on Staff side.
+- **1 Complaint generates N Work Orders** (`1 : N`): Optional on Complaint side (0..N, work orders exist only after work is assigned).
+- **1 Staff member performs N Work Orders** (`1 : N`): Mandatory on Work Order side.
 
 ---
 
 ## 3. Semantic Net (Occurrence Level)
 
-Illustrates declared $1:N$ relationships through sample populations rather than abstract rules:
+Illustrates declared `1:N` relationships through sample populations rather than abstract rules:
 
 ### Figure A: 1:N Submits Relationship
-*Citizen $c_1$ submits two complaints ($k_1, k_2$); citizen $c_2$ submits complaint $k_3$. Each complaint has exactly one citizen.*
+*Citizen `c1` submits two complaints (`k1`, `k2`); citizen `c2` submits complaint `k3`. Each complaint has exactly one citizen.*
 
 ```mermaid
 graph LR
@@ -144,7 +144,7 @@ graph LR
 ```
 
 ### Figure B: 1:N Generates Relationship
-*Complaint $k_1$ has generated two work orders ($w_1, w_2$); $k_2$ has generated one work order ($w_3$); newly-submitted complaint $k_3$ has none yet.*
+*Complaint `k1` has generated two work orders (`w1`, `w2`); `k2` has generated one work order (`w3`); newly-submitted complaint `k3` has none yet.*
 
 ```mermaid
 graph LR

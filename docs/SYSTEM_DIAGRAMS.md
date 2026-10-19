@@ -139,23 +139,23 @@ Legend:
 
 1. **CITIZEN submits COMPLAINT (`1 : N`)**:
    - **Participation**: Mandatory on Complaint side (a complaint *must* be submitted by exactly 1 citizen).
-   - **Optionality**: A citizen may register and have zero or many complaints ($0 \dots N$).
+   - **Optionality**: A citizen may register and have zero or many complaints (0..N).
    - **Constraint**: `ON DELETE RESTRICT` (a citizen with active complaints cannot be deleted).
 2. **DEPARTMENT handles COMPLAINT (`1 : N`)**:
    - **Participation**: Mandatory on Complaint side (every complaint *must* be assigned to exactly 1 department).
-   - **Optionality**: A department handles zero or many complaints ($0 \dots N$).
+   - **Optionality**: A department handles zero or many complaints (0..N).
    - **Constraint**: `ON DELETE RESTRICT`.
 3. **DEPARTMENT employs STAFF (`1 : N`)**:
    - **Participation**: Mandatory on Staff side (staff member belongs to exactly 1 department).
-   - **Optionality**: A department employs zero or many staff members ($0 \dots N$).
+   - **Optionality**: A department employs zero or many staff members (0..N).
    - **Constraint**: `ON DELETE RESTRICT`.
 4. **COMPLAINT generates WORK_ORDER (`1 : N`)**:
    - **Participation**: Mandatory on Work Order side (a work order is generated for exactly 1 complaint).
-   - **Optionality**: A complaint has $0$ work orders upon initial submission; work orders exist only after supervisor assignment ($0 \dots N$).
+   - **Optionality**: A complaint has 0 work orders upon initial submission; work orders exist only after supervisor assignment (0..N).
    - **Constraint**: `ON DELETE CASCADE` (deleting a complaint purges linked work orders).
 5. **STAFF performs WORK_ORDER (`1 : N`)**:
    - **Participation**: Mandatory on Work Order side (a work order is assigned to exactly 1 staff member).
-   - **Optionality**: A staff member performs zero or many work orders ($0 \dots N$).
+   - **Optionality**: A staff member performs zero or many work orders (0..N).
    - **Constraint**: `ON DELETE RESTRICT`.
 
 ---
@@ -165,7 +165,7 @@ Legend:
 The Semantic Network models concrete data occurrences (instances) rather than abstract types, illustrating how individual entities connect across relationship sets.
 
 ### 2.1 Figure A: 1:N Submits Relationship
-*Sample occurrence demonstrating that citizen $c_1$ submits two complaints ($k_1, k_2$), while citizen $c_2$ submits complaint $k_3$. Each complaint belongs to exactly one citizen.*
+*Sample occurrence demonstrating that citizen `c1` submits two complaints (`k1`, `k2`), while citizen `c2` submits complaint `k3`. Each complaint belongs to exactly one citizen.*
 
 ```mermaid
 flowchart LR
@@ -229,7 +229,7 @@ flowchart LR
 ---
 
 ### 2.2 Figure B: 1:N Generates Relationship
-*Sample occurrence demonstrating that complaint $k_1$ has generated two work orders ($w_1, w_2$), complaint $k_2$ has generated one work order ($w_3$), and newly-submitted complaint $k_3$ has generated zero work orders.*
+*Sample occurrence demonstrating that complaint `k1` has generated two work orders (`w1`, `w2`), complaint `k2` has generated one work order (`w3`), and newly-submitted complaint `k3` has generated zero work orders.*
 
 ```mermaid
 flowchart LR
@@ -300,22 +300,22 @@ flowchart LR
 #### Entity Instance Set 1: Citizen
 | Occurrence | `Citizen_ID` | `Name` | `Phone` | `Address` |
 |---|---|---|---|---|
-| $c_1$ | `C01` | Ali Raza | +1-555-0101 | 14-B Clifton Block 5 |
-| $c_2$ | `C02` | Sara Khan | +1-555-0102 | 88 Gulshan-e-Iqbal Block 10 |
+| `c1` | `C01` | Ali Raza | +1-555-0101 | 14-B Clifton Block 5 |
+| `c2` | `C02` | Sara Khan | +1-555-0102 | 88 Gulshan-e-Iqbal Block 10 |
 
 #### Entity Instance Set 2: Complaint
 | Occurrence | `Complaint_ID` | `Citizen_ID` | `Department_ID` | `Category` | `Status` | Description |
 |---|---|---|---|---|---|---|
-| $k_1$ | `K101` | `C01` | `D03` | Sanitation | In Progress | Overflowing commercial dumpster |
-| $k_2$ | `K102` | `C01` | `D01` | Water Supply | Assigned | Main pipeline ruptured |
-| $k_3$ | `K103` | `C02` | `D04` | Streetlights | Submitted | Non-functional streetlight |
+| `k1` | `K101` | `C01` | `D03` | Sanitation | In Progress | Overflowing commercial dumpster |
+| `k2` | `K102` | `C01` | `D01` | Water Supply | Assigned | Main pipeline ruptured |
+| `k3` | `K103` | `C02` | `D04` | Streetlights | Submitted | Non-functional streetlight |
 
 #### Entity Instance Set 3: Work Order
 | Occurrence | `WorkOrder_ID` | `Complaint_ID` | `Staff_ID` | `Work_Status` | `Action_Taken` |
 |---|---|---|---|---|---|
-| $w_1$ | `WO11` | `K101` | `S05` | Completed | Initial site cleared, extra bin placed |
-| $w_2$ | `WO12` | `K101` | `S06` | In Progress | Daily monitoring route active |
-| $w_3$ | `WO21` | `K102` | `S02` | Assigned | Excavation scheduled |
+| `w1` | `WO11` | `K101` | `S05` | Completed | Initial site cleared, extra bin placed |
+| `w2` | `WO12` | `K101` | `S06` | In Progress | Daily monitoring route active |
+| `w3` | `WO21` | `K102` | `S02` | Assigned | Excavation scheduled |
 
 ---
 
@@ -505,8 +505,8 @@ Type:           Payload (Outbound)
 ```
 
 ### 6.2 Data Stores
-- **D1: CITIZEN RECORDS** = $\{ \underline{\text{Citizen\_ID}} + \text{Name} + \text{Phone} + \text{Address} + \text{created\_at} \}$
-- **D2: COMPLAINT RECORDS** = $\{ \underline{\text{Complaint\_ID}} + \text{Citizen\_ID} + \text{Department\_ID} + \text{Complaint\_Date} + \text{Category} + \text{Description} + \text{Location} + \text{Status} \}$
-- **D3: DEPARTMENT RECORDS** = $\{ \underline{\text{Department\_ID}} + \text{Department\_Name} + \text{Office\_Location} \}$
-- **D4: STAFF RECORDS** = $\{ \underline{\text{Staff\_ID}} + \text{Department\_ID} + \text{Name} + \text{Phone} + \text{Designation} + \text{is\_active} \}$
-- **D5: WORK ORDER RECORDS** = $\{ \underline{\text{WorkOrder\_ID}} + \text{Complaint\_ID} + \text{Staff\_ID} + \text{Assigned\_Date} + \text{Completion\_Date} + \text{Work\_Status} + \text{Action\_Taken} \}$
+- **D1: CITIZEN RECORDS** = `{ <u>Citizen_ID</u>, Name, Phone, Address, created_at }`
+- **D2: COMPLAINT RECORDS** = `{ <u>Complaint_ID</u>, Citizen_ID, Department_ID, Complaint_Date, Category, Description, Location, Status }`
+- **D3: DEPARTMENT RECORDS** = `{ <u>Department_ID</u>, Department_Name, Office_Location }`
+- **D4: STAFF RECORDS** = `{ <u>Staff_ID</u>, Department_ID, Name, Phone, Designation, is_active }`
+- **D5: WORK ORDER RECORDS** = `{ <u>WorkOrder_ID</u>, Complaint_ID, Staff_ID, Assigned_Date, Completion_Date, Work_Status, Action_Taken }`

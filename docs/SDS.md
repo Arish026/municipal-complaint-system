@@ -206,13 +206,13 @@ CREATE TABLE DECISION_AUDIT_LOG (
 The decision-support agent executes transparent heuristics without autonomous execution:
 
 1. **SLA Overdue Detection**:
-   $$\text{Age}(\text{Complaint}) = \text{NOW}() - \text{Complaint\_Date}$$
-   If $\text{Status} \in \{\text{'Submitted'}, \text{'Categorized'}\}$ and $\text{Age} > 72 \text{ hours}$, trigger `Overdue Alert`.
+   - Calculation: `Age(Complaint) = NOW() - Complaint_Date`
+   - Condition: If `Status IN ('Submitted', 'Categorized')` and `Age > 72 hours`, trigger `Overdue Alert`.
 2. **Workload Imbalance**:
-   For each active technician $s_i \in \text{STAFF}$, calculate $\text{ActiveJobs}(s_i)$.
-   If $\text{ActiveJobs}(s_i) \ge 4$ and $\exists s_j \in \text{Department}(s_i)$ with $\text{ActiveJobs}(s_j) \le 1$, trigger `Workload Imbalance Alert`.
+   - For each active technician `s_i` in `STAFF`, count active work orders `ActiveJobs(s_i)`.
+   - Condition: If `ActiveJobs(s_i) >= 4` and another staff member `s_j` in the same department has `ActiveJobs(s_j) <= 1`, trigger `Workload Imbalance Alert`.
 3. **Zone Clustering**:
-   If $\text{Count}(\text{Complaints in Zone } Z \text{ within } 48 \text{ hours}) \ge 3$ within the same category, trigger `Recurring Incident Cluster Alert`.
+   - Condition: If `Count(Complaints in Zone Z within 48 hours) >= 3` for the same category, trigger `Recurring Incident Cluster Alert`.
 
 ### 5.2 Supervisor Approval Workflow
 All consequential actions (e.g., job reassignment, expedited escalation) require human supervisor sign-off. Every decision is recorded immutably in `DECISION_AUDIT_LOG` with supervisor staff ID and timestamp.

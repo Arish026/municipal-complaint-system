@@ -114,27 +114,27 @@ flowchart TB
 
 ## 5. Balancing Verification with Level 0
 
-| Level 0 Boundary Flow | Source $\to$ Destination (Level 0) | Level 1 Implementation | Balancing Status |
+| Level 0 Boundary Flow | Source → Destination (Level 0) | Level 1 Implementation | Balancing Status |
 |---|---|---|---|
-| `REGISTRATION DETAILS` | `CITIZEN` $\to$ Process 0 | `CITIZEN` $\to$ Process `1.0` | **BALANCED** |
-| `COMPLAINT DETAILS` | `CITIZEN` $\to$ Process 0 | `CITIZEN` $\to$ Process `2.0` | **BALANCED** |
-| `COMPLAINT INQUIRY` | `CITIZEN` $\to$ Process 0 | `CITIZEN` $\to$ Process `4.0` | **BALANCED** |
-| `COMPLAINT NUMBER & ACKNOWLEDGMENT` | Process 0 $\to$ `CITIZEN` | Process `2.0` $\to$ `CITIZEN` | **BALANCED** |
-| `CORRECTION MESSAGE` | Process 0 $\to$ `CITIZEN` | Process `2.0` $\to$ `CITIZEN` | **BALANCED** |
-| `STATUS INFORMATION` | Process 0 $\to$ `CITIZEN` | Process `4.0` $\to$ `CITIZEN` | **BALANCED** |
-| `RESOLUTION INFORMATION` | Process 0 $\to$ `CITIZEN` | Process `4.0` $\to$ `CITIZEN` | **BALANCED** |
-| `DEPARTMENT INFORMATION` | `ADMIN` $\to$ Process 0 | `ADMIN` $\to$ Process `3.0` | **BALANCED** |
-| `STAFF INFORMATION` | `ADMIN` $\to$ Process 0 | `ADMIN` $\to$ Process `3.0` | **BALANCED** |
-| `REPORTING REQUESTS` | `ADMIN` $\to$ Process 0 | `ADMIN` $\to$ Process `5.0` | **BALANCED** |
-| `COMPLAINT REPORTS` | Process 0 $\to$ `ADMIN` | Process `5.0` $\to$ `ADMIN` | **BALANCED** |
-| `DEPARTMENT PERFORMANCE` | Process 0 $\to$ `ADMIN` | Process `5.0` $\to$ `ADMIN` | **BALANCED** |
-| `PENDING WORK SUMMARY` | Process 0 $\to$ `ADMIN` | Process `5.0` $\to$ `ADMIN` | **BALANCED** |
-| `WORK UPDATES` | `STAFF` $\to$ Process 0 | `STAFF` $\to$ Process `4.0` | **BALANCED** |
-| `ACTION TAKEN` | `STAFF` $\to$ Process 0 | `STAFF` $\to$ Process `4.0` | **BALANCED** |
-| `COMPLETION INFORMATION` | `STAFF` $\to$ Process 0 | `STAFF` $\to$ Process `4.0` | **BALANCED** |
-| `ASSIGNED COMPLAINTS` | Process 0 $\to$ `STAFF` | Process `3.0` $\to$ `STAFF` | **BALANCED** |
-| `WORK ORDERS` | Process 0 $\to$ `STAFF` | Process `3.0` $\to$ `STAFF` | **BALANCED** |
-| `TASK DETAILS` | Process 0 $\to$ `STAFF` | Process `3.0` $\to$ `STAFF` | **BALANCED** |
+| `REGISTRATION DETAILS` | `CITIZEN` → Process 0 | `CITIZEN` → Process `1.0` | **BALANCED** |
+| `COMPLAINT DETAILS` | `CITIZEN` → Process 0 | `CITIZEN` → Process `2.0` | **BALANCED** |
+| `COMPLAINT INQUIRY` | `CITIZEN` → Process 0 | `CITIZEN` → Process `4.0` | **BALANCED** |
+| `COMPLAINT NUMBER & ACKNOWLEDGMENT` | Process 0 → `CITIZEN` | Process `2.0` → `CITIZEN` | **BALANCED** |
+| `CORRECTION MESSAGE` | Process 0 → `CITIZEN` | Process `2.0` → `CITIZEN` | **BALANCED** |
+| `STATUS INFORMATION` | Process 0 → `CITIZEN` | Process `4.0` → `CITIZEN` | **BALANCED** |
+| `RESOLUTION INFORMATION` | Process 0 → `CITIZEN` | Process `4.0` → `CITIZEN` | **BALANCED** |
+| `DEPARTMENT INFORMATION` | `ADMIN` → Process 0 | `ADMIN` → Process `3.0` | **BALANCED** |
+| `STAFF INFORMATION` | `ADMIN` → Process 0 | `ADMIN` → Process `3.0` | **BALANCED** |
+| `REPORTING REQUESTS` | `ADMIN` → Process 0 | `ADMIN` → Process `5.0` | **BALANCED** |
+| `COMPLAINT REPORTS` | Process 0 → `ADMIN` | Process `5.0` → `ADMIN` | **BALANCED** |
+| `DEPARTMENT PERFORMANCE` | Process 0 → `ADMIN` | Process `5.0` → `ADMIN` | **BALANCED** |
+| `PENDING WORK SUMMARY` | Process 0 → `ADMIN` | Process `5.0` → `ADMIN` | **BALANCED** |
+| `WORK UPDATES` | `STAFF` → Process 0 | `STAFF` → Process `4.0` | **BALANCED** |
+| `ACTION TAKEN` | `STAFF` → Process 0 | `STAFF` → Process `4.0` | **BALANCED** |
+| `COMPLETION INFORMATION` | `STAFF` → Process 0 | `STAFF` → Process `4.0` | **BALANCED** |
+| `ASSIGNED COMPLAINTS` | Process 0 → `STAFF` | Process `3.0` → `STAFF` | **BALANCED** |
+| `WORK ORDERS` | Process 0 → `STAFF` | Process `3.0` → `STAFF` | **BALANCED** |
+| `TASK DETAILS` | Process 0 → `STAFF` | Process `3.0` → `STAFF` | **BALANCED** |
 
 ---
 
