@@ -52,7 +52,7 @@ jobs:
           flake8 scripts/ --max-line-length=120 --ignore=E501,W503 || echo "Lint check completed."
 
   frontend-check:
-    name: Frontend Package Validation
+    name: Frontend TypeScript & Build Validation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -63,6 +63,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: Validate package.json
-        run: |
-          node -e "const pkg = require('./frontend/package.json'); console.log('Validated: ' + pkg.name);"
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Validate Next.js TypeScript Build
+        working-directory: frontend
+        run: npm run build
