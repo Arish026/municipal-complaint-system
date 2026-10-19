@@ -6,6 +6,17 @@
 
 ---
 
+## 📑 Individual Diagram Documents
+For focused, in-depth study, each diagram is maintained in its own dedicated document with full attribute tables, mini-specifications, and formal semantics:
+
+* 📊 **[Entity-Relationship Diagram (ERD)](erd.md)**: Full Crow's foot notation, cardinalities, attribute data types, and primary/foreign key definitions.
+* 🕸️ **[Semantic Net (Occurrence Level)](semantic_net.md)**: Figures A & B depicting concrete entity instances, relationship paths, attribute valuation bindings, and relational formalization.
+* 🌐 **[DFD Level 0 (Context Diagram)](dfd_level_0.md)**: Overall system boundary, external entities (`CITIZEN`, `ADMINISTRATION`, `STAFF`), and the 19 primary data flows.
+* 🔀 **[DFD Level 1 (Diagram 0)](dfd_level_1.md)**: Main processes (`1.0` through `5.0`), persistent data stores (`D1` through `D5`), and Level 0 balancing verification.
+* 🔍 **[DFD Level 2 (Process 2.0)](dfd_level_2.md)**: Detailed decomposition of `REGISTER COMPLAINTS` into sub-processes `2.1` to `2.6`, Structured English mini-specs, and error validation handling.
+
+---
+
 ## Table of Contents
 1. [Entity-Relationship Diagram (ERD)](#1-entity-relationship-diagram-erd)
    - [Visual Diagram](#11-erd-visual-diagram)
@@ -46,13 +57,13 @@ erDiagram
     CITIZEN {
         int Citizen_ID PK "Unique identifier for citizen"
         string Name "Full name of citizen"
-        string Phone "Primary contact phone number"
-        string Address "Residential physical address"
+        string Phone UK "Primary contact phone number"
+        text Address "Residential physical address"
     }
 
     DEPARTMENT {
         int Department_ID PK "Unique identifier for department"
-        string Department_Name "Name of municipal department"
+        string Department_Name UK "Name of municipal department"
         string Office_Location "Building/floor/office address"
     }
 
@@ -156,39 +167,63 @@ The Semantic Network models concrete data occurrences (instances) rather than ab
 ### 2.1 Figure A: 1:N Submits Relationship
 *Sample occurrence demonstrating that citizen $c_1$ submits two complaints ($k_1, k_2$), while citizen $c_2$ submits complaint $k_3$. Each complaint belongs to exactly one citizen.*
 
-```
-VALUES                   ATTRIBUTES         CITIZEN ENTITIES      SUBMITS RELATIONSHIP     COMPLAINT ENTITIES     ATTRIBUTES       VALUES
------------------------------------------------------------------------------------------------------------------------------------------------------
-[ C01, Ali Raza ]  ---> [ Citizen_ID, Name ] ----> ( c1 ) -----------> [ r1 ] --------------> ( k1 ) <--- [ Complaint_ID, Category ] <--- [ K101, Sanitation ]
-                                                     | \
-                                                     |  \------------> [ r2 ] --------------> ( k2 ) <--- [ Complaint_ID, Category ] <--- [ K102, Water Supply ]
-                                                     |
-[ C02, Sara Khan ] ---> [ Citizen_ID, Name ] ----> ( c2 ) -----------> [ r3 ] --------------> ( k3 ) <--- [ Complaint_ID, Category ] <--- [ K103, Streetlights ]
-```
-
-#### Mermaid Representation (Occurrence Graph A)
 ```mermaid
-graph LR
-    subgraph Citizen Occurrences
-        c1["c1<br/>(C01: Ali Raza)"]
-        c2["c2<br/>(C02: Sara Khan)"]
+flowchart LR
+    %% Citizen Values & Attributes
+    subgraph CITIZEN_VALUES ["Citizen Data"]
+        v_c1["Citizen_ID: C01<br/>Name: Ali Raza"]
+        v_c2["Citizen_ID: C02<br/>Name: Sara Khan"]
     end
 
-    subgraph Submits Relationship Instances
+    %% Citizen Entity Instances
+    subgraph CITIZEN_ENTITIES ["CITIZEN Entities"]
+        c1((c1))
+        c2((c2))
+    end
+
+    %% Submits Relationship Instances
+    subgraph SUBMITS_REL ["SUBMITS Relationship"]
         r1(("r1"))
         r2(("r2"))
         r3(("r3"))
     end
 
-    subgraph Complaint Occurrences
-        k1["k1<br/>(K101: Sanitation)"]
-        k2["k2<br/>(K102: Water Supply)"]
-        k3["k3<br/>(K103: Streetlights)"]
+    %% Complaint Entity Instances
+    subgraph COMPLAINT_ENTITIES ["COMPLAINT Entities"]
+        k1((k1))
+        k2((k2))
+        k3((k3))
     end
 
-    c1 --> r1 --> k1
-    c1 --> r2 --> k2
-    c2 --> r3 --> k3
+    %% Complaint Values & Attributes
+    subgraph COMPLAINT_VALUES ["Complaint Data"]
+        v_k1["Complaint_ID: K101<br/>Category: Sanitation"]
+        v_k2["Complaint_ID: K102<br/>Category: Water Supply"]
+        v_k3["Complaint_ID: K103<br/>Category: Streetlights"]
+    end
+
+    %% Bindings
+    v_c1 -.- c1
+    v_c2 -.- c2
+
+    %% Paths
+    c1 ==> r1 ==> k1
+    c1 ==> r2 ==> k2
+    c2 ==> r3 ==> k3
+
+    k1 -.- v_k1
+    k2 -.- v_k2
+    k3 -.- v_k3
+
+    classDef citizen fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0369a1,font-weight:bold;
+    classDef rel fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e,font-weight:bold;
+    classDef complaint fill:#f1f5f9,stroke:#475569,stroke-width:2px,color:#0f172a,font-weight:bold;
+    classDef data fill:#ffffff,stroke:#94a3b8,stroke-width:1px,color:#1e293b,font-size:12px;
+
+    class c1,c2 citizen;
+    class r1,r2,r3 rel;
+    class k1,k2,k3 complaint;
+    class v_c1,v_c2,v_k1,v_k2,v_k3 data;
 ```
 
 ---
@@ -196,42 +231,66 @@ graph LR
 ### 2.2 Figure B: 1:N Generates Relationship
 *Sample occurrence demonstrating that complaint $k_1$ has generated two work orders ($w_1, w_2$), complaint $k_2$ has generated one work order ($w_3$), and newly-submitted complaint $k_3$ has generated zero work orders.*
 
-```
-VALUES                   ATTRIBUTES           COMPLAINT ENTITIES    GENERATES RELATIONSHIP   WORK ORDER ENTITIES    ATTRIBUTES          VALUES
---------------------------------------------------------------------------------------------------------------------------------------------------------
-[ K101, In Progress ] -> [ Complaint_ID, Status ] -> ( k1 ) -----------> [ r1 ] -------------> ( w1 ) <--- [ WorkOrder_ID, Work_Status ] <- [ WO11, Completed ]
-                                                       \
-                                                        \--------------> [ r2 ] -------------> ( w2 ) <--- [ WorkOrder_ID, Work_Status ] <- [ WO12, In Progress ]
-                                                       
-[ K102, Assigned ]    -> [ Complaint_ID, Status ] -> ( k2 ) -----------> [ r3 ] -------------> ( w3 ) <--- [ WorkOrder_ID, Work_Status ] <- [ WO21, Assigned ]
-
-[ K103, Submitted ]   -> [ Complaint_ID, Status ] -> ( k3 )    (No work orders generated yet - ticket in queue)
-```
-
-#### Mermaid Representation (Occurrence Graph B)
 ```mermaid
-graph LR
-    subgraph Complaint Occurrences
-        k1["k1<br/>(K101: In Progress)"]
-        k2["k2<br/>(K102: Assigned)"]
-        k3["k3<br/>(K103: Submitted)"]
+flowchart LR
+    %% Complaint Values & Attributes
+    subgraph COMPLAINT_VALS ["Complaint Data"]
+        v_k1["Complaint_ID: K101<br/>Status: In Progress"]
+        v_k2["Complaint_ID: K102<br/>Status: Assigned"]
+        v_k3["Complaint_ID: K103<br/>Status: Submitted"]
     end
 
-    subgraph Generates Relationship Instances
+    %% Complaint Entity Instances
+    subgraph COMPLAINT_SET ["COMPLAINT Entities"]
+        k1((k1))
+        k2((k2))
+        k3((k3))
+    end
+
+    %% Generates Relationship Instances
+    subgraph GENERATES_REL ["GENERATES Relationship"]
         r1(("r1"))
         r2(("r2"))
         r3(("r3"))
     end
 
-    subgraph Work Order Occurrences
-        w1["w1<br/>(WO11: Completed)"]
-        w2["w2<br/>(WO12: In Progress)"]
-        w3["w3<br/>(WO21: Assigned)"]
+    %% Work Order Entity Instances
+    subgraph WORK_ORDER_SET ["WORK ORDER Entities"]
+        w1((w1))
+        w2((w2))
+        w3((w3))
     end
 
-    k1 --> r1 --> w1
-    k1 --> r2 --> w2
-    k2 --> r3 --> w3
+    %% Work Order Values & Attributes
+    subgraph WO_VALS ["Work Order Data"]
+        v_w1["WorkOrder_ID: WO11<br/>Work_Status: Completed"]
+        v_w2["WorkOrder_ID: WO12<br/>Work_Status: In Progress"]
+        v_w3["WorkOrder_ID: WO21<br/>Work_Status: Assigned"]
+    end
+
+    %% Bindings
+    v_k1 -.- k1
+    v_k2 -.- k2
+    v_k3 -.- k3
+
+    %% Paths
+    k1 ==> r1 ==> w1
+    k1 ==> r2 ==> w2
+    k2 ==> r3 ==> w3
+
+    w1 -.- v_w1
+    w2 -.- v_w2
+    w3 -.- v_w3
+
+    classDef complaint fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0369a1,font-weight:bold;
+    classDef rel fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e,font-weight:bold;
+    classDef wo fill:#f1f5f9,stroke:#475569,stroke-width:2px,color:#0f172a,font-weight:bold;
+    classDef data fill:#ffffff,stroke:#94a3b8,stroke-width:1px,color:#1e293b,font-size:12px;
+
+    class k1,k2,k3 complaint;
+    class r1,r2,r3 rel;
+    class w1,w2,w3 wo;
+    class v_k1,v_k2,v_k3,v_w1,v_w2,v_w3 data;
 ```
 
 ---
@@ -270,23 +329,18 @@ The Level 0 Context Diagram establishes the global boundary of the system:
 
 ```mermaid
 flowchart TD
-    %% External Entities
-    ADMIN["MUNICIPAL ADMINISTRATION"]
-    CITIZEN["CITIZEN"]
-    STAFF["MUNICIPAL STAFF"]
+    ADMIN["🏛️ MUNICIPAL ADMINISTRATION"]
+    CITIZEN["👤 CITIZEN"]
+    STAFF["👷 MUNICIPAL STAFF"]
 
-    %% Central Process
-    SYSTEM(("0<br/>MUNICIPAL<br/>MANAGEMENT<br/>SYSTEM"))
+    SYSTEM(("⚙️ 0<br/>MUNICIPAL<br/>MANAGEMENT<br/>SYSTEM"))
 
-    %% Citizen Flows
     CITIZEN -- "1. REGISTRATION DETAILS<br/>2. COMPLAINT DETAILS<br/>3. COMPLAINT INQUIRY" --> SYSTEM
     SYSTEM -- "1. COMPLAINT NUMBER & ACKNOWLEDGMENT<br/>2. CORRECTION MESSAGE<br/>3. STATUS INFORMATION<br/>4. RESOLUTION INFORMATION" --> CITIZEN
 
-    %% Admin Flows
     ADMIN -- "1. DEPARTMENT INFORMATION<br/>2. STAFF INFORMATION<br/>3. REPORTING REQUESTS" --> SYSTEM
     SYSTEM -- "1. COMPLAINT REPORTS<br/>2. DEPARTMENT PERFORMANCE<br/>3. PENDING WORK SUMMARY" --> ADMIN
 
-    %% Staff Flows
     STAFF -- "1. WORK UPDATES<br/>2. ACTION TAKEN<br/>3. COMPLETION INFORMATION" --> SYSTEM
     SYSTEM -- "1. ASSIGNED COMPLAINTS<br/>2. WORK ORDERS<br/>3. TASK DETAILS" --> STAFF
 
@@ -297,30 +351,6 @@ flowchart TD
     class SYSTEM process;
 ```
 
-### 3.2 Level 0 Flow Specification
-
-| Flow ID | Source | Destination | Data Flow Name | Contents / Payloads |
-|---|---|---|---|---|
-| **L0-01** | `CITIZEN` | Process 0 | `REGISTRATION DETAILS` | Citizen Name, Contact Phone, Residential Address |
-| **L0-02** | `CITIZEN` | Process 0 | `COMPLAINT DETAILS` | Citizen ID, Category, Incident Description, Incident Location |
-| **L0-03** | `CITIZEN` | Process 0 | `COMPLAINT INQUIRY` | Complaint ID or Registered Phone Number |
-| **L0-04** | Process 0 | `CITIZEN` | `COMPLAINT NUMBER & ACKNOWLEDGMENT` | Tracking Complaint ID, Timestamp, Assigned Department, Status |
-| **L0-05** | Process 0 | `CITIZEN` | `CORRECTION MESSAGE` | Validation errors (invalid phone, empty description, unresolvable address) |
-| **L0-06** | Process 0 | `CITIZEN` | `STATUS INFORMATION` | Current lifecycle status, assigned team, estimated SLA |
-| **L0-07** | Process 0 | `CITIZEN` | `RESOLUTION INFORMATION` | Completion date, field remedy summary, satisfaction confirmation |
-| **L0-08** | `ADMIN` | Process 0 | `DEPARTMENT INFORMATION` | Department Name, Office Location, Admin Contacts |
-| **L0-09** | `ADMIN` | Process 0 | `STAFF INFORMATION` | Staff Name, Assigned Department ID, Phone, Role Designation |
-| **L0-10** | `ADMIN` | Process 0 | `REPORTING REQUESTS` | Filter parameters: Date range, Department ID, Resolution SLA, Status |
-| **L0-11** | Process 0 | `ADMIN` | `COMPLAINT REPORTS` | Aggregate complaint counts, SLA compliance percentages, backlog metrics |
-| **L0-12** | Process 0 | `ADMIN` | `DEPARTMENT PERFORMANCE` | Mean Time To Resolution (MTTR), active work orders per department |
-| **L0-13** | Process 0 | `ADMIN` | `PENDING WORK SUMMARY` | Overdue complaints list, staff workload imbalances, cluster alerts |
-| **L0-14** | `STAFF` | Process 0 | `WORK UPDATES` | Work Order ID, Status change (`In Progress`, `On Hold`) |
-| **L0-15** | `STAFF` | Process 0 | `ACTION TAKEN` | Field remarks, replacement parts, remedial action summary |
-| **L0-16** | `STAFF` | Process 0 | `COMPLETION INFORMATION` | Completion timestamp, verified resolution remarks |
-| **L0-17** | Process 0 | `STAFF` | `ASSIGNED COMPLAINTS` | Complaint ID, citizen address, incident description |
-| **L0-18** | Process 0 | `STAFF` | `WORK ORDERS` | Work Order ID, Assigned Date, Target completion SLA |
-| **L0-19** | Process 0 | `STAFF` | `TASK DETAILS` | Specific inspection checklists, priority level, safety notices |
-
 ---
 
 ## 4. Data Flow Diagram (DFD) — Level 1 (Diagram 0)
@@ -330,60 +360,57 @@ Level 1 decomposes the central system into five core functional processes and fi
 
 ```mermaid
 flowchart TB
-    %% External Entities
-    CITIZEN["CITIZEN"]
-    STAFF["MUNICIPAL STAFF"]
-    ADMIN["MUNICIPAL ADMINISTRATION"]
+    subgraph ENTITIES ["External Stakeholders"]
+        CITIZEN["👤 CITIZEN"]
+        STAFF["👷 MUNICIPAL STAFF"]
+        ADMIN["🏛️ MUNICIPAL ADMINISTRATION"]
+    end
 
-    %% Processes
-    P1(("1.0<br/>MANAGE<br/>CITIZENS"))
-    P2(("2.0<br/>REGISTER<br/>COMPLAINTS"))
-    P3(("3.0<br/>ASSIGN<br/>DEPT & WORK"))
-    P4(("4.0<br/>UPDATE<br/>COMPLAINT<br/>STATUS"))
-    P5(("5.0<br/>GENERATE<br/>REPORTS"))
+    subgraph PROCESSES ["Core System Processes"]
+        P1(("1.0<br/>MANAGE<br/>CITIZENS"))
+        P2(("2.0<br/>REGISTER<br/>COMPLAINTS"))
+        P3(("3.0<br/>ASSIGN<br/>DEPT & WORK"))
+        P4(("4.0<br/>UPDATE<br/>COMPLAINT<br/>STATUS"))
+        P5(("5.0<br/>GENERATE<br/>REPORTS"))
+    end
 
-    %% Data Stores
-    D1[("D1: CITIZEN RECORDS")]
-    D2[("D2: COMPLAINT RECORDS")]
-    D3[("D3: DEPARTMENT RECORDS")]
-    D4[("D4: STAFF RECORDS")]
-    D5[("D5: WORK ORDER RECORDS")]
+    subgraph STORES ["Persistent Data Stores"]
+        D1[("D1: CITIZEN RECORDS")]
+        D2[("D2: COMPLAINT RECORDS")]
+        D3[("D3: DEPARTMENT RECORDS")]
+        D4[("D4: STAFF RECORDS")]
+        D5[("D5: WORK ORDER RECORDS")]
+    end
 
-    %% P1 Flows
     CITIZEN -- "REGISTRATION DETAILS" --> P1
     P1 -- "NEW CITIZEN" --> D1
 
-    %% P2 Flows
     CITIZEN -- "COMPLAINT DETAILS" --> P2
-    D1 -- "CITIZEN DETAILS" --> P2
-    D3 -- "DEPT DETAILS" --> P2
+    D1 -. "CITIZEN DETAILS" .-> P2
+    D3 -. "DEPT DETAILS" .-> P2
     P2 -- "NEW COMPLAINT" --> D2
-    P2 -- "COMPLAINT NUMBER & ACKNOWLEDGMENT" --> CITIZEN
-    P2 -- "CORRECTION MESSAGE" --> CITIZEN
+    P2 -- "COMPLAINT NUMBER & ACKNOWLEDGMENT<br/>CORRECTION MESSAGE" --> CITIZEN
 
-    %% P3 Flows
-    D2 -- "COMPLAINT" --> P3
-    D3 -- "DEPT DETAILS" --> P3
-    D4 -- "STAFF DETAILS" --> P3
-    ADMIN -- "DEPARTMENT & STAFF INFO" --> P3
+    D2 -. "COMPLAINT" .-> P3
+    D3 -. "DEPT DETAILS" .-> P3
+    D4 -. "STAFF DETAILS" .-> P3
+    ADMIN -- "DEPARTMENT & STAFF INFORMATION" --> P3
     P3 -- "WORK ORDER" --> D5
-    P3 -- "ASSIGNED COMPLAINTS,<br/>WORK ORDERS, TASK DETAILS" --> STAFF
+    P3 -- "ASSIGNED COMPLAINTS, WORK ORDERS" --> STAFF
 
-    %% P4 Flows
-    STAFF -- "WORK UPDATES,<br/>ACTION TAKEN,<br/>COMPLETION INFO" --> P4
+    STAFF -- "WORK UPDATES, ACTION TAKEN" --> P4
     CITIZEN -- "COMPLAINT INQUIRY" --> P4
     P4 -- "STATUS" --> D2
     P4 -- "WORK PROGRESS" --> D5
     P4 -- "STATUS & RESOLUTION INFORMATION" --> CITIZEN
 
-    %% P5 Flows
     ADMIN -- "REPORTING REQUESTS" --> P5
     D1 -. "REPORT DATA" .-> P5
     D2 -. "REPORT DATA" .-> P5
     D3 -. "REPORT DATA" .-> P5
     D4 -. "REPORT DATA" .-> P5
     D5 -. "REPORT DATA" .-> P5
-    P5 -- "COMPLAINT REPORTS,<br/>DEPARTMENT PERFORMANCE,<br/>PENDING WORK SUMMARY" --> ADMIN
+    P5 -- "COMPLAINT REPORTS, PENDING WORK" --> ADMIN
 
     classDef entity fill:#f8fafc,stroke:#334155,stroke-width:2px,color:#0f172a,font-weight:bold;
     classDef process fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0369a1,font-weight:bold;
@@ -394,37 +421,15 @@ flowchart TB
     class D1,D2,D3,D4,D5 store;
 ```
 
-### 4.2 Process Directory (1.0 - 5.0)
-
-| Process ID | Process Name | Objective | Inputs | Outputs | Stores Accessed |
-|---|---|---|---|---|---|
-| **1.0** | **MANAGE CITIZENS** | Verify and enroll citizen profiles. | `REGISTRATION DETAILS` | `NEW CITIZEN` | Writes `D1` |
-| **2.0** | **REGISTER COMPLAINTS** | Validate complaints, map to department, and issue tracking IDs. | `COMPLAINT DETAILS`, `CITIZEN DETAILS`, `DEPT DETAILS` | `NEW COMPLAINT`, `COMPLAINT NUMBER & ACKNOWLEDGMENT`, `CORRECTION MESSAGE` | Reads `D1`, `D3`; Writes `D2` |
-| **3.0** | **ASSIGN DEPARTMENT AND WORK** | Allocate tickets to departments, create work orders, and assign technicians. | `COMPLAINT`, `DEPT DETAILS`, `STAFF DETAILS`, `ADMIN INFO` | `WORK ORDER`, `ASSIGNED COMPLAINTS`, `WORK ORDERS`, `TASK DETAILS` | Reads `D2`, `D3`, `D4`; Writes `D5` |
-| **4.0** | **UPDATE COMPLAINT STATUS** | Log field updates, complete work orders, update complaint lifecycle, answer citizen tracking inquiries. | `WORK UPDATES`, `ACTION TAKEN`, `COMPLETION INFO`, `COMPLAINT INQUIRY` | `STATUS`, `WORK PROGRESS`, `STATUS INFORMATION`, `RESOLUTION INFORMATION` | Reads/Writes `D2`, `D5` |
-| **5.0** | **GENERATE REPORTS** | Aggregate municipal analytics, SLA compliance, and backlog summaries. | `REPORTING REQUESTS`, records from `D1` to `D5` | `COMPLAINT REPORTS`, `DEPARTMENT PERFORMANCE`, `PENDING WORK SUMMARY` | Reads `D1`, `D2`, `D3`, `D4`, `D5` |
-
-### 4.3 Data Store Directory (D1 - D5)
-
-| Store ID | Physical Entity | Description | Primary Key | Key Attributes Stored |
-|---|---|---|---|---|
-| **D1** | `CITIZEN` | Persistent store of registered citizens. | `Citizen_ID` | `Citizen_ID`, `Name`, `Phone`, `Address`, `created_at` |
-| **D2** | `COMPLAINT` | Persistent store of municipal complaints. | `Complaint_ID` | `Complaint_ID`, `Citizen_ID`, `Department_ID`, `Complaint_Date`, `Category`, `Description`, `Location`, `Status` |
-| **D3** | `DEPARTMENT` | Official roster of municipal departments. | `Department_ID` | `Department_ID`, `Department_Name`, `Office_Location` |
-| **D4** | `STAFF` | Municipal field staff and supervisors. | `Staff_ID` | `Staff_ID`, `Department_ID`, `Name`, `Phone`, `Designation`, `is_active` |
-| **D5** | `WORK_ORDER` | Work orders dispatched to field staff. | `WorkOrder_ID` | `WorkOrder_ID`, `Complaint_ID`, `Staff_ID`, `Assigned_Date`, `Completion_Date`, `Work_Status`, `Action_Taken` |
-
 ---
 
 ## 5. Data Flow Diagram (DFD) — Level 2 (Process 2.0: Register Complaints)
 
 ### 5.1 Functional Decomposition (2.1 - 2.6)
-Level 2 decomposes **Process 2.0 (REGISTER COMPLAINTS)** into its sub-processes to reveal internal validation, categorization, department routing, and atomic persistence.
 
 ```mermaid
 flowchart TD
-    %% Boundary
-    subgraph P2["PROCESS 2.0 REGISTER COMPLAINTS"]
+    subgraph P2 ["PROCESS 2.0: REGISTER COMPLAINTS"]
         P2_1(("2.1<br/>RECEIVE<br/>COMPLAINT"))
         P2_2(("2.2<br/>VALIDATE CITIZEN<br/>& COMPLAINT DETAILS"))
         P2_3(("2.3<br/>DETERMINE<br/>COMPLAINT CATEGORY"))
@@ -433,29 +438,22 @@ flowchart TD
         P2_6(("2.6<br/>GENERATE NUMBER<br/>& ACKNOWLEDGMENT"))
     end
 
-    %% External Entities
-    CITIZEN["CITIZEN"]
-
-    %% Data Stores
+    CITIZEN["👤 CITIZEN"]
     D1[("D1: CITIZEN RECORDS")]
     D3[("D3: DEPARTMENT RECORDS")]
     D2[("D2: COMPLAINT RECORDS")]
 
-    %% Flows
     CITIZEN -- "COMPLAINT DETAILS" --> P2_1
     P2_1 -- "RECEIVED DETAILS" --> P2_2
     D1 -. "CITIZEN DETAILS" .-> P2_2
 
-    P2_2 -- "CORRECTION MESSAGE<br/>(VALIDATION FAILED)" --> CITIZEN
+    P2_2 -- "CORRECTION MESSAGE (FAILED)" --> CITIZEN
     P2_2 -- "VALIDATED DETAILS" --> P2_3
-
     P2_3 -- "COMPLAINT CATEGORY" --> P2_4
     D3 -. "DEPARTMENT DETAILS" .-> P2_4
-
     P2_4 -- "COMPLAINT WITH DEPARTMENT" --> P2_5
     P2_5 -- "COMPLAINT RECORD" --> D2
     P2_5 -- "SAVED COMPLAINT ID" --> P2_6
-
     P2_6 -- "COMPLAINT NUMBER & ACKNOWLEDGMENT" --> CITIZEN
 
     classDef entity fill:#f8fafc,stroke:#334155,stroke-width:2px,color:#0f172a,font-weight:bold;
@@ -469,134 +467,9 @@ flowchart TD
 
 ---
 
-### 5.2 Level 2 Process Specifications (Mini-Specs)
-
-#### Process 2.1: RECEIVE COMPLAINT
-```
-BEGIN Process 2.1
-    RECEIVE incoming Complaint_Submission_Payload from CITIZEN
-    PARSE Citizen_Phone, Category_Raw, Description, Incident_Location
-    TIMESTAMP receipt_time = CURRENT_TIMESTAMP
-    OUTPUT Received_Details TO Process 2.2
-END Process 2.1
-```
-
-#### Process 2.2: VALIDATE CITIZEN & COMPLAINT DETAILS
-```
-BEGIN Process 2.2
-    INPUT Received_Details
-    QUERY D1 (CITIZEN RECORDS) USING Citizen_Phone
-    
-    IF Citizen record not found THEN
-        GENERATE Correction_Message("Citizen is not registered. Please register first.")
-        SEND Correction_Message TO CITIZEN
-        HALT
-    ENDIF
-
-    IF Description is EMPTY OR LENGTH(Description) < 10 THEN
-        GENERATE Correction_Message("Description too short. Please provide clear details.")
-        SEND Correction_Message TO CITIZEN
-        HALT
-    ENDIF
-
-    IF Incident_Location is EMPTY THEN
-        GENERATE Correction_Message("Incident location is mandatory.")
-        SEND Correction_Message TO CITIZEN
-        HALT
-    ENDIF
-
-    OUTPUT Validated_Details(Citizen_ID, Category_Raw, Description, Incident_Location) TO Process 2.3
-END Process 2.2
-```
-
-#### Process 2.3: DETERMINE COMPLAINT CATEGORY
-```
-BEGIN Process 2.3
-    INPUT Validated_Details
-    MATCH Category_Raw AGAINST Municipal Taxonomy:
-        CASE "Burst Pipe", "Low Pressure", "Water Contamination":
-            Standardized_Category = "Water Supply & Sanitation"
-        CASE "Pothole", "Broken Drain Grate", "Damaged Sidewalk":
-            Standardized_Category = "Roads & Infrastructure Maintenance"
-        CASE "Garbage Pile", "Dead Animal", "Dumpster Overflow":
-            Standardized_Category = "Solid Waste Management"
-        CASE "Dark Streetlight", "Hanging Wire":
-            Standardized_Category = "Street Lighting & Electricity"
-        DEFAULT:
-            Standardized_Category = Category_Raw
-    ENDCASE
-    OUTPUT Complaint_Category TO Process 2.4
-END Process 2.3
-```
-
-#### Process 2.4: IDENTIFY RESPONSIBLE DEPARTMENT
-```
-BEGIN Process 2.4
-    INPUT Complaint_Category
-    QUERY D3 (DEPARTMENT RECORDS) WHERE Department_Name MATCHES Complaint_Category
-    
-    IF Department_ID Found THEN
-        Assigned_Department_ID = Department_ID
-    ELSE
-        Assigned_Department_ID = 1 -- General Municipal Services Fallback
-    ENDIF
-    
-    OUTPUT Complaint_With_Department(Citizen_ID, Assigned_Department_ID, Category, Description, Location) TO Process 2.5
-END Process 2.4
-```
-
-#### Process 2.5: SAVE COMPLAINT RECORD
-```
-BEGIN Process 2.5
-    INPUT Complaint_With_Department
-    EXECUTE TRANSACTION:
-        INSERT INTO D2 (COMPLAINT RECORDS) VALUES (
-            Citizen_ID,
-            Assigned_Department_ID,
-            CURRENT_TIMESTAMP,
-            Category,
-            Description,
-            Location,
-            'Submitted'
-        ) RETURNING Complaint_ID
-    COMMIT TRANSACTION
-    
-    OUTPUT Saved_Complaint_ID TO Process 2.6
-END Process 2.5
-```
-
-#### Process 2.6: GENERATE NUMBER & ACKNOWLEDGMENT
-```
-BEGIN Process 2.6
-    INPUT Saved_Complaint_ID
-    FETCH Complaint Details from D2
-    CONSTRUCT Acknowledgment_Payload:
-        - Complaint_Number = Saved_Complaint_ID
-        - Submission_Date = Complaint_Date
-        - Initial_Status = 'Submitted'
-        - Department = Department_Name
-        - Message = "Your complaint has been successfully registered."
-    SEND Acknowledgment_Payload TO CITIZEN
-END Process 2.6
-```
-
----
-
-### 5.3 Balancing Proof with Level 1
-
-| Balancing Dimension | Level 1 (Process 2.0) | Level 2 (Decomposed 2.1 - 2.6) | Status |
-|---|---|---|---|
-| **External Inputs** | `COMPLAINT DETAILS` from `CITIZEN` | `COMPLAINT DETAILS` enters `2.1 RECEIVE COMPLAINT` | **BALANCED** |
-| **External Outputs** | `COMPLAINT NUMBER & ACKNOWLEDGMENT` to `CITIZEN`<br/>`CORRECTION MESSAGE` to `CITIZEN` | `2.6` outputs `COMPLAINT NUMBER & ACKNOWLEDGMENT`<br/>`2.2` outputs `CORRECTION MESSAGE` | **BALANCED** |
-| **Data Store Reads** | Reads `D1 CITIZEN RECORDS`<br/>Reads `D3 DEPARTMENT RECORDS` | `2.2` reads `D1 CITIZEN RECORDS`<br/>`2.4` reads `D3 DEPARTMENT RECORDS` | **BALANCED** |
-| **Data Store Writes** | Writes `D2 COMPLAINT RECORDS` (`NEW COMPLAINT`) | `2.5` writes `D2 COMPLAINT RECORDS` (`COMPLAINT RECORD`) | **BALANCED** |
-
----
-
 ## 6. Complete Data Dictionary
 
 ### 6.1 Data Flows
-
 ```
 Data Flow Name: REGISTRATION DETAILS
 Composition:    Citizen_Name + Citizen_Phone + Citizen_Address

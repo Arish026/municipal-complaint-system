@@ -2,8 +2,7 @@
 
 ## Project: Municipal Complaint Management System (MCMS)
 
-**Course Reference**: University of Karachi — BS Computer Science — Database Management Systems  
-**Related Specifications**: [PRD.md](PRD.md) | [SDS.md](SDS.md) | [SYSTEM_DIAGRAMS.md](SYSTEM_DIAGRAMS.md)
+**Related Specifications**: [PRD.md](PRD.md) | [SDS.md](SDS.md) | [ERD.md](erd.md) | [Semantic Net](semantic_net.md) | [DFD Level 0](dfd_level_0.md) | [DFD Level 1](dfd_level_1.md) | [DFD Level 2](dfd_level_2.md)
 
 ---
 

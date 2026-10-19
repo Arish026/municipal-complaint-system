@@ -10,10 +10,15 @@
 A centralized, three-tier enterprise database and municipal management system designed to track public complaints from submission to verified resolution. Built with **Next.js**, **Django REST Framework (DRF)**, and **PostgreSQL**, complete with a rule-based **Decision-Support Agent** for proactive backlog alerting and workload rebalancing.
 
 > 📚 **Complete Documentation**:
-> - [System Diagrams & Modeling Specifications (ERD, Semantic Net, DFD L0-L2)](docs/SYSTEM_DIAGRAMS.md)
-> - [Software Requirements Specification (SRS)](docs/SRS.md)
-> - [System Design Specification (SDS)](docs/SDS.md)
-> - [Product Requirements Document (PRD)](docs/PRD.md)
+> - 📊 [Entity-Relationship Diagram (ERD)](docs/erd.md)
+> - 🕸️ [Semantic Net (Occurrence Level)](docs/semantic_net.md)
+> - 🌐 [DFD Level 0 (Context Diagram)](docs/dfd_level_0.md)
+> - 🔀 [DFD Level 1 (Diagram 0)](docs/dfd_level_1.md)
+> - 🔍 [DFD Level 2 (Process 2.0)](docs/dfd_level_2.md)
+> - 📑 [Master System Diagrams & Data Dictionary](docs/SYSTEM_DIAGRAMS.md)
+> - 📋 [Software Requirements Specification (SRS)](docs/SRS.md)
+> - 🏗️ [System Design Specification (SDS)](docs/SDS.md)
+> - 🎯 [Product Requirements Document (PRD)](docs/PRD.md)
 
 ---
 
@@ -307,7 +312,12 @@ flowchart TD
 │   └── seed_data.sql                  # Pre-generated synthetic municipal dataset
 ├── docs/                              # Project specifications & briefing materials
 │   ├── Briefing Docs.pdf              # Original project briefing document
-│   ├── SYSTEM_DIAGRAMS.md             # Concrete ERD, Semantic Net, DFD L0-L2, Data Dictionary
+│   ├── erd.md                         # Entity-Relationship Diagram (Crow's foot)
+│   ├── semantic_net.md                # Semantic Net (Occurrence Level - Fig A & B)
+│   ├── dfd_level_0.md                 # DFD Level 0 (Context Diagram)
+│   ├── dfd_level_1.md                 # DFD Level 1 (Diagram 0)
+│   ├── dfd_level_2.md                 # DFD Level 2 (Process 2.0 Decomposition)
+│   ├── SYSTEM_DIAGRAMS.md             # Master System Diagrams & Data Dictionary
 │   ├── PRD.md                         # Product Requirements Document
 │   ├── SRS.md                         # Software Requirements Specification
 │   └── SDS.md                         # System Design Specification
