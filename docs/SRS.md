@@ -2,7 +2,7 @@
 
 ## Project: Municipal Complaint Management System (MCMS)
 
-**Related Specifications**: [PRD.md](PRD.md) | [SDS.md](SDS.md) | [ERD.md](erd.md) | [Semantic Net](semantic_net.md) | [DFD Level 0](dfd_level_0.md) | [DFD Level 1](dfd_level_1.md) | [DFD Level 2](dfd_level_2.md)
+**Related Specifications**: [PRD.md](PRD.md) | [SDS.md](SDS.md) | [ERD.md](diagrams/erd.md) | [Semantic Net](diagrams/semantic_net.md) | [DFD Level 0](diagrams/dfd_level_0.md) | [DFD Level 1](diagrams/dfd_level_1.md) | [DFD Level 2](diagrams/dfd_level_2.md)
 
 ---
 

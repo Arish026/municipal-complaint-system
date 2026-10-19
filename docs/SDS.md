@@ -4,12 +4,12 @@
 
 **Academic & Engineering Standard**: University of Karachi — BS Computer Science — Database Management Systems  
 **System Diagrams & Specifications**:
-- 📊 [Entity-Relationship Diagram (ERD)](erd.md)
-- 🕸️ [Semantic Net (Occurrence Level)](semantic_net.md)
-- 🌐 [DFD Level 0 (Context Diagram)](dfd_level_0.md)
-- 🔀 [DFD Level 1 (Diagram 0)](dfd_level_1.md)
-- 🔍 [DFD Level 2 (Process 2.0)](dfd_level_2.md)
-- 📑 [Full Master System Diagrams Reference](SYSTEM_DIAGRAMS.md)
+- 📊 [Entity-Relationship Diagram (ERD)](diagrams/erd.md)
+- 🕸️ [Semantic Net (Occurrence Level)](diagrams/semantic_net.md)
+- 🌐 [DFD Level 0 (Context Diagram)](diagrams/dfd_level_0.md)
+- 🔀 [DFD Level 1 (Diagram 0)](diagrams/dfd_level_1.md)
+- 🔍 [DFD Level 2 (Process 2.0)](diagrams/dfd_level_2.md)
+- 📑 [Full Master System Diagrams Reference](diagrams/README.md)
 
 ---
 

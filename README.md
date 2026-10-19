@@ -10,12 +10,12 @@
 A centralized, three-tier enterprise database and municipal management system designed to track public complaints from submission to verified resolution. Built with **Next.js**, **Django REST Framework (DRF)**, and **PostgreSQL**, complete with a rule-based **Decision-Support Agent** for proactive backlog alerting and workload rebalancing.
 
 > 📚 **Complete Documentation**:
-> - 📊 [Entity-Relationship Diagram (ERD)](docs/erd.md)
-> - 🕸️ [Semantic Net (Occurrence Level)](docs/semantic_net.md)
-> - 🌐 [DFD Level 0 (Context Diagram)](docs/dfd_level_0.md)
-> - 🔀 [DFD Level 1 (Diagram 0)](docs/dfd_level_1.md)
-> - 🔍 [DFD Level 2 (Process 2.0)](docs/dfd_level_2.md)
-> - 📑 [Master System Diagrams & Data Dictionary](docs/SYSTEM_DIAGRAMS.md)
+> - 📊 [Entity-Relationship Diagram (ERD)](docs/diagrams/erd.md)
+> - 🕸️ [Semantic Net (Occurrence Level)](docs/diagrams/semantic_net.md)
+> - 🌐 [DFD Level 0 (Context Diagram)](docs/diagrams/dfd_level_0.md)
+> - 🔀 [DFD Level 1 (Diagram 0)](docs/diagrams/dfd_level_1.md)
+> - 🔍 [DFD Level 2 (Process 2.0)](docs/diagrams/dfd_level_2.md)
+> - 📑 [Master System Diagrams & Data Dictionary](docs/diagrams/README.md)
 > - 📋 [Software Requirements Specification (SRS)](docs/SRS.md)
 > - 🏗️ [System Design Specification (SDS)](docs/SDS.md)
 > - 🎯 [Product Requirements Document (PRD)](docs/PRD.md)
@@ -310,17 +310,17 @@ flowchart TD
 ├── database/
 │   ├── schema.sql                     # PostgreSQL DDL schema with constraints & indexes
 │   └── seed_data.sql                  # Pre-generated synthetic municipal dataset
-├── docs/                              # Project specifications & briefing materials
-│   ├── Briefing Docs.pdf              # Original project briefing document
-│   ├── erd.md                         # Entity-Relationship Diagram (Crow's foot)
-│   ├── semantic_net.md                # Semantic Net (Occurrence Level - Fig A & B)
-│   ├── dfd_level_0.md                 # DFD Level 0 (Context Diagram)
-│   ├── dfd_level_1.md                 # DFD Level 1 (Diagram 0)
-│   ├── dfd_level_2.md                 # DFD Level 2 (Process 2.0 Decomposition)
-│   ├── SYSTEM_DIAGRAMS.md             # Master System Diagrams & Data Dictionary
+├── docs/                              # Project specifications & requirements
 │   ├── PRD.md                         # Product Requirements Document
 │   ├── SRS.md                         # Software Requirements Specification
-│   └── SDS.md                         # System Design Specification
+│   ├── SDS.md                         # System Design Specification
+│   └── diagrams/                      # System modeling & visual specifications
+│       ├── README.md                  # Master System Diagrams & Data Dictionary
+│       ├── erd.md                     # Entity-Relationship Diagram (Crow's foot)
+│       ├── semantic_net.md            # Semantic Net (Occurrence Level - Fig A & B)
+│       ├── dfd_level_0.md             # DFD Level 0 (Context Diagram)
+│       ├── dfd_level_1.md             # DFD Level 1 (Diagram 0)
+│       └── dfd_level_2.md             # DFD Level 2 (Process 2.0 Decomposition)
 ├── scripts/
 │   └── seed_synthetic_data.py         # Synthetic data generator script
 ├── .editorconfig
