@@ -1,44 +1,106 @@
 # Software Requirements Specification (SRS)
 
-## Project: Municipal Complaint Management System
+## Project: Municipal Complaint Management System (MCMS)
+
+**Course Reference**: University of Karachi — BS Computer Science — Database Management Systems  
+**Related Specifications**: [PRD.md](PRD.md) | [SDS.md](SDS.md) | [SYSTEM_DIAGRAMS.md](SYSTEM_DIAGRAMS.md)
+
+---
 
 ### 1. Technology Stack
-- **Frontend**: Next.js (React, TypeScript / JavaScript, Modern Responsive CSS)
-- **Backend**: Django REST Framework (DRF, Python)
-- **Database**: PostgreSQL (Relational DBMS with ACID compliance)
-- **Deployment & Orchestration**: Docker, Docker Compose
+- **Frontend Presentation**: Next.js 15 (React 19, TypeScript, Vanilla Responsive CSS)
+- **Application & API**: Django REST Framework (Python 3.12+, ViewSets, Serializers)
+- **Relational Database**: PostgreSQL 16 (Relational DDL, Foreign Keys, Check Constraints, Serial Sequences)
+- **Containerization**: Docker & Docker Compose
 
 ---
 
-### 2. Functional Requirements (FR)
+### 2. Functional Requirements (FR) & DFD Process Mapping
 
-| ID | Module | Description |
-|---|---|---|
-| **FR-01** | **Citizens** | Create and update citizen records (Name, Phone, Address, Unique Citizen ID). |
-| **FR-02** | **Complaints Validation** | Validate citizen details and complaint inputs; return actionable correction messages for invalid data. |
-| **FR-03** | **Categorization** | Categorize complaints (e.g., Water Supply, Road Maintenance, Waste Management) and map to responsible department. |
-| **FR-04** | **Registration** | Persist complaints atomically, generate unique complaint numbers, and issue submission acknowledgments. |
-| **FR-05** | **Work Assignment** | Generate work orders and assign qualified departmental staff to complaints. |
-| **FR-06** | **Status Updates** | Record work performed, actions taken, completion timestamps, and complaint lifecycle status changes. |
-| **FR-07** | **Inquiry** | Provide citizens with instant complaint status lookups and detailed resolution tracking. |
-| **FR-08** | **Reporting** | Generate complaint lifecycle reports, departmental performance summaries, and pending-work backlogs. |
-| **FR-09** | **Alerts & Decision-Support** | Generate explainable operational alerts (overdue, backlog, repetition); enforce human supervisor approval for consequential actions; record audit logs. |
+| FR ID | Feature Module | DFD Process Reference | Primary Data Store | Description & Validation Rules |
+|---|---|---|---|---|
+| **FR-01** | **Citizens** | `1.0 MANAGE CITIZENS` | `D1: CITIZEN` | Create and update citizen profile records (`Name`, unique `Phone`, `Address`). Validates phone format and enforces unique contact numbers. |
+| **FR-02** | **Complaints Validation** | `2.2 VALIDATE CITIZEN & COMPLAINT DETAILS` | `D1: CITIZEN` | Validate citizen identity against `D1` and check complaint inputs. Emits `CORRECTION MESSAGE` if description is $< 10$ chars, location is missing, or citizen is unregistered. |
+| **FR-03** | **Categorization** | `2.3 DETERMINE CATEGORY` & `2.4 IDENTIFY DEPT` | `D3: DEPARTMENT` | Normalizes incoming complaint narrative into official categories (e.g., Water, Sanitation, Roads) and matches responsible department ID. |
+| **FR-04** | **Registration** | `2.5 SAVE RECORD` & `2.6 GENERATE ACK` | `D2: COMPLAINT` | Atomically commits complaint record in `D2`, assigns sequential `Complaint_ID`, sets status to `Submitted`, and returns `COMPLAINT NUMBER & ACKNOWLEDGMENT`. |
+| **FR-05** | **Work Assignment** | `3.0 ASSIGN DEPT AND WORK` | `D5: WORK_ORDER` | Supervisor assigns qualified departmental staff (`D4`) to a pending complaint (`D2`), generating a new work order (`D5`) with initial status `Assigned`. |
+| **FR-06** | **Status Updates** | `4.0 UPDATE COMPLAINT STATUS` | `D2: COMPLAINT`, `D5: WORK_ORDER` | Records field notes, actions taken, and completion timestamps. Synchronizes `WORK_ORDER.Work_Status` with `COMPLAINT.Status`. |
+| **FR-07** | **Inquiry & Live Tracking** | `4.0 UPDATE COMPLAINT STATUS` | `D2: COMPLAINT`, `D5: WORK_ORDER` | Provides citizens with transparent inquiry response (`STATUS & RESOLUTION INFORMATION`) using tracking `Complaint_ID` or registered phone. |
+| **FR-08** | **Reporting & Analytics** | `5.0 GENERATE REPORTS` | `D1` through `D5` | Aggregates municipal performance summaries, Mean Time To Resolution (MTTR), department workload distribution, and pending backlog counts. |
+| **FR-09** | **Operational Alerts & Auditing** | Decision-Support Service | `DECISION_AUDIT_LOG` | Flags overdue complaints ($> 72$ hrs in queue), staff workload imbalances ($\ge 4$ active jobs), and geographic clusters. Enforces human supervisor sign-off. |
 
 ---
 
-### 3. Non-Functional Requirements (NFR)
+### 3. Detailed Functional Specifications
 
-#### Security
-- Enforce role-based access control (RBAC) server-side across all endpoints.
-- Protect personal identifiable information (PII).
-- Prevent unauthorized access or modifications across citizen records.
+#### FR-01: Citizen Profile Management
+- **Inputs**: `Name` (String, 1-100 chars), `Phone` (E.164 or standardized local format, 10-20 chars), `Address` (Text, mandatory).
+- **Processing**: Enforces uniqueness constraint on `Phone`. Rejects duplicate registration attempts with `409 Conflict`.
+- **Outputs**: `Citizen_ID` (Integer PK), registration timestamp.
 
-#### Data Integrity
-- Strict primary key (PK) and foreign key (FK) constraints.
-- Mandatory complaint ownership and departmental assignment.
-- Transactional consistency for state transitions (atomic commits/rollbacks).
+#### FR-02 & FR-03: Input Validation and Categorization
+- **Validation Criteria**:
+  - `Phone`: Must exist in `D1: CITIZEN`.
+  - `Description`: Must not be blank, minimum 10 characters, maximum 2000 characters.
+  - `Location`: Street/ward name, minimum 5 characters.
+- **Categorization Routing Table**:
+  - `Water Supply & Sanitation` $\to$ Pipeline leaks, contamination, low pressure.
+  - `Roads & Infrastructure Maintenance` $\to$ Potholes, damaged storm drains, street curbs.
+  - `Solid Waste Management` $\to$ Garbage overflow, debris dumping.
+  - `Street Lighting & Electricity` $\to$ Blacked-out lamps, exposed wires.
+  - `Public Health & Vector Control` $\to$ Stagnant water, fumigation requests.
+  - `Parks & Urban Forestry` $\to$ Fallen trees, damaged park equipment.
 
-#### Testing & Quality Assurance
-- Automated tests covering CRUD operations on all entities.
-- Workflow transition verification (e.g., Submitted → In Progress → Resolved → Verified).
-- Integrity constraint validation under synthetic municipal test data.
+#### FR-04: Atomic Complaint Registration
+- **Transaction Guarantee**: Complaint persistence executed in `READ COMMITTED` transaction.
+- **Default State**: Initial `Status` set strictly to `'Submitted'`.
+- **Response**: Immediate structured JSON acknowledgment with tracking URL and formatted ticket ID (e.g. `K101`).
+
+#### FR-05 & FR-06: Work Order Dispatch & Lifecycle Transitions
+```mermaid
+stateDiagram-v2
+    [*] --> Submitted : Citizen Registers
+    Submitted --> Categorized : Department Identified
+    Categorized --> Assigned : Supervisor Creates Work Order
+    Assigned --> In_Progress : Staff Inspects Site
+    In_Progress --> Completed : Repairs Executed
+    Completed --> Resolved : Department Confirms
+    Resolved --> Verified : Citizen Verification / Close
+    Verified --> [*]
+```
+
+- **Allowed State Transitions**:
+  - `Submitted` $\to$ `Categorized` $\to$ `Assigned` $\to$ `In Progress` $\to$ `Resolved` $\to$ `Verified` / `Closed`.
+  - Rejection allowed only at `Submitted` / `Categorized` stage with required administrative rationale.
+
+#### FR-07: Citizen Inquiry Service
+- **Query Endpoint**: `GET /api/complaints/track/?id={Complaint_ID}&phone={Phone}`
+- **Security Check**: Enforces phone match or authorized session before disclosing citizen address or technician contact.
+
+#### FR-08: Administrative Reports
+- **Complaint Volume Breakdown**: Counts grouped by Category, Department, and Month.
+- **Department Performance**: Ratio of Resolved to Total Complaints, Average Resolution Time (hours).
+- **Pending Backlog**: Count of active tickets by aging bracket ($< 24\text{h}$, $24-72\text{h}$, $> 72\text{h}$).
+
+#### FR-09: Decision-Support Agent & Alerts
+- Evaluates operational conditions periodically or upon transaction commit.
+- Records alerts into `DECISION_AUDIT_LOG`:
+  - `alert_type`: `'Overdue'`, `'Workload Imbalance'`, `'Recurring Issue'`.
+  - `suggested_action`: Plain-text recommendation for supervisor.
+  - `supervisor_decision`: Default `'Pending'`; transitions to `'Approved'` or `'Rejected'`.
+
+---
+
+### 4. Requirements Traceability Matrix (RTM)
+
+| Requirement | Process in DFD Level 1 | Sub-Process in Level 2 | Database Entity / Store | API Endpoint |
+|---|---|---|---|---|
+| **FR-01** | `1.0 MANAGE CITIZENS` | N/A | `D1: CITIZEN` | `POST /api/citizens/` |
+| **FR-02** | `2.0 REGISTER COMPLAINTS` | `2.1, 2.2` | `D1: CITIZEN` | `POST /api/complaints/validate/` |
+| **FR-03** | `2.0 REGISTER COMPLAINTS` | `2.3, 2.4` | `D3: DEPARTMENT` | `POST /api/complaints/categorize/` |
+| **FR-04** | `2.0 REGISTER COMPLAINTS` | `2.5, 2.6` | `D2: COMPLAINT` | `POST /api/complaints/` |
+| **FR-05** | `3.0 ASSIGN DEPT & WORK` | N/A | `D4: STAFF`, `D5: WORK_ORDER` | `POST /api/work-orders/` |
+| **FR-06** | `4.0 UPDATE STATUS` | N/A | `D2: COMPLAINT`, `D5: WORK_ORDER` | `PATCH /api/work-orders/{id}/` |
+| **FR-07** | `4.0 UPDATE STATUS` | N/A | `D2: COMPLAINT` | `GET /api/complaints/track/` |
+| **FR-08** | `5.0 GENERATE REPORTS` | N/A | `D1`, `D2`, `D3`, `D4`, `D5` | `GET /api/reports/` |
+| **FR-09** | Decision Engine | N/A | `DECISION_AUDIT_LOG` | `GET /api/agent/alerts/` |
