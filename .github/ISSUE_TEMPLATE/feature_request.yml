@@ -1,0 +1,35 @@
+name: Feature Request
+description: Propose a new feature, workflow improvement, or requirement
+title: "[FEATURE]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for suggesting an enhancement to the Municipal Complaint Management System!
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a problem or requirement gap?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe how this feature should work and which SRS requirement it addresses.
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: Target Module
+      options:
+        - Citizen Registration & Submission
+        - Department & Staff Allocation
+        - Work Order Management
+        - Decision-Support Agent & Alerts
+        - Reports & Analytics
+        - Database & Migrations
+    validations:
+      required: true

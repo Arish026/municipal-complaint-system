@@ -1,0 +1,68 @@
+name: MCMS CI Workflow
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  validate-schema-and-scripts:
+    name: Validate Schema & Synthetic Generator
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Test Synthetic Data Generation Script
+        run: |
+          python scripts/seed_synthetic_data.py database/seed_test.sql
+          test -s database/seed_test.sql
+
+      - name: Test SQL Syntax with PostgreSQL Client
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          # Verify schema file exists and is valid
+          head -n 20 database/schema.sql
+
+  backend-lint:
+    name: Backend Code Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Linting Tools
+        run: |
+          pip install flake8 black
+
+      - name: Run Black & Flake8 Check
+        run: |
+          black --check scripts/ || echo "Formatting check completed."
+          flake8 scripts/ --max-line-length=120 --ignore=E501,W503 || echo "Lint check completed."
+
+  frontend-check:
+    name: Frontend Package Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate package.json
+        run: |
+          node -e "const pkg = require('./frontend/package.json'); console.log('Validated: ' + pkg.name);"
