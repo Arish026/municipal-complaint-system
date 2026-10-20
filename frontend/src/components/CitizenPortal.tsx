@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { Department, Complaint, ComplaintStatus } from '../types';
 import {
   FileText,
@@ -22,6 +23,13 @@ import {
   Lightbulb,
   ShieldAlert,
   Trees,
+  Filter,
+  Eye,
+  ExternalLink,
+  ChevronRight,
+  ArrowRight,
+  Activity,
+  Sparkles,
 } from 'lucide-react';
 
 interface CitizenPortalProps {
@@ -47,58 +55,60 @@ const STATUS_STEPS: ComplaintStatus[] = [
   'Resolved',
 ];
 
-const URDU_STEPS = ['موصول', 'جانچ', 'تفویض', 'کارروائی', 'حل شدہ'];
-
 interface DeptStyle {
   icon: React.ReactNode;
-  urdu: string;
+  image?: string;
   color: string;
   bg: string;
   border: string;
+  tagline: string;
 }
 
 const DEPT_METADATA: Record<number, DeptStyle> = {
   1: {
-    icon: <Droplets size={20} strokeWidth={2} />,
-    urdu: 'پانی اور نکاسی آب',
+    icon: <Droplets size={22} strokeWidth={2} />,
+    image: '/images/water-service.jpg',
     color: '#0284c7',
     bg: '#f0f9ff',
     border: '#bae6fd',
+    tagline: 'Pipelines, leaks & sewage',
   },
   2: {
-    icon: <Construction size={20} strokeWidth={2} />,
-    urdu: 'سڑکیں اور مرمت',
+    icon: <Construction size={22} strokeWidth={2} />,
+    image: '/images/road-service.jpg',
     color: '#d97706',
     bg: '#fffbeb',
     border: '#fde68a',
+    tagline: 'Potholes, paving & curbs',
   },
   3: {
-    icon: <Trash2 size={20} strokeWidth={2} />,
-    urdu: 'صفائی اور کچرا',
+    icon: <Trash2 size={22} strokeWidth={2} />,
     color: '#059669',
     bg: '#ecfdf5',
     border: '#a7f3d0',
+    tagline: 'Dumpsters & refuse cleanup',
   },
   4: {
-    icon: <Lightbulb size={20} strokeWidth={2} />,
-    urdu: 'اسٹریٹ لائٹس',
+    icon: <Lightbulb size={22} strokeWidth={2} />,
     color: '#ca8a04',
     bg: '#fefce8',
     border: '#fef08a',
+    tagline: 'Street lighting & cables',
   },
   5: {
-    icon: <ShieldAlert size={20} strokeWidth={2} />,
-    urdu: 'صحتِ عامہ و اسپرے',
+    icon: <ShieldAlert size={22} strokeWidth={2} />,
     color: '#e11d48',
     bg: '#fff1f2',
     border: '#fecdd3',
+    tagline: 'Vector control & sanitation',
   },
   6: {
-    icon: <Trees size={20} strokeWidth={2} />,
-    urdu: 'پارکس اور درخت',
+    icon: <Trees size={22} strokeWidth={2} />,
+    image: '/images/park-service.jpg',
     color: '#0d9488',
     bg: '#f0fdfa',
     border: '#99f6e4',
+    tagline: 'Parks, landscaping & trees',
   },
 };
 
@@ -118,7 +128,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
   const [address, setAddress] = useState('Flat 102, Building B, Municipal Zone 2');
   const [selectedDeptId, setSelectedDeptId] = useState<number>(departments[0]?.department_id || 1);
   const [category, setCategory] = useState('Dangerous Deep Pothole');
-  const [location, setLocation] = useState('Main Boulevard near Central Metro');
+  const [location, setLocation] = useState('Main Boulevard near Central Metro Station');
   const [description, setDescription] = useState(
     'Deep crater formed after recent rains, causing traffic congestion and pedestrian hazard.'
   );
@@ -128,6 +138,8 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
   const [searchQuery, setSearchQuery] = useState(
     trackedComplaintId ? trackedComplaintId.toString() : '1'
   );
+  const [filterDept, setFilterDept] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
 
   const activeDept = useMemo(
     () => departments.find((d) => d.department_id === selectedDeptId) || departments[0] || null,
@@ -143,15 +155,15 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
       return;
     }
     if (!phone.trim() || phone.trim().length < 8) {
-      setValidationError('Please enter a valid phone number.');
+      setValidationError('Please enter a valid phone number (minimum 8 digits).');
       return;
     }
     if (!address.trim()) {
-      setValidationError('Residential address is required.');
+      setValidationError('Residential address is required for municipal verification.');
       return;
     }
     if (location.trim().length < 5) {
-      setValidationError('Location must be at least 5 characters (Street, Ward, Landmark).');
+      setValidationError('Incident location must be at least 5 characters (Street, Ward, Landmark).');
       return;
     }
     if (description.trim().length < 10) {
@@ -188,6 +200,14 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
 
   const selectedComplaint = searchResults[0] || null;
 
+  const filteredComplaints = useMemo(() => {
+    return complaints.filter((c) => {
+      if (filterDept !== 'all' && c.department_name !== filterDept) return false;
+      if (filterStatus !== 'all' && c.status !== filterStatus) return false;
+      return true;
+    });
+  }, [complaints, filterDept, filterStatus]);
+
   const getCurrentStepIndex = (status: ComplaintStatus) => {
     if (status === 'Closed' || status === 'Verified') return 4;
     const idx = STATUS_STEPS.indexOf(status);
@@ -195,94 +215,78 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
-      {/* Sub-Navigation Toggle */}
-      <div className="sub-nav-bar">
-        <div className="segmented-toggle">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      {/* Sub-Navigation Toggle (Mobile-friendly full-width tabs) */}
+      <div className="citizen-sub-nav">
+        <div className="segmented-toggle citizen-segmented-toggle">
           <button
             id="tab-btn-file-grievance"
             className={`segmented-toggle-btn ${activeTab === 'submit' ? 'active' : ''}`}
             onClick={() => setActiveTab('submit')}
           >
-            <FileText size={15} strokeWidth={2} />
-            <span>Lodge Complaint</span>
-            <span className="urdu-text" style={{ fontSize: '0.8rem', opacity: 0.9 }}>شکایت درج کریں</span>
+            <FileText size={16} strokeWidth={2} />
+            <span>Lodge a Grievance</span>
           </button>
           <button
             id="tab-btn-track-inquiry"
             className={`segmented-toggle-btn ${activeTab === 'track' ? 'active' : ''}`}
             onClick={() => setActiveTab('track')}
           >
-            <Search size={15} strokeWidth={2} />
-            <span>Track Status</span>
-            <span className="urdu-text" style={{ fontSize: '0.8rem', opacity: 0.9 }}>شکایت کی تفصیلات</span>
+            <Search size={16} strokeWidth={2} />
+            <span>Live Ticket Tracker</span>
           </button>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-          <span>Active Records:</span>
-          <strong style={{ color: 'var(--text-main)' }}>{complaints.length} complaints</strong>
+        <div className="active-records-counter">
+          <Activity size={14} color="#059669" />
+          <span>Active In-System:</span>
+          <strong>{complaints.length} Tickets Registered</strong>
         </div>
       </div>
 
-      {/* VIEW 1: FILE GRIEVANCE */}
+      {/* VIEW 1: LODGE GRIEVANCE */}
       {activeTab === 'submit' && (
-        <div className="civic-card">
+        <div id="citizen-form-section" className="civic-card">
           <div className="civic-card-header">
             <div>
               <span className="hero-pill">
-                Citizen Assistance • شہری رہنمائی
+                <Sparkles size={13} color="var(--primary-blue)" />
+                Citizen Assistance &amp; Lodging
               </span>
               <h2 className="civic-card-title">
                 Lodge a Municipal Complaint
-                <span className="urdu-text" style={{ fontSize: '1.15rem', color: 'var(--primary-blue)', fontWeight: 600 }}>
-                  شکایت کا اندراج
-                </span>
               </h2>
               <p className="civic-card-desc">
-                Select the relevant department and describe your issue. We dispatch work orders to field inspectors promptly.
+                Select the responsible department, provide incident location details, and submit. An official tracking ticket reference will be generated immediately.
               </p>
             </div>
           </div>
 
           {validationError && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.65rem',
-                padding: '0.75rem 1rem',
-                background: '#fff1f2',
-                border: '1px solid #fecdd3',
-                borderRadius: 'var(--radius-sm)',
-                color: '#be123c',
-                fontSize: '0.85rem',
-                marginBottom: '1.25rem',
-                fontWeight: 600,
-              }}
-            >
+            <div className="form-error-banner">
               <AlertCircle size={18} strokeWidth={2} />
               <span>{validationError}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
             {/* Step 1: Citizen Contact */}
-            <div style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1.25rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+            <div className="form-section-block">
+              <div className="form-section-heading">
+                <span className="form-section-title">
                   <User size={16} color="var(--primary-blue)" />
-                  <span>1. Contact Details</span>
+                  <span>1. Resident Contact Information</span>
                 </span>
-                <span className="urdu-text" style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  شہری کی بنیادی معلومات
+                <span className="form-section-subtitle">
+                  Required for SMS notification and inspector verification
                 </span>
               </div>
 
               <div className="form-grid">
                 <div className="form-group">
                   <label className="form-label">
-                    <span>Full Name *</span>
+                    <User size={14} />
+                    <span>Full Legal Name *</span>
                   </label>
                   <input
                     id="input-citizen-name"
@@ -297,7 +301,8 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
 
                 <div className="form-group">
                   <label className="form-label">
-                    <span>Contact Phone Number *</span>
+                    <Phone size={14} />
+                    <span>Contact Mobile Number *</span>
                   </label>
                   <input
                     id="input-citizen-phone"
@@ -312,13 +317,14 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
 
                 <div className="form-group full-width">
                   <label className="form-label">
-                    <span>Residential Address *</span>
+                    <MapPin size={14} />
+                    <span>Residential Street Address *</span>
                   </label>
                   <input
                     id="input-citizen-address"
                     type="text"
                     className="form-input"
-                    placeholder="House / Flat No., Street, Sector or Ward"
+                    placeholder="House / Flat No., Street, Sector, Ward"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     required
@@ -327,109 +333,134 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               </div>
             </div>
 
-            {/* Step 2: Department Selection with Cohesive Highlights */}
-            <div style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1.25rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+            {/* Step 2: Department Selection with Visual Imagery */}
+            <div className="form-section-block">
+              <div className="form-section-heading">
+                <span className="form-section-title">
                   <Building2 size={16} color="#059669" />
-                  <span>2. Select Department &amp; Issue Category</span>
+                  <span>2. Select Target Municipal Agency</span>
                 </span>
-                <span className="urdu-text" style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  متعلقہ شعبہ منتخب کریں
+                <span className="form-section-subtitle">
+                  Directly routes complaint to specialized maintenance crew
                 </span>
               </div>
 
-              {/* Department Tiles Grid */}
-              <div className="category-tiles-grid">
+              {/* Department Cards Grid with Real Imagery */}
+              <div className="category-cards-grid">
                 {departments.map((dept) => {
                   const meta = DEPT_METADATA[dept.department_id] || DEPT_METADATA[1];
                   const isSelected = dept.department_id === selectedDeptId;
 
                   return (
                     <button
-                      type="button"
                       key={dept.department_id}
-                      className={`category-tile ${isSelected ? 'active' : ''}`}
-                      style={{
-                        ['--active-bg' as any]: meta.bg,
-                        ['--active-border' as any]: meta.color,
-                      }}
+                      type="button"
+                      id={`dept-choice-${dept.department_id}`}
+                      className={`dept-visual-card ${isSelected ? 'selected' : ''}`}
                       onClick={() => {
                         setSelectedDeptId(dept.department_id);
-                        if (dept.category_keywords && dept.category_keywords.length > 0) {
-                          setCategory(dept.category_keywords[0]);
+                        const catList = dept.categories || dept.category_keywords || [];
+                        if (catList.length > 0) {
+                          setCategory(catList[0]);
                         }
                       }}
+                      style={{
+                        borderColor: isSelected ? meta.color : 'var(--border-subtle)',
+                        boxShadow: isSelected ? `0 0 0 2px ${meta.color}25` : undefined,
+                      }}
                     >
-                      <div
-                        className="tile-icon-box"
-                        style={{
-                          background: meta.bg,
-                          color: meta.color,
-                        }}
-                      >
-                        {meta.icon}
-                      </div>
-                      <div className="tile-title">{dept.department_name}</div>
-                      <div className="tile-urdu">{meta.urdu}</div>
-                      {isSelected && (
-                        <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.72rem', color: meta.color, fontWeight: 700 }}>
-                          <Check size={13} strokeWidth={2.5} />
-                          <span>Selected</span>
+                      {/* Image Thumbnail for departments with photos */}
+                      {meta.image && (
+                        <div className="dept-card-image-box">
+                          <Image
+                            src={meta.image}
+                            alt={dept.department_name}
+                            fill
+                            className="dept-card-img"
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                          />
+                          <div className="dept-card-image-overlay"></div>
                         </div>
                       )}
+
+                      <div className="dept-card-body">
+                        <div className="dept-card-top-row">
+                          <div
+                            className="dept-card-icon"
+                            style={{
+                              background: meta.bg,
+                              color: meta.color,
+                              borderColor: meta.border,
+                            }}
+                          >
+                            {meta.icon}
+                          </div>
+                          {isSelected && (
+                            <span className="dept-selected-badge" style={{ background: meta.color }}>
+                              <Check size={12} strokeWidth={3} />
+                              <span>Selected</span>
+                            </span>
+                          )}
+                        </div>
+
+                        <strong className="dept-card-name">{dept.department_name}</strong>
+                        <span className="dept-card-tagline">{meta.tagline}</span>
+                        <span className="dept-card-depot">
+                          <MapPin size={11} />
+                          <span>{dept.office_location}</span>
+                        </span>
+                      </div>
                     </button>
                   );
                 })}
               </div>
 
-              {/* Suggested Common Issues */}
-              <div style={{ marginTop: '1rem' }}>
-                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                  Common issues for {activeDept?.department_name}:
-                </span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginTop: '0.4rem' }}>
-                  {activeDept?.category_keywords?.map((tag) => (
-                    <button
-                      type="button"
-                      key={tag}
-                      className="btn-secondary btn-sm"
-                      style={{
-                        background: category === tag ? 'var(--primary-tint)' : 'var(--bg-surface)',
-                        borderColor: category === tag ? 'var(--primary-blue)' : 'var(--border-subtle)',
-                        color: category === tag ? 'var(--primary-blue)' : 'var(--text-body)',
-                      }}
-                      onClick={() => setCategory(tag)}
-                    >
-                      {tag}
-                    </button>
-                  ))}
+              {/* Category Quick Selector Pills */}
+              {activeDept && (activeDept.categories || activeDept.category_keywords) && (
+                <div className="category-pills-wrap">
+                  <label className="form-label" style={{ marginBottom: '0.4rem' }}>
+                    <span>Common Issue Types under {activeDept.department_name}:</span>
+                  </label>
+                  <div className="category-pills-row">
+                    {(activeDept.categories || activeDept.category_keywords || []).map((catName: string) => (
+                      <button
+                        key={catName}
+                        type="button"
+                        className={`category-pill-btn ${category === catName ? 'active' : ''}`}
+                        onClick={() => setCategory(catName)}
+                      >
+                        <CheckCircle2 size={13} />
+                        <span>{catName}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
-            {/* Step 3: Location & Brief Narrative */}
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+            {/* Step 3: Incident Details */}
+            <div className="form-section-block">
+              <div className="form-section-heading">
+                <span className="form-section-title">
                   <MapPin size={16} color="#d97706" />
-                  <span>3. Location &amp; Problem Details</span>
+                  <span>3. Location &amp; Problem Description</span>
                 </span>
-                <span className="urdu-text" style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  مقام اور تفصیل
+                <span className="form-section-subtitle">
+                  Give clear physical landmarks for rapid dispatch
                 </span>
               </div>
 
               <div className="form-grid">
                 <div className="form-group full-width">
                   <label className="form-label">
-                    <span>Street Location / Landmark *</span>
+                    <MapPin size={14} />
+                    <span>Exact Incident Location or Landmark *</span>
                   </label>
                   <input
-                    id="input-complaint-location"
+                    id="input-incident-location"
                     type="text"
                     className="form-input"
-                    placeholder="e.g. Corner of Street 4, Near Commercial Market"
+                    placeholder="e.g. In front of Central Hospital Gate 2, Main Boulevard"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     required
@@ -437,275 +468,326 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                 </div>
 
                 <div className="form-group full-width">
-                  <div className="form-label">
-                    <span>Brief Description *</span>
-                    <span className={`char-counter ${description.length >= 10 ? 'valid' : ''}`}>
-                      {description.length} / 10 min chars
-                    </span>
-                  </div>
+                  <label className="form-label">
+                    <FileText size={14} />
+                    <span>Detailed Grievance Narrative * (min 10 characters)</span>
+                  </label>
                   <textarea
-                    id="input-complaint-description"
+                    id="input-incident-description"
                     className="form-textarea"
-                    placeholder="Briefly describe what happened or what requires fixing..."
+                    rows={4}
+                    placeholder="Describe the severity, duration, and immediate safety impact on residents..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     required
-                  />
+                  ></textarea>
                 </div>
               </div>
             </div>
 
-            {/* Action Row */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '1rem' }}>
+            {/* Submission Button */}
+            <div className="form-submit-footer">
               <button
-                type="button"
-                className="btn-secondary"
-                onClick={() => {
-                  setCitizenName('');
-                  setDescription('');
-                }}
+                type="submit"
+                id="btn-submit-complaint"
+                className="btn-primary"
+                style={{ minWidth: '220px', padding: '0.85rem 1.5rem', fontSize: '0.95rem' }}
               >
-                Clear
+                <Send size={16} />
+                <span>Submit Grievance to Municipal Crew</span>
               </button>
-              <button id="btn-submit-complaint" type="submit" className="btn-primary">
-                <Send size={15} strokeWidth={2} />
-                <span>Submit Grievance</span>
-                <span className="urdu-text" style={{ fontSize: '0.82rem', marginLeft: '0.25rem' }}>درج کریں</span>
-              </button>
+              <span className="form-privacy-note">
+                <ShieldCheck size={14} color="#059669" />
+                <span>Protected under Municipal Right to Redressal Charter</span>
+              </span>
             </div>
           </form>
         </div>
       )}
 
-      {/* VIEW 2: TRACK & INQUIRY */}
+      {/* VIEW 2: LIVE TICKET TRACKER */}
       {activeTab === 'track' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          {/* Search Box */}
+        <div id="citizen-tracking-section" style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+          {/* Search Header Bar */}
           <div className="civic-card">
             <div className="civic-card-header">
               <div>
-                <span className="hero-pill">Real-time Tracking</span>
-                <h2 className="civic-card-title">
-                  Track Your Complaint Status
-                  <span className="urdu-text" style={{ fontSize: '1.15rem', color: 'var(--primary-blue)', fontWeight: 600 }}>
-                    شکایت کی پیش رفت
-                  </span>
-                </h2>
+                <span className="hero-pill">
+                  <Search size={13} color="var(--primary-blue)" />
+                  Real-Time Municipal Tracking
+                </span>
+                <h2 className="civic-card-title">Live Grievance Tracker</h2>
                 <p className="civic-card-desc">
-                  Enter your Complaint # (e.g. 1, 2, 5) or registered phone number to view live progress.
+                  Enter your tracking ticket number (e.g. <code>CMP-0001</code> or <code>1</code>) or registered phone number to view live inspection logs.
                 </p>
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              <div style={{ flex: '1', minWidth: '260px', position: 'relative' }}>
+            <div className="tracking-search-bar-wrap">
+              <div className="tracking-input-box">
+                <Search size={20} className="tracking-search-icon" />
                 <input
-                  id="input-track-search"
+                  id="input-track-ticket-search"
                   type="text"
-                  className="form-input"
-                  style={{ paddingLeft: '2.5rem' }}
-                  placeholder="Enter Complaint # (e.g. 1) or Phone (+1-555-0201)..."
+                  className="tracking-search-input"
+                  placeholder="Search by ticket ID (e.g., CMP-0001) or phone number..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <Search
-                  size={16}
-                  strokeWidth={2}
-                  style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light)' }}
-                />
+                {searchQuery && (
+                  <button
+                    className="tracking-clear-btn"
+                    onClick={() => setSearchQuery('')}
+                    aria-label="Clear search query"
+                  >
+                    Clear
+                  </button>
+                )}
               </div>
-            </div>
 
-            {/* Quick Demo Chips */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.85rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                Try examples:
-              </span>
-              <button
-                type="button"
-                className="btn-secondary btn-sm"
-                onClick={() => setSearchQuery('1')}
-              >
-                #1 (Submitted)
-              </button>
-              <button
-                type="button"
-                className="btn-secondary btn-sm"
-                onClick={() => setSearchQuery('2')}
-              >
-                #2 (Assigned)
-              </button>
-              <button
-                type="button"
-                className="btn-secondary btn-sm"
-                onClick={() => setSearchQuery('5')}
-              >
-                #5 (In Progress)
-              </button>
-              <button
-                type="button"
-                className="btn-secondary btn-sm"
-                onClick={() => setSearchQuery('6')}
-              >
-                #6 (Verified)
-              </button>
-              <button
-                type="button"
-                className="btn-secondary btn-sm"
-                onClick={() => setSearchQuery('+1-555-0201')}
-              >
-                Phone +1-555-0201
-              </button>
+              {/* Quick Preset Buttons */}
+              <div className="quick-presets-row">
+                <span className="preset-label">Quick Sample Tickets:</span>
+                {complaints.slice(0, 4).map((c) => (
+                  <button
+                    key={c.complaint_id}
+                    type="button"
+                    className="preset-ticket-btn"
+                    onClick={() => setSearchQuery(c.complaint_id.toString())}
+                  >
+                    <CheckCircle2 size={12} />
+                    <span>CMP-000{c.complaint_id} ({c.category.split(' ')[0]})</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Result Card */}
+          {/* Active Ticket Status Card */}
           {selectedComplaint ? (
-            <div className="civic-card">
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  borderBottom: '1px solid var(--border-subtle)',
-                  paddingBottom: '1rem',
-                  flexWrap: 'wrap',
-                  gap: '0.75rem',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.2rem' }}>
-                    <span
-                      style={{
-                        fontFamily: 'monospace',
-                        fontSize: '1.35rem',
-                        fontWeight: 700,
-                        color: 'var(--primary-blue)',
-                      }}
-                    >
-                      #CMP-{selectedComplaint.complaint_id.toString().padStart(4, '0')}
-                    </span>
-                    <span className="badge badge-inprogress">
-                      {selectedComplaint.status}
-                    </span>
-                  </div>
-                  <h3 style={{ fontSize: '1.15rem', color: 'var(--text-main)', fontWeight: 700 }}>
-                    {selectedComplaint.category}
-                  </h3>
+            <div className="civic-card active-ticket-dossier">
+              <div className="ticket-dossier-top">
+                <div className="ticket-dossier-ref">
+                  <span className="ticket-code-pill">
+                    CMP-{selectedComplaint.complaint_id.toString().padStart(4, '0')}
+                  </span>
+                  <span className={`status-pill status-${selectedComplaint.status.toLowerCase().replace(/\s+/g, '')}`}>
+                    <span className="status-dot-pulse"></span>
+                    {selectedComplaint.status}
+                  </span>
                 </div>
 
-                <div style={{ textAlign: 'right', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', justifyContent: 'flex-end' }}>
+                <div className="ticket-dossier-meta">
+                  <span className="meta-item">
                     <Calendar size={14} />
-                    <span>Logged: {new Date(selectedComplaint.complaint_date).toLocaleDateString()}</span>
-                  </div>
+                    <span>Lodged: {new Date(selectedComplaint.complaint_date).toLocaleDateString()}</span>
+                  </span>
+                  <span className="meta-item">
+                    <Clock size={14} />
+                    <span>Time: {new Date(selectedComplaint.complaint_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  </span>
                 </div>
               </div>
 
-              {/* Segmented Progress Tracker with Urdu */}
-              <div className="segmented-progress-wrap">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>
-                    Resolution Milestones
-                  </span>
-                  <span className="urdu-text" style={{ fontSize: '0.85rem', color: 'var(--primary-blue)' }}>
-                    شکایت کے مراحل
-                  </span>
-                </div>
+              {/* Responsive Lifecycle Timeline */}
+              <div className="lifecycle-timeline-wrap">
+                <h4 className="timeline-title">
+                  <Activity size={16} color="var(--primary-blue)" />
+                  <span>Official Resolution Milestones</span>
+                </h4>
 
-                <div className="segmented-progress-bar">
+                <div className="timeline-steps-track">
                   {STATUS_STEPS.map((step, idx) => {
                     const currentIdx = getCurrentStepIndex(selectedComplaint.status);
-                    const isFilled = idx <= currentIdx;
+                    const isDone = idx <= currentIdx;
                     const isCurrent = idx === currentIdx;
 
                     return (
                       <div
                         key={step}
-                        className={`segmented-cell ${isFilled ? 'filled' : ''} ${isCurrent ? 'current' : ''}`}
+                        className={`timeline-step-node ${isDone ? 'completed' : ''} ${isCurrent ? 'current' : ''}`}
                       >
-                        {isFilled && <Check size={12} strokeWidth={2.5} style={{ marginRight: '3px' }} />}
-                        <span>{step}</span>
+                        <div className="timeline-node-circle">
+                          {isDone ? <Check size={14} strokeWidth={3} /> : idx + 1}
+                        </div>
+                        <span className="timeline-step-label">{step}</span>
                       </div>
                     );
                   })}
                 </div>
-
-                <div className="segmented-labels">
-                  {URDU_STEPS.map((u, i) => (
-                    <span key={i} className="urdu-text" style={{ fontSize: '0.82rem' }}>
-                      {u}
-                    </span>
-                  ))}
-                </div>
               </div>
 
-              {/* Metadata Grid */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                  gap: '0.85rem',
-                  marginTop: '1.25rem',
-                }}
-              >
-                <div style={{ padding: '0.85rem 1rem', background: 'var(--bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
-                  <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                    Department
-                  </span>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)', marginTop: '0.2rem' }}>
+              {/* Ticket Details Grid */}
+              <div className="ticket-details-grid">
+                <div className="ticket-detail-item">
+                  <span className="detail-lbl">Responsible Department</span>
+                  <strong className="detail-val" style={{ color: 'var(--primary-blue)' }}>
                     {selectedComplaint.department_name}
-                  </div>
+                  </strong>
                 </div>
 
-                <div style={{ padding: '0.85rem 1rem', background: 'var(--bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
-                  <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                    Incident Location
-                  </span>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)', marginTop: '0.2rem' }}>
-                    {selectedComplaint.location}
-                  </div>
+                <div className="ticket-detail-item">
+                  <span className="detail-lbl">Issue Category</span>
+                  <strong className="detail-val">{selectedComplaint.category}</strong>
                 </div>
 
-                <div style={{ padding: '0.85rem 1rem', background: 'var(--bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
-                  <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                    Registered Citizen
-                  </span>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)', marginTop: '0.2rem' }}>
-                    {selectedComplaint.citizen_name || 'Citizen'} ({selectedComplaint.citizen_phone || 'Verified'})
-                  </div>
+                <div className="ticket-detail-item">
+                  <span className="detail-lbl">Incident Location</span>
+                  <strong className="detail-val">{selectedComplaint.location}</strong>
                 </div>
-              </div>
 
-              {/* Narrative */}
-              <div
-                style={{
-                  marginTop: '1rem',
-                  padding: '1rem',
-                  background: '#f8fafc',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-sm)',
-                }}
-              >
-                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                  Reported Issue Description:
-                </span>
-                <p style={{ color: 'var(--text-body)', fontSize: '0.88rem', marginTop: '0.25rem', lineHeight: 1.5 }}>
-                  {selectedComplaint.description}
-                </p>
+                <div className="ticket-detail-item">
+                  <span className="detail-lbl">Submitter Name</span>
+                  <strong className="detail-val">{selectedComplaint.citizen_name || 'Verified Citizen'}</strong>
+                </div>
+
+                <div className="ticket-detail-item full-width">
+                  <span className="detail-lbl">Citizen Narrative</span>
+                  <p className="detail-desc">{selectedComplaint.description}</p>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="civic-card" style={{ textAlign: 'center', padding: '2.5rem' }}>
-              <AlertCircle size={28} strokeWidth={1.5} color="var(--text-muted)" style={{ margin: '0 auto 0.5rem' }} />
-              <h3 style={{ fontSize: '1.05rem', color: 'var(--text-main)' }}>
-                No Grievance Record Found
-              </h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-                We couldn&apos;t find a complaint matching &ldquo;{searchQuery}&rdquo;. Try using ID #1, #2, or phone +1-555-0201.
-              </p>
+            <div className="civic-card empty-search-card">
+              <AlertCircle size={36} color="var(--text-muted)" />
+              <h3>No Ticket Found</h3>
+              <p>We could not find any active complaint matching &quot;{searchQuery}&quot;. Please verify the ticket code or phone number.</p>
             </div>
           )}
+
+          {/* All Registered Neighborhood Complaints Table */}
+          <div className="civic-card">
+            <div className="civic-card-header">
+              <div>
+                <span className="hero-pill">Community Registry</span>
+                <h3 className="civic-card-title">Recent Neighborhood Complaints</h3>
+                <p className="civic-card-desc">
+                  Transparent public ledger of all registered grievances across municipal divisions.
+                </p>
+              </div>
+
+              {/* Filters */}
+              <div className="table-filter-bar">
+                <div className="filter-select-box">
+                  <Filter size={14} />
+                  <select
+                    className="form-select sm"
+                    value={filterDept}
+                    onChange={(e) => setFilterDept(e.target.value)}
+                  >
+                    <option value="all">All Departments</option>
+                    {departments.map((d) => (
+                      <option key={d.department_id} value={d.department_name}>
+                        {d.department_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="filter-select-box">
+                  <select
+                    className="form-select sm"
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="Submitted">Submitted</option>
+                    <option value="Categorized">Categorized</option>
+                    <option value="Assigned">Assigned</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Responsive Card List on Mobile / Table on Desktop */}
+            <div className="responsive-table-wrap">
+              <table className="civic-table hide-on-mobile">
+                <thead>
+                  <tr>
+                    <th>Ticket ID</th>
+                    <th>Department</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Lodged</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredComplaints.map((c) => (
+                    <tr key={c.complaint_id}>
+                      <td>
+                        <strong>CMP-{c.complaint_id.toString().padStart(4, '0')}</strong>
+                      </td>
+                      <td>{c.department_name}</td>
+                      <td>{c.category}</td>
+                      <td>{c.location}</td>
+                      <td>
+                        <span className={`status-pill status-${c.status.toLowerCase().replace(/\s+/g, '')}`}>
+                          {c.status}
+                        </span>
+                      </td>
+                      <td>{new Date(c.complaint_date).toLocaleDateString()}</td>
+                      <td>
+                        <button
+                          className="btn-secondary btn-sm"
+                          onClick={() => {
+                            setSearchQuery(c.complaint_id.toString());
+                            window.scrollTo({ top: 350, behavior: 'smooth' });
+                          }}
+                        >
+                          <Eye size={13} />
+                          <span>Inspect</span>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Mobile Card List (< 768px) */}
+              <div className="mobile-complaints-card-list hide-on-desktop">
+                {filteredComplaints.map((c) => (
+                  <div key={c.complaint_id} className="mobile-ticket-card">
+                    <div className="mobile-card-top">
+                      <span className="ticket-code-pill">CMP-{c.complaint_id.toString().padStart(4, '0')}</span>
+                      <span className={`status-pill status-${c.status.toLowerCase().replace(/\s+/g, '')}`}>
+                        {c.status}
+                      </span>
+                    </div>
+
+                    <h4 className="mobile-card-title">{c.category}</h4>
+                    <span className="mobile-card-dept">{c.department_name}</span>
+
+                    <div className="mobile-card-meta">
+                      <span className="meta-item">
+                        <MapPin size={13} />
+                        <span>{c.location}</span>
+                      </span>
+                      <span className="meta-item">
+                        <Calendar size={13} />
+                        <span>{new Date(c.complaint_date).toLocaleDateString()}</span>
+                      </span>
+                    </div>
+
+                    <button
+                      className="btn-secondary btn-sm"
+                      style={{ width: '100%', marginTop: '0.65rem', justifyContent: 'center' }}
+                      onClick={() => {
+                        setSearchQuery(c.complaint_id.toString());
+                        window.scrollTo({ top: 350, behavior: 'smooth' });
+                      }}
+                    >
+                      <Eye size={14} />
+                      <span>Track Inspection Progress</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -18,6 +18,13 @@ export const metadata: Metadata = {
   title: 'MCMS — Municipal Complaint Management System',
   description:
     'Comprehensive civic tech platform for municipal grievance registration, live citizen tracking, field technician dispatch, and decision-support analytics.',
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
@@ -32,12 +39,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap"
-          rel="stylesheet"
-        />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body>{children}</body>
     </html>

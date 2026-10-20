@@ -2,7 +2,20 @@
 
 import React, { useState } from 'react';
 import { Complaint } from '../types';
-import { CheckCircle2, Copy, Check, ExternalLink, X, MapPin, Calendar, Building2 } from 'lucide-react';
+import {
+  CheckCircle2,
+  Copy,
+  Check,
+  ExternalLink,
+  X,
+  MapPin,
+  Calendar,
+  Building2,
+  Tag,
+  Phone,
+  User,
+  ShieldCheck,
+} from 'lucide-react';
 
 interface TicketModalProps {
   complaint: Complaint | null;
@@ -32,21 +45,32 @@ export const TicketModal: React.FC<TicketModalProps> = ({
       <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="modal-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <CheckCircle2 size={22} color="#059669" strokeWidth={2} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <div
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: '#ecfdf5',
+                border: '1px solid #a7f3d0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <CheckCircle2 size={20} color="#059669" strokeWidth={2.5} />
+            </div>
             <div>
-              <h2 className="modal-title">
-                Grievance Registered
-                <span className="urdu-text" style={{ fontSize: '0.95rem', color: '#059669', marginLeft: '0.5rem' }}>
-                  شکایت درج ہوگئی
-                </span>
-              </h2>
+              <h2 className="modal-title">Grievance Registered Successfully</h2>
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                Official Municipal Dispatch Receipt
+              </span>
             </div>
           </div>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
-            aria-label="Close"
+            className="modal-close-btn"
+            aria-label="Close Modal"
           >
             <X size={18} />
           </button>
@@ -54,120 +78,91 @@ export const TicketModal: React.FC<TicketModalProps> = ({
 
         {/* Body */}
         <div className="modal-body">
-          <div
-            style={{
-              textAlign: 'center',
-              padding: '1.25rem',
-              background: 'var(--primary-tint)',
-              border: '1.5px dashed #bfdbfe',
-              borderRadius: 'var(--radius-md)',
-              marginBottom: '1.25rem',
-            }}
-          >
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--primary-blue)', display: 'block' }}>
-              Tracking Reference Code • شکایتی کوڈ
-            </span>
-            <div
-              style={{
-                fontSize: '2rem',
-                fontWeight: 700,
-                letterSpacing: '0.04em',
-                color: 'var(--text-main)',
-                marginTop: '0.2rem',
-                fontFamily: 'monospace',
-              }}
-            >
-              {ticketCode}
-            </div>
+          {/* Tracking Ticket Box */}
+          <div className="modal-ticket-highlight">
+            <span className="modal-ticket-caption">Official Tracking Reference Code</span>
+            <div className="modal-ticket-code">{ticketCode}</div>
             <button
+              id="btn-copy-ticket-ref"
               onClick={handleCopy}
               className="btn-secondary btn-sm"
               style={{ marginTop: '0.65rem' }}
-              id="btn-copy-ticket-ref"
             >
-              {copied ? <Check size={13} color="#059669" strokeWidth={2.5} /> : <Copy size={13} />}
-              <span>{copied ? 'Copied Reference' : 'Copy Code'}</span>
+              {copied ? <Check size={14} color="#059669" strokeWidth={2.5} /> : <Copy size={14} />}
+              <span>{copied ? 'Copied to Clipboard' : 'Copy Tracking Code'}</span>
             </button>
           </div>
 
-          {/* Details */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: '0.75rem',
-              fontSize: '0.85rem',
-              background: 'var(--bg-subtle)',
-              padding: '1rem',
-              borderRadius: 'var(--radius-sm)',
-            }}
-          >
-            <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.72rem', fontWeight: 600 }}>
-                Citizen Name
+          {/* Key Ticket Details */}
+          <div className="modal-details-grid">
+            <div className="modal-detail-box">
+              <span className="modal-detail-lbl">
+                <User size={12} />
+                <span>Submitter</span>
               </span>
-              <strong style={{ color: 'var(--text-main)' }}>{complaint.citizen_name || 'Citizen'}</strong>
+              <strong className="modal-detail-val">{complaint.citizen_name || 'Verified Citizen'}</strong>
             </div>
-            <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.72rem', fontWeight: 600 }}>
-                Contact Phone
+
+            <div className="modal-detail-box">
+              <span className="modal-detail-lbl">
+                <Phone size={12} />
+                <span>Contact Phone</span>
               </span>
-              <strong style={{ color: 'var(--text-main)' }}>{complaint.citizen_phone || 'Verified'}</strong>
+              <strong className="modal-detail-val">{complaint.citizen_phone || 'Verified'}</strong>
             </div>
-            <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.72rem', fontWeight: 600 }}>
-                Target Department
+
+            <div className="modal-detail-box">
+              <span className="modal-detail-lbl">
+                <Building2 size={12} />
+                <span>Target Department</span>
               </span>
-              <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>
+              <strong className="modal-detail-val" style={{ color: 'var(--primary-blue)' }}>
                 {complaint.department_name}
-              </div>
+              </strong>
             </div>
-            <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.72rem', fontWeight: 600 }}>
-                Category
+
+            <div className="modal-detail-box">
+              <span className="modal-detail-lbl">
+                <Tag size={12} />
+                <span>Issue Category</span>
               </span>
-              <strong style={{ color: 'var(--primary-blue)' }}>{complaint.category}</strong>
+              <strong className="modal-detail-val">{complaint.category}</strong>
             </div>
-            <div style={{ gridColumn: '1 / -1', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.5rem' }}>
-              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.72rem', fontWeight: 600 }}>
-                Location
+
+            <div className="modal-detail-box full-width">
+              <span className="modal-detail-lbl">
+                <MapPin size={12} />
+                <span>Incident Location</span>
               </span>
-              <div style={{ color: 'var(--text-main)', fontWeight: 600 }}>
-                {complaint.location}
-              </div>
+              <span className="modal-detail-val">{complaint.location}</span>
             </div>
           </div>
 
-          <div
-            style={{
-              marginTop: '1rem',
-              padding: '0.75rem',
-              background: '#ecfdf5',
-              border: '1px solid #a7f3d0',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '0.8rem',
-              color: '#065f46',
-            }}
-          >
-            <strong>Note:</strong> Your grievance has been recorded. Our municipal response team will inspect the site and update status accordingly.
+          {/* Informational SLA Note */}
+          <div className="modal-sla-note">
+            <ShieldCheck size={16} color="#059669" />
+            <span>
+              <strong>Municipal SLA Standard:</strong> An on-site inspection crew will be dispatched within 24 hours. You can track progress in real time using your ticket code.
+            </span>
           </div>
         </div>
 
         {/* Footer */}
         <div className="modal-footer">
-          <button className="btn-secondary btn-sm" onClick={onClose}>
-            Close
+          <button className="btn-secondary" onClick={onClose} style={{ padding: '0.65rem 1.25rem' }}>
+            Done
           </button>
           <button
             id="btn-modal-track-now"
-            className="btn-primary btn-sm"
+            className="btn-primary"
+            style={{ padding: '0.65rem 1.25rem' }}
             onClick={() => {
               onTrack(complaint.complaint_id);
               onClose();
             }}
           >
-            <ExternalLink size={14} />
-            <span>Track Grievance</span>
+            <ExternalLink size={15} />
+            <span>Track Grievance Live</span>
           </button>
         </div>
       </div>

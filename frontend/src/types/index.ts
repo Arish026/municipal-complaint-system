@@ -38,6 +38,7 @@ export interface Department {
   department_name: string;
   office_location: string;
   category_keywords?: string[];
+  categories?: string[];
 }
 
 export interface Staff {
@@ -63,6 +64,7 @@ export interface Complaint {
   citizen_phone?: string;
   department_name?: string;
   work_order?: WorkOrder;
+  updated_at?: string;
 }
 
 export interface WorkOrder {
@@ -98,4 +100,7 @@ export interface SystemStats {
   resolvedCount: number;
   overdueCount: number;
   avgResolutionHours: number;
+  resolvedComplaints?: number;
+  activeWorkOrders?: number;
 }
+

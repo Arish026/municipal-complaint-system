@@ -13,6 +13,12 @@ import {
   FileCheck,
   Send,
   Building2,
+  User,
+  ShieldCheck,
+  Filter,
+  Activity,
+  Layers,
+  ChevronRight,
 } from 'lucide-react';
 
 interface StaffPortalProps {
@@ -78,22 +84,20 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
       <div className="civic-card">
         <div className="civic-card-header">
           <div>
-            <span className="hero-pill">Field Operations</span>
-            <h2 className="civic-card-title">
-              Field Technician Workdesk
-              <span className="urdu-text" style={{ fontSize: '1.15rem', color: 'var(--primary-blue)', fontWeight: 600 }}>
-                فیلڈ ورک ڈیسک
-              </span>
-            </h2>
+            <span className="hero-pill">
+              <Wrench size={13} color="var(--primary-blue)" />
+              Field Operations &amp; Inspection Desk
+            </span>
+            <h2 className="civic-card-title">Field Technician Workdesk</h2>
             <p className="civic-card-desc">
-              Manage on-site work orders, submit inspection remarks, and mark repairs as resolved.
+              Manage assigned municipal work orders, log physical on-site diagnostic remarks, and certify maintenance resolution.
             </p>
           </div>
 
           {/* Profile Switcher */}
           <div style={{ minWidth: '260px' }}>
             <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-              Select Inspector Profile:
+              Select Active Field Personnel:
             </label>
             <select
               id="select-active-technician"
@@ -111,48 +115,22 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
         </div>
 
         {/* Technician Info Banner */}
-        <div
-          style={{
-            padding: '1rem 1.25rem',
-            borderRadius: 'var(--radius-md)',
-            background: 'var(--bg-subtle)',
-            border: '1px solid var(--border-subtle)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '50%',
-                background: 'var(--primary-tint)',
-                border: '1px solid #bfdbfe',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--primary-blue)',
-                fontWeight: 700,
-                fontSize: '0.95rem',
-              }}
-            >
+        <div className="staff-info-banner">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <div className="staff-avatar-circle">
               {currentStaff.name.charAt(0)}
             </div>
             <div>
               <strong style={{ fontSize: '1rem', color: 'var(--text-main)', display: 'block' }}>
                 {currentStaff.name}
               </strong>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                 {currentStaff.designation} • {currentStaff.phone}
               </span>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.82rem' }}>
+          <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.82rem', flexWrap: 'wrap' }}>
             <div>
               <span style={{ color: 'var(--text-muted)', display: 'block' }}>Assigned Jobs</span>
               <strong style={{ color: 'var(--primary-blue)', fontSize: '0.95rem' }}>
@@ -160,7 +138,7 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
               </strong>
             </div>
             <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block' }}>Department</span>
+              <span style={{ color: 'var(--text-muted)', display: 'block' }}>Operating Department</span>
               <strong style={{ color: 'var(--text-main)', fontSize: '0.95rem' }}>
                 {currentStaff.department_name}
               </strong>
@@ -170,15 +148,7 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
       </div>
 
       {/* Filter Tabs */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '1rem',
-        }}
-      >
+      <div className="staff-filter-bar">
         <div className="segmented-toggle">
           {(['ALL', 'Assigned', 'In Progress', 'Completed'] as const).map((filter) => (
             <button
@@ -193,75 +163,56 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
         </div>
 
         <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-          Showing {staffOrders.length} jobs in queue
+          Showing {staffOrders.length} work orders in technician queue
         </span>
       </div>
 
       {/* Orders Grid */}
       {staffOrders.length > 0 ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.15rem' }}>
+        <div className="work-orders-grid">
           {staffOrders.map((order) => {
             const linkedComplaint = complaints.find((c) => c.complaint_id === order.complaint_id);
 
             return (
-              <div
-                key={order.work_order_id}
-                className="civic-card"
-                style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', padding: '1.25rem' }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div key={order.work_order_id} className="civic-card work-order-card">
+                <div className="work-order-top">
                   <div>
-                    <span style={{ fontFamily: 'monospace', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-light)' }}>
+                    <span className="work-order-id-code">
                       WORK ORDER #{order.work_order_id.toString().padStart(4, '0')}
                     </span>
-                    <h3 style={{ fontSize: '1.05rem', color: 'var(--text-main)', fontWeight: 700, marginTop: '0.2rem' }}>
+                    <h3 className="work-order-title">
                       {linkedComplaint?.category || 'Field Repair'}
                     </h3>
                   </div>
-                  <span className="badge badge-inprogress">
+                  <span className={`status-pill status-${order.work_status.toLowerCase().replace(/\s+/g, '')}`}>
                     {order.work_status}
                   </span>
                 </div>
 
-                <div style={{ fontSize: '0.85rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#d97706', fontWeight: 600, marginBottom: '0.3rem' }}>
+                <div className="work-order-location-box">
+                  <div className="location-heading">
                     <MapPin size={15} />
                     <span>{linkedComplaint?.location || 'Assigned Zone'}</span>
                   </div>
-                  <p style={{ color: 'var(--text-body)', fontSize: '0.82rem', lineHeight: 1.5 }}>
+                  <p className="location-desc">
                     {linkedComplaint?.description || 'Inspection and site maintenance required.'}
                   </p>
                 </div>
 
-                <div
-                  style={{
-                    padding: '0.75rem',
-                    background: 'var(--bg-subtle)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '0.8rem',
-                  }}
-                >
-                  <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.7rem', fontWeight: 600 }}>
-                    Inspection Log &amp; Remarks:
+                <div className="inspection-log-box">
+                  <span className="log-caption">
+                    <FileCheck size={12} />
+                    <span>Inspection Remarks &amp; Action Taken:</span>
                   </span>
-                  <div style={{ color: 'var(--text-main)', marginTop: '0.2rem', fontWeight: 500 }}>
+                  <div className="log-text">
                     {order.action_taken || 'No field remarks logged yet.'}
                   </div>
                 </div>
 
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginTop: 'auto',
-                    paddingTop: '0.75rem',
-                    borderTop: '1px solid var(--border-subtle)',
-                  }}
-                >
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    <span>Assigned: </span>
-                    {new Date(order.assigned_date).toLocaleDateString()}
+                <div className="work-order-footer">
+                  <div className="assigned-date-item">
+                    <Calendar size={13} />
+                    <span>Assigned: {new Date(order.assigned_date).toLocaleDateString()}</span>
                   </div>
                   <button
                     id={`btn-update-order-${order.work_order_id}`}
@@ -277,14 +228,10 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
           })}
         </div>
       ) : (
-        <div className="civic-card" style={{ padding: '2.5rem', textAlign: 'center' }}>
-          <Clock size={28} strokeWidth={1.5} color="var(--text-muted)" style={{ margin: '0 auto 0.5rem' }} />
-          <h3 style={{ fontSize: '1.05rem', color: 'var(--text-main)' }}>
-            No Assigned Jobs Found
-          </h3>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            No work orders assigned to {currentStaff.name} matching filter &ldquo;{statusFilter}&rdquo;.
-          </p>
+        <div className="civic-card empty-orders-card">
+          <Clock size={32} strokeWidth={1.5} color="var(--text-muted)" style={{ margin: '0 auto 0.5rem' }} />
+          <h3>No Assigned Jobs Found</h3>
+          <p>No active work orders currently assigned to {currentStaff.name} matching filter &ldquo;{statusFilter}&rdquo;.</p>
         </div>
       )}
 
@@ -294,13 +241,14 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
           <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2 className="modal-title">
-                Update Work Order #{activeEditingOrder.work_order_id}
+                Update Work Order #{activeEditingOrder.work_order_id.toString().padStart(4, '0')}
               </h2>
             </div>
             <form onSubmit={handleSaveUpdate}>
-              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 <div className="form-group">
                   <label className="form-label">
+                    <Activity size={14} />
                     <span>Work Order Status *</span>
                   </label>
                   <select
@@ -318,6 +266,7 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
 
                 <div className="form-group">
                   <label className="form-label">
+                    <FileCheck size={14} />
                     <span>Field Action Notes &amp; Observations</span>
                   </label>
                   <textarea
