@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Department, Complaint, WorkOrder, DecisionAuditLog, SystemStats, SupervisorDecision } from '../types';
+import { Department, Complaint, DecisionAuditLog, SystemStats, SupervisorDecision } from '../types';
 import {
   BarChart3,
   AlertTriangle,
@@ -11,17 +11,13 @@ import {
   TrendingUp,
   ShieldAlert,
   Building2,
-  Users,
   Layers,
   Droplets,
   Construction,
   Trash2,
   Lightbulb,
   Trees,
-  FileText,
   Activity,
-  ArrowUpRight,
-  ShieldCheck,
 } from 'lucide-react';
 
 interface AdminPortalProps {
@@ -32,13 +28,13 @@ interface AdminPortalProps {
   onResolveDecision: (auditId: number, decision: SupervisorDecision) => void;
 }
 
-const DEPT_CONFIG: Record<number, { bar: string; text: string; icon: React.ReactNode }> = {
-  1: { bar: '#0284c7', text: '#0369a1', icon: <Droplets size={16} /> },
-  2: { bar: '#d97706', text: '#b45309', icon: <Construction size={16} /> },
-  3: { bar: '#059669', text: '#047857', icon: <Trash2 size={16} /> },
-  4: { bar: '#ca8a04', text: '#a16207', icon: <Lightbulb size={16} /> },
-  5: { bar: '#e11d48', text: '#be123c', icon: <ShieldAlert size={16} /> },
-  6: { bar: '#0d9488', text: '#0f766e', icon: <Trees size={16} /> },
+const DEPT_CONFIG: Record<number, { color: string; icon: React.ReactNode }> = {
+  1: { color: '#233d2c', icon: <Droplets size={15} /> },
+  2: { color: '#8a6523', icon: <Construction size={15} /> },
+  3: { color: '#2e5a3c', icon: <Trash2 size={15} /> },
+  4: { color: '#946c1e', icon: <Lightbulb size={15} /> },
+  5: { color: '#993030', icon: <ShieldAlert size={15} /> },
+  6: { color: '#1e4d3a', icon: <Trees size={15} /> },
 };
 
 export const AdminPortal: React.FC<AdminPortalProps> = ({
@@ -61,9 +57,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     const total = deptComplaints.length;
     const resolutionRate = total > 0 ? Math.round((resolved / total) * 100) : 100;
     const config = DEPT_CONFIG[dept.department_id] || {
-      bar: '#2563eb',
-      text: '#1d4ed8',
-      icon: <Building2 size={16} />,
+      color: '#233d2c',
+      icon: <Building2 size={15} />,
     };
 
     return {
@@ -76,71 +71,58 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {/* Overview Header */}
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-          <span className="hero-pill">
-            <Activity size={13} style={{ marginRight: '0.35rem' }} />
-            Town Hall Analytics
-          </span>
-          <span className="hero-pill" style={{ background: '#f8fafc', color: 'var(--text-muted)' }}>
-            Real-time Supervisor SLA
-          </span>
-        </div>
-        <h2 className="hero-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Building2 size={28} color="var(--primary-blue)" />
-          Supervisor Command Center
-        </h2>
-        <p className="hero-desc">
-          Monitor municipal resolution velocity, review automated escalation alerts, and assess department capacity.
-        </p>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="stats-grid">
-        <div className="stat-card" style={{ borderLeft: '4px solid #2563eb' }}>
-          <div className="stat-top">
-            <span className="stat-label">Total Grievances</span>
-            <Layers size={18} color="#2563eb" />
+      <div className="civic-card">
+        <div className="civic-card-header">
+          <div>
+            <span className="hero-pill">Town Hall Analytics</span>
+            <h2 className="civic-card-title">Supervisor Command Center</h2>
+            <p className="civic-card-desc">
+              Resolution metrics, escalation alerts, and department capacity.
+            </p>
           </div>
-          <div className="stat-value">{stats.totalComplaints}</div>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.25rem' }}>
-            <TrendingUp size={12} color="#059669" /> Registered across city
-          </span>
         </div>
 
-        <div className="stat-card" style={{ borderLeft: '4px solid #d97706' }}>
-          <div className="stat-top">
-            <span className="stat-label">Active in Queue</span>
-            <Clock size={18} color="#d97706" />
+        {/* KPI Cards */}
+        <div className="stats-grid" style={{ marginTop: '0.5rem' }}>
+          <div className="stat-card">
+            <div className="stat-top">
+              <span className="stat-label">Total Grievances</span>
+              <Layers size={16} color="var(--primary-moss)" />
+            </div>
+            <div className="stat-value">{stats.totalComplaints}</div>
+            <span className="stat-subtext">All city zones</span>
           </div>
-          <div className="stat-value">{stats.pendingCount + stats.inProgressCount}</div>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Assigned or Under Repair
-          </span>
-        </div>
 
-        <div className="stat-card" style={{ borderLeft: '4px solid #059669' }}>
-          <div className="stat-top">
-            <span className="stat-label">Resolved &amp; Closed</span>
-            <CheckCircle2 size={18} color="#059669" />
+          <div className="stat-card">
+            <div className="stat-top">
+              <span className="stat-label">Active Queue</span>
+              <Clock size={16} color="#8a6523" />
+            </div>
+            <div className="stat-value">{stats.pendingCount + stats.inProgressCount}</div>
+            <span className="stat-subtext">Assigned or in progress</span>
           </div>
-          <div className="stat-value">{stats.resolvedCount}</div>
-          <span style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 600, marginTop: '0.25rem' }}>
-            {stats.totalComplaints > 0 ? Math.round((stats.resolvedCount / stats.totalComplaints) * 100) : 0}% Citizen Satisfaction
-          </span>
-        </div>
 
-        <div className="stat-card" style={{ borderLeft: '4px solid #e11d48' }}>
-          <div className="stat-top">
-            <span className="stat-label">Overdue Alerts (&gt;72h)</span>
-            <AlertTriangle size={18} color="#e11d48" />
+          <div className="stat-card">
+            <div className="stat-top">
+              <span className="stat-label">Resolved</span>
+              <CheckCircle2 size={16} color="#235336" />
+            </div>
+            <div className="stat-value" style={{ color: '#235336' }}>{stats.resolvedCount}</div>
+            <span className="stat-subtext">
+              {stats.totalComplaints > 0 ? Math.round((stats.resolvedCount / stats.totalComplaints) * 100) : 0}% Closed
+            </span>
           </div>
-          <div className="stat-value" style={{ color: '#e11d48' }}>{stats.overdueCount}</div>
-          <span style={{ fontSize: '0.75rem', color: '#e11d48', marginTop: '0.25rem' }}>
-            Requires Supervisor Review
-          </span>
+
+          <div className="stat-card">
+            <div className="stat-top">
+              <span className="stat-label">Overdue Alerts</span>
+              <AlertTriangle size={16} color="#993030" />
+            </div>
+            <div className="stat-value" style={{ color: '#993030' }}>{stats.overdueCount}</div>
+            <span className="stat-subtext">&gt; 72h Pending Review</span>
+          </div>
         </div>
       </div>
 
@@ -148,15 +130,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       <div className="civic-card">
         <div className="civic-card-header" style={{ flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <span className="hero-pill">
-              <ShieldAlert size={12} style={{ marginRight: '0.35rem' }} />
-              Decision Intelligence
-            </span>
-            <h3 className="civic-card-title">
-              Supervisor Escalation Feed
-            </h3>
+            <span className="hero-pill">Decision Intelligence</span>
+            <h3 className="civic-card-title">Escalation Feed</h3>
             <p className="civic-card-desc">
-              Flags overdue tickets in queue (&gt; 72 hours) and staff workload bottlenecks.
+              Overdue tickets and technician workload alerts.
             </p>
           </div>
 
@@ -166,7 +143,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               className={`segmented-toggle-btn ${activeAlertTab === 'pending' ? 'active' : ''}`}
               onClick={() => setActiveAlertTab('pending')}
             >
-              Pending Approval ({pendingAlerts.length})
+              Pending ({pendingAlerts.length})
             </button>
             <button
               id="btn-alert-tab-resolved"
@@ -181,157 +158,112 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         {/* Pending Alerts */}
         {activeAlertTab === 'pending' ? (
           pendingAlerts.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {pendingAlerts.map((alert) => (
                 <div
                   key={alert.audit_id}
-                  style={{
-                    padding: '1.15rem',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid #fecdd3',
-                    background: '#fff1f2',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.65rem',
-                  }}
+                  className="civic-card alert-item-card"
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span className="badge badge-overdue">
-                        <AlertTriangle size={12} style={{ marginRight: '0.25rem' }} />
-                        {alert.alert_type}
+                      <span className="status-pill status-overdue">
+                        <AlertTriangle size={11} />
+                        <span>{alert.alert_type}</span>
                       </span>
-                      <strong style={{ fontSize: '0.9rem', fontFamily: 'monospace' }}>
-                        #CMP-{alert.complaint_id.toString().padStart(4, '0')}
+                      <strong style={{ fontSize: '0.85rem' }}>
+                        CMP-{alert.complaint_id.toString().padStart(4, '0')}
                       </strong>
                     </div>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                      <Clock size={12} />
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                       Flagged: {new Date(alert.created_at).toLocaleDateString()}
                     </span>
                   </div>
 
-                  <div style={{ fontSize: '0.85rem', color: '#9f1239' }}>
-                    <strong>Detected Issue: </strong>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-body)', margin: '0.35rem 0' }}>
                     {alert.explanation}
+                  </p>
+
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                    Action: <strong>{alert.suggested_action}</strong>
                   </div>
 
-                  <div
-                    style={{
-                      padding: '0.65rem 0.85rem',
-                      background: '#ffffff',
-                      borderRadius: 'var(--radius-sm)',
-                      border: '1px solid #fecdd3',
-                      fontSize: '0.82rem',
-                      color: 'var(--text-main)',
-                    }}
-                  >
-                    <strong>Recommended Action: </strong>
-                    {alert.suggested_action}
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.25rem', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.5rem' }}>
                     <button
                       id={`btn-reject-alert-${alert.audit_id}`}
-                      className="btn-secondary btn-sm"
+                      className="btn-pill-secondary btn-sm"
                       onClick={() => onResolveDecision(alert.audit_id, 'Rejected')}
                     >
-                      <XCircle size={14} />
-                      <span>Dismiss Alert</span>
+                      <XCircle size={13} />
+                      <span>Dismiss</span>
                     </button>
                     <button
                       id={`btn-approve-alert-${alert.audit_id}`}
-                      className="btn-primary btn-sm"
-                      style={{ background: '#e11d48' }}
+                      className="btn-pill-primary btn-sm"
                       onClick={() => onResolveDecision(alert.audit_id, 'Approved')}
                     >
-                      <CheckCircle2 size={14} />
-                      <span>Authorize Re-assignment</span>
+                      <CheckCircle2 size={13} />
+                      <span>Authorize</span>
                     </button>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: '2.5rem 1.5rem' }}>
-              <CheckCircle2 size={36} color="#059669" style={{ margin: '0 auto 0.75rem' }} />
-              <strong style={{ display: 'block', color: 'var(--text-main)', fontSize: '1.05rem' }}>
-                All Escalation Queues Clear
+            <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+              <CheckCircle2 size={32} color="#233d2c" style={{ margin: '0 auto 0.5rem' }} />
+              <strong style={{ display: 'block', color: 'var(--text-main)', fontSize: '0.95rem' }}>
+                All Escalations Clear
               </strong>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                No pending bottlenecks or staff overload alerts detected. City operations running smoothly.
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                No pending bottlenecks detected.
               </span>
             </div>
           )
         ) : (
-          /* Audit Trail - Responsive: Table on Desktop, Cards on Mobile */
-          <>
-            <div className="hide-on-mobile" style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border-subtle)', textAlign: 'left', color: 'var(--text-muted)' }}>
-                    <th style={{ padding: '0.65rem' }}>Audit ID</th>
-                    <th style={{ padding: '0.65rem' }}>Alert Type</th>
-                    <th style={{ padding: '0.65rem' }}>Ticket</th>
-                    <th style={{ padding: '0.65rem' }}>Action Taken</th>
-                    <th style={{ padding: '0.65rem' }}>Supervisor Decision</th>
+          <div className="responsive-table-wrap">
+            <table className="civic-table hide-on-mobile">
+              <thead>
+                <tr>
+                  <th>Audit ID</th>
+                  <th>Type</th>
+                  <th>Ticket</th>
+                  <th>Action</th>
+                  <th>Decision</th>
+                </tr>
+              </thead>
+              <tbody>
+                {resolvedAlerts.map((log) => (
+                  <tr key={log.audit_id}>
+                    <td>#{log.audit_id}</td>
+                    <td>{log.alert_type}</td>
+                    <td>CMP-{log.complaint_id.toString().padStart(4, '0')}</td>
+                    <td>{log.suggested_action}</td>
+                    <td>
+                      <span className={`status-pill ${log.supervisor_decision === 'Approved' ? 'status-resolved' : 'status-overdue'}`}>
+                        {log.supervisor_decision}
+                      </span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {resolvedAlerts.map((log) => (
-                    <tr key={log.audit_id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                      <td style={{ padding: '0.65rem', fontFamily: 'monospace' }}>#{log.audit_id}</td>
-                      <td style={{ padding: '0.65rem', fontWeight: 600 }}>{log.alert_type}</td>
-                      <td style={{ padding: '0.65rem', fontFamily: 'monospace', color: 'var(--primary-blue)' }}>
-                        #CMP-{log.complaint_id.toString().padStart(4, '0')}
-                      </td>
-                      <td style={{ padding: '0.65rem', maxWidth: '300px', color: 'var(--text-body)' }}>
-                        {log.suggested_action}
-                      </td>
-                      <td style={{ padding: '0.65rem' }}>
-                        <span className={`badge ${log.supervisor_decision === 'Approved' ? 'badge-resolved' : 'badge-overdue'}`}>
-                          {log.supervisor_decision}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
 
-            {/* Mobile View for Audit Trail */}
-            <div className="hide-on-desktop" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {/* Mobile Cards */}
+            <div className="mobile-complaints-card-list hide-on-desktop">
               {resolvedAlerts.map((log) => (
-                <div
-                  key={log.audit_id}
-                  style={{
-                    padding: '0.9rem',
-                    background: 'var(--bg-surface)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-sm)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.45rem',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <strong style={{ fontSize: '0.82rem', fontFamily: 'monospace' }}>
-                      #CMP-{log.complaint_id.toString().padStart(4, '0')}
-                    </strong>
-                    <span className={`badge ${log.supervisor_decision === 'Approved' ? 'badge-resolved' : 'badge-overdue'}`}>
+                <div key={log.audit_id} className="mobile-ticket-card">
+                  <div className="mobile-card-top">
+                    <span className="ticket-code-pill">CMP-{log.complaint_id.toString().padStart(4, '0')}</span>
+                    <span className={`status-pill ${log.supervisor_decision === 'Approved' ? 'status-resolved' : 'status-overdue'}`}>
                       {log.supervisor_decision}
                     </span>
                   </div>
-                  <div style={{ fontSize: '0.82rem', color: 'var(--text-main)', fontWeight: 600 }}>
-                    {log.alert_type}
-                  </div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                    {log.suggested_action}
-                  </div>
+                  <strong style={{ fontSize: '0.85rem' }}>{log.alert_type}</strong>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{log.suggested_action}</p>
                 </div>
               ))}
             </div>
-          </>
+          </div>
         )}
       </div>
 
@@ -339,81 +271,44 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       <div className="civic-card">
         <div className="civic-card-header">
           <div>
-            <span className="hero-pill">
-              <Building2 size={12} style={{ marginRight: '0.35rem' }} />
-              Capacity Monitoring
-            </span>
-            <h3 className="civic-card-title">
-              Department Performance &amp; Resolution
-            </h3>
+            <span className="hero-pill">Capacity Monitoring</span>
+            <h3 className="civic-card-title">Department Performance</h3>
             <p className="civic-card-desc">
-              Resolution rates, ticket capacity, and dispatch depots across the 6 municipal agencies.
+              Resolution velocity and volume across the 6 municipal agencies.
             </p>
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.85rem' }}>
           {departmentStats.map((dept) => (
             <div
               key={dept.department_id}
-              style={{
-                padding: '1.15rem',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-subtle)',
-                background: 'var(--bg-surface)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.65rem',
-              }}
+              className="dept-stat-card"
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: 'var(--radius-sm)',
-                      background: `${dept.bar}15`,
-                      color: dept.bar,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                  <div className="dept-stat-icon" style={{ background: '#f2efe9', color: 'var(--primary-moss)' }}>
                     {dept.icon}
                   </div>
-                  <strong style={{ fontSize: '0.88rem', color: 'var(--text-main)' }}>
+                  <strong style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>
                     {dept.department_name}
                   </strong>
                 </div>
-                <span style={{ fontSize: '0.9rem', fontWeight: 700, color: dept.text }}>
+                <span style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--primary-moss)' }}>
                   {dept.resolutionRate}%
                 </span>
               </div>
 
               {/* Progress Bar */}
-              <div
-                style={{
-                  height: '8px',
-                  width: '100%',
-                  borderRadius: 'var(--radius-full)',
-                  background: 'var(--bg-subtle)',
-                  overflow: 'hidden',
-                }}
-              >
+              <div className="dept-progress-track">
                 <div
-                  style={{
-                    height: '100%',
-                    width: `${dept.resolutionRate}%`,
-                    background: dept.bar,
-                    borderRadius: 'var(--radius-full)',
-                    transition: 'width 0.4s ease',
-                  }}
+                  className="dept-progress-fill"
+                  style={{ width: `${dept.resolutionRate}%`, background: 'var(--primary-moss)' }}
                 />
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                <span>Total Workload: <strong>{dept.total}</strong> Tickets</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                <span>{dept.total} Tickets</span>
                 <span>{dept.office_location}</span>
               </div>
             </div>

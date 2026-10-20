@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import {
   Department,
   Staff,
@@ -115,7 +114,6 @@ export default function Home() {
         onNewComplaintClick={() => {
           setActivePortal('citizen');
           setTrackedId(null);
-          // Scroll smoothly to form
           const el = document.getElementById('citizen-form-section');
           if (el) el.scrollIntoView({ behavior: 'smooth' });
         }}
@@ -129,111 +127,77 @@ export default function Home() {
 
       {/* Main Content Area */}
       <main className="main-content">
-        {/* Civic Hero Section with Real Generated Municipal Imagery */}
-        <section className="hero-banner-section">
-          <div className="hero-banner-image-wrapper">
-            <Image
-              src="/images/hero-civic.jpg"
-              alt="City Hall and Civic Operations Center"
-              fill
-              priority
-              className="hero-banner-image"
-              sizes="100vw"
-            />
-            <div className="hero-banner-overlay"></div>
-          </div>
+        {/* Civic Hero Section (Compact & Image-Free, Leafora Warm Natural Style) */}
+        <section className="civic-hero-wrap">
+          <div className="civic-hero-card">
+            <div className="hero-top-badge">
+              <Sparkles size={13} color="#243e2e" />
+              <span>MUNICIPAL CARE &amp; REDRESSAL</span>
+            </div>
 
-          <div className="container hero-banner-container">
-            <div className="hero-banner-content">
-              <div className="hero-badge">
-                <Sparkles size={14} color="#fde047" />
-                <span>Municipal Services &amp; Infrastructure Portal</span>
+            <h1 className="civic-hero-title">
+              Direct Civic Care for Every Neighborhood
+            </h1>
+
+            <p className="civic-hero-desc">
+              Report infrastructure issues, track on-site inspections, and verify repairs in real time.
+            </p>
+
+            <div className="civic-hero-actions">
+              <button
+                id="hero-btn-file-grievance"
+                className="btn-pill-primary"
+                onClick={() => {
+                  setActivePortal('citizen');
+                  setTrackedId(null);
+                  const el = document.getElementById('citizen-form-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                <Plus size={16} strokeWidth={2.5} />
+                <span>File Grievance</span>
+              </button>
+
+              <button
+                id="hero-btn-track-status"
+                className="btn-pill-secondary"
+                onClick={() => {
+                  setActivePortal('citizen');
+                  setTrackedId(complaints[0]?.complaint_id || null);
+                  const el = document.getElementById('citizen-tracking-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                <Search size={16} strokeWidth={2.2} />
+                <span>Track Ticket</span>
+              </button>
+
+              <a href="tel:1122" className="helpline-pill-link">
+                <PhoneCall size={14} />
+                <span>24/7 Helpline: 1122</span>
+              </a>
+            </div>
+
+            {/* Quick Metrics Strip */}
+            <div className="hero-stats-row">
+              <div className="hero-stat-chip">
+                <span className="hero-stat-number">{stats.totalComplaints}</span>
+                <span className="hero-stat-label">Total Logged</span>
               </div>
 
-              <h1 className="hero-banner-title">
-                Direct Citizen Grievance Redressal &amp; Field Dispatch
-              </h1>
-
-              <p className="hero-banner-desc">
-                Register neighborhood infrastructure issues, track inspection and repair progress in real time, and connect directly with municipal service crews across the metropolitan region.
-              </p>
-
-              <div className="hero-banner-cta-group">
-                <button
-                  id="hero-btn-file-grievance"
-                  className="btn-hero-primary"
-                  onClick={() => {
-                    setActivePortal('citizen');
-                    setTrackedId(null);
-                    const el = document.getElementById('citizen-form-section');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  <Plus size={18} strokeWidth={2.5} />
-                  <span>File a Grievance</span>
-                </button>
-
-                <button
-                  id="hero-btn-track-status"
-                  className="btn-hero-secondary"
-                  onClick={() => {
-                    setActivePortal('citizen');
-                    setTrackedId(complaints[0]?.complaint_id || null);
-                    const el = document.getElementById('citizen-tracking-section');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  <Search size={18} strokeWidth={2.2} />
-                  <span>Track Status by Ticket ID</span>
-                </button>
-
-                <a href="tel:1122" className="btn-hero-tertiary">
-                  <PhoneCall size={17} />
-                  <span>24/7 Helpline: 1122</span>
-                </a>
+              <div className="hero-stat-chip">
+                <span className="hero-stat-number" style={{ color: '#235336' }}>{stats.resolvedCount}</span>
+                <span className="hero-stat-label">Resolved</span>
               </div>
 
-              {/* Quick Metrics Strip */}
-              <div className="hero-metrics-strip">
-                <div className="hero-metric-card">
-                  <div className="hero-metric-icon">
-                    <FileText size={18} color="#2563eb" />
-                  </div>
-                  <div>
-                    <strong className="hero-metric-val">{stats.totalComplaints}</strong>
-                    <span className="hero-metric-lbl">Total Registered</span>
-                  </div>
-                </div>
+              <div className="hero-stat-chip">
+                <span className="hero-stat-number" style={{ color: '#8a6523' }}>{stats.inProgressCount}</span>
+                <span className="hero-stat-label">In Progress</span>
+              </div>
 
-                <div className="hero-metric-card">
-                  <div className="hero-metric-icon">
-                    <CheckCircle2 size={18} color="#059669" />
-                  </div>
-                  <div>
-                    <strong className="hero-metric-val">{stats.resolvedCount}</strong>
-                    <span className="hero-metric-lbl">Cases Resolved</span>
-                  </div>
-                </div>
-
-                <div className="hero-metric-card">
-                  <div className="hero-metric-icon">
-                    <Wrench size={18} color="#d97706" />
-                  </div>
-                  <div>
-                    <strong className="hero-metric-val">{stats.inProgressCount}</strong>
-                    <span className="hero-metric-lbl">Active In Progress</span>
-                  </div>
-                </div>
-
-                <div className="hero-metric-card">
-                  <div className="hero-metric-icon">
-                    <Clock size={18} color="#7c3aed" />
-                  </div>
-                  <div>
-                    <strong className="hero-metric-val">{stats.avgResolutionHours}h</strong>
-                    <span className="hero-metric-lbl">Avg. Resolution</span>
-                  </div>
-                </div>
+              <div className="hero-stat-chip">
+                <span className="hero-stat-number">{stats.avgResolutionHours}h</span>
+                <span className="hero-stat-label">Avg. Resolution</span>
               </div>
             </div>
           </div>

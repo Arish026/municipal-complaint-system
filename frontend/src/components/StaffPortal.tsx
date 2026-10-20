@@ -14,11 +14,8 @@ import {
   Send,
   Building2,
   User,
-  ShieldCheck,
-  Filter,
   Activity,
   Layers,
-  ChevronRight,
 } from 'lucide-react';
 
 interface StaffPortalProps {
@@ -79,29 +76,26 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {/* Top Banner */}
       <div className="civic-card">
         <div className="civic-card-header">
           <div>
-            <span className="hero-pill">
-              <Wrench size={13} color="var(--primary-blue)" />
-              Field Operations &amp; Inspection Desk
-            </span>
-            <h2 className="civic-card-title">Field Technician Workdesk</h2>
+            <span className="hero-pill">Field Operations</span>
+            <h2 className="civic-card-title">Technician Desk</h2>
             <p className="civic-card-desc">
-              Manage assigned municipal work orders, log physical on-site diagnostic remarks, and certify maintenance resolution.
+              Manage work orders, log inspection notes, and confirm repairs.
             </p>
           </div>
 
           {/* Profile Switcher */}
-          <div style={{ minWidth: '260px' }}>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-              Select Active Field Personnel:
+          <div style={{ minWidth: '220px' }}>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+              Select Personnel:
             </label>
             <select
               id="select-active-technician"
-              className="form-select"
+              className="form-select sm"
               value={selectedStaffId}
               onChange={(e) => setSelectedStaffId(Number(e.target.value))}
             >
@@ -116,31 +110,31 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
 
         {/* Technician Info Banner */}
         <div className="staff-info-banner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <div className="staff-avatar-circle">
               {currentStaff.name.charAt(0)}
             </div>
             <div>
-              <strong style={{ fontSize: '1rem', color: 'var(--text-main)', display: 'block' }}>
+              <strong style={{ fontSize: '0.95rem', color: 'var(--text-main)', display: 'block' }}>
                 {currentStaff.name}
               </strong>
-              <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                {currentStaff.designation} • {currentStaff.phone}
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                {currentStaff.designation} • {currentStaff.department_name}
               </span>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.82rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.8rem' }}>
             <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block' }}>Assigned Jobs</span>
-              <strong style={{ color: 'var(--primary-blue)', fontSize: '0.95rem' }}>
+              <span style={{ color: 'var(--text-muted)', display: 'block' }}>Assigned</span>
+              <strong style={{ color: 'var(--primary-moss)', fontSize: '0.95rem' }}>
                 {staffOrders.length} Tasks
               </strong>
             </div>
             <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block' }}>Operating Department</span>
+              <span style={{ color: 'var(--text-muted)', display: 'block' }}>Phone</span>
               <strong style={{ color: 'var(--text-main)', fontSize: '0.95rem' }}>
-                {currentStaff.department_name}
+                {currentStaff.phone}
               </strong>
             </div>
           </div>
@@ -162,8 +156,8 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
           ))}
         </div>
 
-        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-          Showing {staffOrders.length} work orders in technician queue
+        <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+          {staffOrders.length} active jobs
         </span>
       </div>
 
@@ -178,10 +172,10 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
                 <div className="work-order-top">
                   <div>
                     <span className="work-order-id-code">
-                      WORK ORDER #{order.work_order_id.toString().padStart(4, '0')}
+                      ORDER #{order.work_order_id.toString().padStart(4, '0')}
                     </span>
                     <h3 className="work-order-title">
-                      {linkedComplaint?.category || 'Field Repair'}
+                      {linkedComplaint?.category || 'Repair Task'}
                     </h3>
                   </div>
                   <span className={`status-pill status-${order.work_status.toLowerCase().replace(/\s+/g, '')}`}>
@@ -191,36 +185,36 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
 
                 <div className="work-order-location-box">
                   <div className="location-heading">
-                    <MapPin size={15} />
+                    <MapPin size={13} />
                     <span>{linkedComplaint?.location || 'Assigned Zone'}</span>
                   </div>
                   <p className="location-desc">
-                    {linkedComplaint?.description || 'Inspection and site maintenance required.'}
+                    {linkedComplaint?.description || 'Inspection required.'}
                   </p>
                 </div>
 
                 <div className="inspection-log-box">
                   <span className="log-caption">
                     <FileCheck size={12} />
-                    <span>Inspection Remarks &amp; Action Taken:</span>
+                    <span>Remarks:</span>
                   </span>
                   <div className="log-text">
-                    {order.action_taken || 'No field remarks logged yet.'}
+                    {order.action_taken || 'No remarks recorded.'}
                   </div>
                 </div>
 
                 <div className="work-order-footer">
                   <div className="assigned-date-item">
-                    <Calendar size={13} />
-                    <span>Assigned: {new Date(order.assigned_date).toLocaleDateString()}</span>
+                    <Calendar size={12} />
+                    <span>{new Date(order.assigned_date).toLocaleDateString()}</span>
                   </div>
                   <button
                     id={`btn-update-order-${order.work_order_id}`}
-                    className="btn-primary btn-sm"
+                    className="btn-pill-primary btn-sm"
                     onClick={() => handleOpenEdit(order)}
                   >
-                    <FileCheck size={14} />
-                    <span>Update Status</span>
+                    <FileCheck size={13} />
+                    <span>Update</span>
                   </button>
                 </div>
               </div>
@@ -229,9 +223,9 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
         </div>
       ) : (
         <div className="civic-card empty-orders-card">
-          <Clock size={32} strokeWidth={1.5} color="var(--text-muted)" style={{ margin: '0 auto 0.5rem' }} />
-          <h3>No Assigned Jobs Found</h3>
-          <p>No active work orders currently assigned to {currentStaff.name} matching filter &ldquo;{statusFilter}&rdquo;.</p>
+          <Clock size={28} strokeWidth={1.5} color="var(--text-muted)" style={{ margin: '0 auto 0.5rem' }} />
+          <h3>No Orders Found</h3>
+          <p>No active work orders for {currentStaff.name}.</p>
         </div>
       )}
 
@@ -241,15 +235,15 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
           <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2 className="modal-title">
-                Update Work Order #{activeEditingOrder.work_order_id.toString().padStart(4, '0')}
+                Update Order #{activeEditingOrder.work_order_id.toString().padStart(4, '0')}
               </h2>
             </div>
             <form onSubmit={handleSaveUpdate}>
-              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div className="form-group">
                   <label className="form-label">
-                    <Activity size={14} />
-                    <span>Work Order Status *</span>
+                    <Activity size={13} />
+                    <span>Status *</span>
                   </label>
                   <select
                     id="select-edit-order-status"
@@ -258,22 +252,22 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
                     onChange={(e) => setEditStatus(e.target.value as WorkOrderStatus)}
                   >
                     <option value="Assigned">Assigned (Queued)</option>
-                    <option value="In Progress">In Progress (Field Work Started)</option>
-                    <option value="Completed">Completed (Repairs Executed)</option>
-                    <option value="On Hold">On Hold (Pending Material)</option>
+                    <option value="In Progress">In Progress (Active)</option>
+                    <option value="Completed">Completed (Resolved)</option>
+                    <option value="On Hold">On Hold (Pending)</option>
                   </select>
                 </div>
 
                 <div className="form-group">
                   <label className="form-label">
-                    <FileCheck size={14} />
-                    <span>Field Action Notes &amp; Observations</span>
+                    <FileCheck size={13} />
+                    <span>Action Notes</span>
                   </label>
                   <textarea
                     id="input-edit-order-notes"
                     className="form-textarea"
                     rows={3}
-                    placeholder="Describe what was repaired, inspected, or replaced on site..."
+                    placeholder="Describe repair actions or diagnosis..."
                     value={actionNotes}
                     onChange={(e) => setActionNotes(e.target.value)}
                   />
@@ -283,7 +277,7 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
               <div className="modal-footer">
                 <button
                   type="button"
-                  className="btn-secondary btn-sm"
+                  className="btn-pill-secondary btn-sm"
                   onClick={() => setActiveEditingOrder(null)}
                 >
                   Cancel
@@ -291,11 +285,11 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
                 <button
                   id="btn-save-order-status"
                   type="submit"
-                  className="btn-primary btn-sm"
+                  className="btn-pill-primary btn-sm"
                   disabled={isUpdating}
                 >
-                  <Send size={14} />
-                  <span>{isUpdating ? 'Saving...' : 'Save Update'}</span>
+                  <Send size={13} />
+                  <span>{isUpdating ? 'Saving...' : 'Save'}</span>
                 </button>
               </div>
             </form>

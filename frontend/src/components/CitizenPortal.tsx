@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import Image from 'next/image';
 import { Department, Complaint, ComplaintStatus } from '../types';
 import {
   FileText,
@@ -25,9 +24,6 @@ import {
   Trees,
   Filter,
   Eye,
-  ExternalLink,
-  ChevronRight,
-  ArrowRight,
   Activity,
   Sparkles,
 } from 'lucide-react';
@@ -57,58 +53,40 @@ const STATUS_STEPS: ComplaintStatus[] = [
 
 interface DeptStyle {
   icon: React.ReactNode;
-  image?: string;
-  color: string;
-  bg: string;
-  border: string;
+  label: string;
   tagline: string;
 }
 
 const DEPT_METADATA: Record<number, DeptStyle> = {
   1: {
     icon: <Droplets size={22} strokeWidth={2} />,
-    image: '/images/water-service.jpg',
-    color: '#0284c7',
-    bg: '#f0f9ff',
-    border: '#bae6fd',
-    tagline: 'Pipelines, leaks & sewage',
+    label: 'Water',
+    tagline: 'Pipelines & sewage',
   },
   2: {
     icon: <Construction size={22} strokeWidth={2} />,
-    image: '/images/road-service.jpg',
-    color: '#d97706',
-    bg: '#fffbeb',
-    border: '#fde68a',
-    tagline: 'Potholes, paving & curbs',
+    label: 'Roads',
+    tagline: 'Paving & potholes',
   },
   3: {
     icon: <Trash2 size={22} strokeWidth={2} />,
-    color: '#059669',
-    bg: '#ecfdf5',
-    border: '#a7f3d0',
-    tagline: 'Dumpsters & refuse cleanup',
+    label: 'Sanitation',
+    tagline: 'Refuse & waste',
   },
   4: {
     icon: <Lightbulb size={22} strokeWidth={2} />,
-    color: '#ca8a04',
-    bg: '#fefce8',
-    border: '#fef08a',
-    tagline: 'Street lighting & cables',
+    label: 'Lighting',
+    tagline: 'Poles & wiring',
   },
   5: {
     icon: <ShieldAlert size={22} strokeWidth={2} />,
-    color: '#e11d48',
-    bg: '#fff1f2',
-    border: '#fecdd3',
-    tagline: 'Vector control & sanitation',
+    label: 'Health',
+    tagline: 'Sanitation & vector',
   },
   6: {
     icon: <Trees size={22} strokeWidth={2} />,
-    image: '/images/park-service.jpg',
-    color: '#0d9488',
-    bg: '#f0fdfa',
-    border: '#99f6e4',
-    tagline: 'Parks, landscaping & trees',
+    label: 'Parks',
+    tagline: 'Greenery & trees',
   },
 };
 
@@ -159,11 +137,11 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
       return;
     }
     if (!address.trim()) {
-      setValidationError('Residential address is required for municipal verification.');
+      setValidationError('Residential address is required.');
       return;
     }
     if (location.trim().length < 5) {
-      setValidationError('Incident location must be at least 5 characters (Street, Ward, Landmark).');
+      setValidationError('Incident location must be at least 5 characters.');
       return;
     }
     if (description.trim().length < 10) {
@@ -215,32 +193,32 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      {/* Sub-Navigation Toggle (Mobile-friendly full-width tabs) */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+      {/* Sub-Navigation Toggle */}
       <div className="citizen-sub-nav">
-        <div className="segmented-toggle citizen-segmented-toggle">
+        <div className="segmented-toggle">
           <button
             id="tab-btn-file-grievance"
             className={`segmented-toggle-btn ${activeTab === 'submit' ? 'active' : ''}`}
             onClick={() => setActiveTab('submit')}
           >
-            <FileText size={16} strokeWidth={2} />
-            <span>Lodge a Grievance</span>
+            <FileText size={15} strokeWidth={2} />
+            <span>Lodge Grievance</span>
           </button>
           <button
             id="tab-btn-track-inquiry"
             className={`segmented-toggle-btn ${activeTab === 'track' ? 'active' : ''}`}
             onClick={() => setActiveTab('track')}
           >
-            <Search size={16} strokeWidth={2} />
-            <span>Live Ticket Tracker</span>
+            <Search size={15} strokeWidth={2} />
+            <span>Live Tracker</span>
           </button>
         </div>
 
         <div className="active-records-counter">
-          <Activity size={14} color="#059669" />
-          <span>Active In-System:</span>
-          <strong>{complaints.length} Tickets Registered</strong>
+          <Activity size={13} color="#233d2c" />
+          <span>Active:</span>
+          <strong>{complaints.length} Registered</strong>
         </div>
       </div>
 
@@ -249,44 +227,36 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
         <div id="citizen-form-section" className="civic-card">
           <div className="civic-card-header">
             <div>
-              <span className="hero-pill">
-                <Sparkles size={13} color="var(--primary-blue)" />
-                Citizen Assistance &amp; Lodging
-              </span>
-              <h2 className="civic-card-title">
-                Lodge a Municipal Complaint
-              </h2>
+              <span className="hero-pill">Citizen Assistance</span>
+              <h2 className="civic-card-title">File a Grievance</h2>
               <p className="civic-card-desc">
-                Select the responsible department, provide incident location details, and submit. An official tracking ticket reference will be generated immediately.
+                Select your service category, pinpoint the location, and receive an instant tracking ticket.
               </p>
             </div>
           </div>
 
           {validationError && (
             <div className="form-error-banner">
-              <AlertCircle size={18} strokeWidth={2} />
+              <AlertCircle size={16} strokeWidth={2} />
               <span>{validationError}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
-            {/* Step 1: Citizen Contact */}
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* Step 1: Resident Info */}
             <div className="form-section-block">
               <div className="form-section-heading">
                 <span className="form-section-title">
-                  <User size={16} color="var(--primary-blue)" />
-                  <span>1. Resident Contact Information</span>
-                </span>
-                <span className="form-section-subtitle">
-                  Required for SMS notification and inspector verification
+                  <User size={15} color="var(--primary-moss)" />
+                  <span>1. Contact Details</span>
                 </span>
               </div>
 
               <div className="form-grid">
                 <div className="form-group">
                   <label className="form-label">
-                    <User size={14} />
-                    <span>Full Legal Name *</span>
+                    <User size={13} />
+                    <span>Full Name *</span>
                   </label>
                   <input
                     id="input-citizen-name"
@@ -301,14 +271,14 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
 
                 <div className="form-group">
                   <label className="form-label">
-                    <Phone size={14} />
-                    <span>Contact Mobile Number *</span>
+                    <Phone size={13} />
+                    <span>Mobile Phone *</span>
                   </label>
                   <input
                     id="input-citizen-phone"
                     type="text"
                     className="form-input"
-                    placeholder="0300-1234567 or +1-555-0201"
+                    placeholder="0300-1234567"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     required
@@ -317,14 +287,14 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
 
                 <div className="form-group full-width">
                   <label className="form-label">
-                    <MapPin size={14} />
-                    <span>Residential Street Address *</span>
+                    <MapPin size={13} />
+                    <span>Address *</span>
                   </label>
                   <input
                     id="input-citizen-address"
                     type="text"
                     className="form-input"
-                    placeholder="House / Flat No., Street, Sector, Ward"
+                    placeholder="House/Flat No., Street, Sector"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     required
@@ -333,20 +303,20 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               </div>
             </div>
 
-            {/* Step 2: Department Selection with Visual Imagery */}
+            {/* Step 2: Department Selection (Leafora Squircle Category Buttons) */}
             <div className="form-section-block">
               <div className="form-section-heading">
                 <span className="form-section-title">
-                  <Building2 size={16} color="#059669" />
-                  <span>2. Select Target Municipal Agency</span>
+                  <Building2 size={15} color="var(--primary-moss)" />
+                  <span>2. Select Department</span>
                 </span>
                 <span className="form-section-subtitle">
-                  Directly routes complaint to specialized maintenance crew
+                  {activeDept?.department_name} • {activeDept?.office_location}
                 </span>
               </div>
 
-              {/* Department Cards Grid with Real Imagery */}
-              <div className="category-cards-grid">
+              {/* Squircles Category Row */}
+              <div className="category-squircles-row">
                 {departments.map((dept) => {
                   const meta = DEPT_METADATA[dept.department_id] || DEPT_METADATA[1];
                   const isSelected = dept.department_id === selectedDeptId;
@@ -356,7 +326,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                       key={dept.department_id}
                       type="button"
                       id={`dept-choice-${dept.department_id}`}
-                      className={`dept-visual-card ${isSelected ? 'selected' : ''}`}
+                      className={`squircle-cat-item ${isSelected ? 'selected' : ''}`}
                       onClick={() => {
                         setSelectedDeptId(dept.department_id);
                         const catList = dept.categories || dept.category_keywords || [];
@@ -364,52 +334,11 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                           setCategory(catList[0]);
                         }
                       }}
-                      style={{
-                        borderColor: isSelected ? meta.color : 'var(--border-subtle)',
-                        boxShadow: isSelected ? `0 0 0 2px ${meta.color}25` : undefined,
-                      }}
                     >
-                      {/* Image Thumbnail for departments with photos */}
-                      {meta.image && (
-                        <div className="dept-card-image-box">
-                          <Image
-                            src={meta.image}
-                            alt={dept.department_name}
-                            fill
-                            className="dept-card-img"
-                            sizes="(max-width: 768px) 100vw, 33vw"
-                          />
-                          <div className="dept-card-image-overlay"></div>
-                        </div>
-                      )}
-
-                      <div className="dept-card-body">
-                        <div className="dept-card-top-row">
-                          <div
-                            className="dept-card-icon"
-                            style={{
-                              background: meta.bg,
-                              color: meta.color,
-                              borderColor: meta.border,
-                            }}
-                          >
-                            {meta.icon}
-                          </div>
-                          {isSelected && (
-                            <span className="dept-selected-badge" style={{ background: meta.color }}>
-                              <Check size={12} strokeWidth={3} />
-                              <span>Selected</span>
-                            </span>
-                          )}
-                        </div>
-
-                        <strong className="dept-card-name">{dept.department_name}</strong>
-                        <span className="dept-card-tagline">{meta.tagline}</span>
-                        <span className="dept-card-depot">
-                          <MapPin size={11} />
-                          <span>{dept.office_location}</span>
-                        </span>
+                      <div className="squircle-icon-box">
+                        {meta.icon}
                       </div>
+                      <span className="squircle-cat-label">{meta.label}</span>
                     </button>
                   );
                 })}
@@ -418,9 +347,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               {/* Category Quick Selector Pills */}
               {activeDept && (activeDept.categories || activeDept.category_keywords) && (
                 <div className="category-pills-wrap">
-                  <label className="form-label" style={{ marginBottom: '0.4rem' }}>
-                    <span>Common Issue Types under {activeDept.department_name}:</span>
-                  </label>
+                  <span className="form-sublabel">Common issues in {activeDept.department_name}:</span>
                   <div className="category-pills-row">
                     {(activeDept.categories || activeDept.category_keywords || []).map((catName: string) => (
                       <button
@@ -429,7 +356,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                         className={`category-pill-btn ${category === catName ? 'active' : ''}`}
                         onClick={() => setCategory(catName)}
                       >
-                        <CheckCircle2 size={13} />
+                        <CheckCircle2 size={12} />
                         <span>{catName}</span>
                       </button>
                     ))}
@@ -438,29 +365,26 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               )}
             </div>
 
-            {/* Step 3: Incident Details */}
+            {/* Step 3: Location & Problem Description */}
             <div className="form-section-block">
               <div className="form-section-heading">
                 <span className="form-section-title">
-                  <MapPin size={16} color="#d97706" />
-                  <span>3. Location &amp; Problem Description</span>
-                </span>
-                <span className="form-section-subtitle">
-                  Give clear physical landmarks for rapid dispatch
+                  <MapPin size={15} color="var(--primary-moss)" />
+                  <span>3. Location &amp; Description</span>
                 </span>
               </div>
 
               <div className="form-grid">
                 <div className="form-group full-width">
                   <label className="form-label">
-                    <MapPin size={14} />
-                    <span>Exact Incident Location or Landmark *</span>
+                    <MapPin size={13} />
+                    <span>Exact Landmark or Street *</span>
                   </label>
                   <input
                     id="input-incident-location"
                     type="text"
                     className="form-input"
-                    placeholder="e.g. In front of Central Hospital Gate 2, Main Boulevard"
+                    placeholder="e.g. Near Central Hospital Gate 2, Main Boulevard"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     required
@@ -469,14 +393,14 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
 
                 <div className="form-group full-width">
                   <label className="form-label">
-                    <FileText size={14} />
-                    <span>Detailed Grievance Narrative * (min 10 characters)</span>
+                    <FileText size={13} />
+                    <span>Problem Description *</span>
                   </label>
                   <textarea
                     id="input-incident-description"
                     className="form-textarea"
-                    rows={4}
-                    placeholder="Describe the severity, duration, and immediate safety impact on residents..."
+                    rows={3}
+                    placeholder="Briefly describe the issue and safety impact..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     required
@@ -490,15 +414,15 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               <button
                 type="submit"
                 id="btn-submit-complaint"
-                className="btn-primary"
-                style={{ minWidth: '220px', padding: '0.85rem 1.5rem', fontSize: '0.95rem' }}
+                className="btn-pill-primary"
+                style={{ padding: '0.85rem 2rem', fontSize: '0.95rem' }}
               >
-                <Send size={16} />
-                <span>Submit Grievance to Municipal Crew</span>
+                <Send size={15} />
+                <span>Submit Grievance</span>
               </button>
               <span className="form-privacy-note">
-                <ShieldCheck size={14} color="#059669" />
-                <span>Protected under Municipal Right to Redressal Charter</span>
+                <ShieldCheck size={14} color="#233d2c" />
+                <span>Official Redressal Guarantee</span>
               </span>
             </div>
           </form>
@@ -507,30 +431,27 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
 
       {/* VIEW 2: LIVE TICKET TRACKER */}
       {activeTab === 'track' && (
-        <div id="citizen-tracking-section" style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+        <div id="citizen-tracking-section" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {/* Search Header Bar */}
           <div className="civic-card">
             <div className="civic-card-header">
               <div>
-                <span className="hero-pill">
-                  <Search size={13} color="var(--primary-blue)" />
-                  Real-Time Municipal Tracking
-                </span>
+                <span className="hero-pill">Status Verification</span>
                 <h2 className="civic-card-title">Live Grievance Tracker</h2>
                 <p className="civic-card-desc">
-                  Enter your tracking ticket number (e.g. <code>CMP-0001</code> or <code>1</code>) or registered phone number to view live inspection logs.
+                  Enter your ticket ID or phone number to check field inspection notes.
                 </p>
               </div>
             </div>
 
             <div className="tracking-search-bar-wrap">
               <div className="tracking-input-box">
-                <Search size={20} className="tracking-search-icon" />
+                <Search size={18} className="tracking-search-icon" />
                 <input
                   id="input-track-ticket-search"
                   type="text"
                   className="tracking-search-input"
-                  placeholder="Search by ticket ID (e.g., CMP-0001) or phone number..."
+                  placeholder="Ticket ID (e.g. 1, CMP-0001) or phone number..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -538,16 +459,16 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                   <button
                     className="tracking-clear-btn"
                     onClick={() => setSearchQuery('')}
-                    aria-label="Clear search query"
+                    aria-label="Clear search"
                   >
                     Clear
                   </button>
                 )}
               </div>
 
-              {/* Quick Preset Buttons */}
+              {/* Sample Ticket Chips */}
               <div className="quick-presets-row">
-                <span className="preset-label">Quick Sample Tickets:</span>
+                <span className="preset-label">Sample Tickets:</span>
                 {complaints.slice(0, 4).map((c) => (
                   <button
                     key={c.complaint_id}
@@ -555,7 +476,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                     className="preset-ticket-btn"
                     onClick={() => setSearchQuery(c.complaint_id.toString())}
                   >
-                    <CheckCircle2 size={12} />
+                    <CheckCircle2 size={11} />
                     <span>CMP-000{c.complaint_id} ({c.category.split(' ')[0]})</span>
                   </button>
                 ))}
@@ -579,23 +500,14 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
 
                 <div className="ticket-dossier-meta">
                   <span className="meta-item">
-                    <Calendar size={14} />
-                    <span>Lodged: {new Date(selectedComplaint.complaint_date).toLocaleDateString()}</span>
-                  </span>
-                  <span className="meta-item">
-                    <Clock size={14} />
-                    <span>Time: {new Date(selectedComplaint.complaint_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    <Calendar size={13} />
+                    <span>{new Date(selectedComplaint.complaint_date).toLocaleDateString()}</span>
                   </span>
                 </div>
               </div>
 
-              {/* Responsive Lifecycle Timeline */}
+              {/* Lifecycle Milestones */}
               <div className="lifecycle-timeline-wrap">
-                <h4 className="timeline-title">
-                  <Activity size={16} color="var(--primary-blue)" />
-                  <span>Official Resolution Milestones</span>
-                </h4>
-
                 <div className="timeline-steps-track">
                   {STATUS_STEPS.map((step, idx) => {
                     const currentIdx = getCurrentStepIndex(selectedComplaint.status);
@@ -608,7 +520,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                         className={`timeline-step-node ${isDone ? 'completed' : ''} ${isCurrent ? 'current' : ''}`}
                       >
                         <div className="timeline-node-circle">
-                          {isDone ? <Check size={14} strokeWidth={3} /> : idx + 1}
+                          {isDone ? <Check size={12} strokeWidth={3} /> : idx + 1}
                         </div>
                         <span className="timeline-step-label">{step}</span>
                       </div>
@@ -620,62 +532,60 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               {/* Ticket Details Grid */}
               <div className="ticket-details-grid">
                 <div className="ticket-detail-item">
-                  <span className="detail-lbl">Responsible Department</span>
-                  <strong className="detail-val" style={{ color: 'var(--primary-blue)' }}>
-                    {selectedComplaint.department_name}
-                  </strong>
+                  <span className="detail-lbl">Department</span>
+                  <strong className="detail-val">{selectedComplaint.department_name}</strong>
                 </div>
 
                 <div className="ticket-detail-item">
-                  <span className="detail-lbl">Issue Category</span>
+                  <span className="detail-lbl">Issue</span>
                   <strong className="detail-val">{selectedComplaint.category}</strong>
                 </div>
 
                 <div className="ticket-detail-item">
-                  <span className="detail-lbl">Incident Location</span>
+                  <span className="detail-lbl">Location</span>
                   <strong className="detail-val">{selectedComplaint.location}</strong>
                 </div>
 
                 <div className="ticket-detail-item">
-                  <span className="detail-lbl">Submitter Name</span>
-                  <strong className="detail-val">{selectedComplaint.citizen_name || 'Verified Citizen'}</strong>
+                  <span className="detail-lbl">Resident</span>
+                  <strong className="detail-val">{selectedComplaint.citizen_name || 'Citizen'}</strong>
                 </div>
 
                 <div className="ticket-detail-item full-width">
-                  <span className="detail-lbl">Citizen Narrative</span>
+                  <span className="detail-lbl">Description</span>
                   <p className="detail-desc">{selectedComplaint.description}</p>
                 </div>
               </div>
             </div>
           ) : (
             <div className="civic-card empty-search-card">
-              <AlertCircle size={36} color="var(--text-muted)" />
+              <AlertCircle size={32} color="var(--text-muted)" />
               <h3>No Ticket Found</h3>
-              <p>We could not find any active complaint matching &quot;{searchQuery}&quot;. Please verify the ticket code or phone number.</p>
+              <p>No complaint found matching &quot;{searchQuery}&quot;. Please check the number.</p>
             </div>
           )}
 
-          {/* All Registered Neighborhood Complaints Table */}
+          {/* Registered Neighborhood Complaints */}
           <div className="civic-card">
             <div className="civic-card-header">
               <div>
-                <span className="hero-pill">Community Registry</span>
+                <span className="hero-pill">Public Ledger</span>
                 <h3 className="civic-card-title">Recent Neighborhood Complaints</h3>
                 <p className="civic-card-desc">
-                  Transparent public ledger of all registered grievances across municipal divisions.
+                  Transparent municipal registry of active grievances.
                 </p>
               </div>
 
               {/* Filters */}
               <div className="table-filter-bar">
                 <div className="filter-select-box">
-                  <Filter size={14} />
+                  <Filter size={13} />
                   <select
                     className="form-select sm"
                     value={filterDept}
                     onChange={(e) => setFilterDept(e.target.value)}
                   >
-                    <option value="all">All Departments</option>
+                    <option value="all">All Depts</option>
                     {departments.map((d) => (
                       <option key={d.department_id} value={d.department_name}>
                         {d.department_name}
@@ -701,17 +611,17 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               </div>
             </div>
 
-            {/* Responsive Card List on Mobile / Table on Desktop */}
+            {/* Table on Desktop / Card List on Mobile */}
             <div className="responsive-table-wrap">
               <table className="civic-table hide-on-mobile">
                 <thead>
                   <tr>
-                    <th>Ticket ID</th>
+                    <th>Ticket</th>
                     <th>Department</th>
-                    <th>Category</th>
+                    <th>Issue</th>
                     <th>Location</th>
                     <th>Status</th>
-                    <th>Lodged</th>
+                    <th>Date</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -732,14 +642,14 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                       <td>{new Date(c.complaint_date).toLocaleDateString()}</td>
                       <td>
                         <button
-                          className="btn-secondary btn-sm"
+                          className="btn-pill-secondary btn-sm"
                           onClick={() => {
                             setSearchQuery(c.complaint_id.toString());
-                            window.scrollTo({ top: 350, behavior: 'smooth' });
+                            window.scrollTo({ top: 300, behavior: 'smooth' });
                           }}
                         >
-                          <Eye size={13} />
-                          <span>Inspect</span>
+                          <Eye size={12} />
+                          <span>Track</span>
                         </button>
                       </td>
                     </tr>
@@ -763,25 +673,25 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
 
                     <div className="mobile-card-meta">
                       <span className="meta-item">
-                        <MapPin size={13} />
+                        <MapPin size={12} />
                         <span>{c.location}</span>
                       </span>
                       <span className="meta-item">
-                        <Calendar size={13} />
+                        <Calendar size={12} />
                         <span>{new Date(c.complaint_date).toLocaleDateString()}</span>
                       </span>
                     </div>
 
                     <button
-                      className="btn-secondary btn-sm"
-                      style={{ width: '100%', marginTop: '0.65rem', justifyContent: 'center' }}
+                      className="btn-pill-secondary btn-sm"
+                      style={{ width: '100%', marginTop: '0.5rem', justifyContent: 'center' }}
                       onClick={() => {
                         setSearchQuery(c.complaint_id.toString());
-                        window.scrollTo({ top: 350, behavior: 'smooth' });
+                        window.scrollTo({ top: 300, behavior: 'smooth' });
                       }}
                     >
-                      <Eye size={14} />
-                      <span>Track Inspection Progress</span>
+                      <Eye size={13} />
+                      <span>Track Status</span>
                     </button>
                   </div>
                 ))}
