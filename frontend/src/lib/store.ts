@@ -22,10 +22,10 @@ import {
 } from './initialData';
 
 const STORAGE_KEYS = {
-  COMPLAINTS: 'mcms_complaints',
-  WORK_ORDERS: 'mcms_work_orders',
-  AUDIT_LOGS: 'mcms_audit_logs',
-  CITIZENS: 'mcms_citizens',
+  COMPLAINTS: 'mcms_complaints_khi_v2',
+  WORK_ORDERS: 'mcms_work_orders_khi_v2',
+  AUDIT_LOGS: 'mcms_audit_logs_khi_v2',
+  CITIZENS: 'mcms_citizens_khi_v2',
 };
 
 export const getStoredDepartments = (): Department[] => {

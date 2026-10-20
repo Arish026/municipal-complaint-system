@@ -7,14 +7,15 @@ import {
   Wrench,
   BarChart3,
   Plus,
-  PhoneCall,
   Search,
   Menu,
   X,
   ShieldCheck,
   Clock,
   Home,
-  FileText,
+  Eye,
+  Type,
+  MapPin,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -22,6 +23,10 @@ interface NavbarProps {
   setActivePortal: (portal: 'citizen' | 'staff' | 'admin') => void;
   onNewComplaintClick: () => void;
   onTrackClick: () => void;
+  fontSizeLevel: 'normal' | 'large' | 'larger';
+  onFontSizeChange: (level: 'normal' | 'large' | 'larger') => void;
+  highContrast: boolean;
+  onToggleHighContrast: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -29,6 +34,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActivePortal,
   onNewComplaintClick,
   onTrackClick,
+  fontSizeLevel,
+  onFontSizeChange,
+  highContrast,
+  onToggleHighContrast,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -39,29 +48,74 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      <header className="header-wrapper">
-        {/* Top Utility Bar */}
+      <header className="header-wrapper persistent-navbar">
+        {/* Top Utility Bar with Accessibility Controls & Live Indicators (NO HELPLINES/NUMBERS) */}
         <div className="top-utility-bar">
           <div className="container top-utility-content">
             <div className="utility-left">
               <span className="utility-badge">
-                <span className="status-dot-pulse"></span>
-                Operations Live
+                <span className="status-dot-pulse" />
+                Karachi Municipal Grid Live
               </span>
-              <a href="tel:1122" className="utility-item helpline-link">
-                <PhoneCall size={12} />
-                <span>Helpline: <strong>1122</strong> (24/7)</span>
-              </a>
+              <span className="utility-item hide-on-mobile">
+                <MapPin size={12} />
+                <span>Zone: All 7 Karachi Districts</span>
+              </span>
               <span className="utility-divider hide-on-mobile">|</span>
               <span className="utility-item hide-on-mobile">
                 <Clock size={12} />
-                <span>Mon–Sat 8:00 AM – 8:00 PM</span>
+                <span>Field Depots: 24/7 Mon–Sun</span>
               </span>
             </div>
-            <div className="utility-right">
+
+            {/* Ease of Access Controls: Font Scaling & High Contrast */}
+            <div className="utility-right accessibility-tray">
+              <div className="a11y-control-group" title="Adjust Interface Text Size">
+                <Type size={12} className="a11y-icon" />
+                <button
+                  type="button"
+                  className={`a11y-btn ${fontSizeLevel === 'normal' ? 'active' : ''}`}
+                  onClick={() => onFontSizeChange('normal')}
+                  aria-label="Standard Font Size"
+                >
+                  A
+                </button>
+                <button
+                  type="button"
+                  className={`a11y-btn ${fontSizeLevel === 'large' ? 'active' : ''}`}
+                  onClick={() => onFontSizeChange('large')}
+                  aria-label="Large Font Size"
+                >
+                  A+
+                </button>
+                <button
+                  type="button"
+                  className={`a11y-btn ${fontSizeLevel === 'larger' ? 'active' : ''}`}
+                  onClick={() => onFontSizeChange('larger')}
+                  aria-label="Extra Large Font Size"
+                >
+                  A++
+                </button>
+              </div>
+
+              <span className="utility-divider">|</span>
+
+              <button
+                type="button"
+                className={`a11y-contrast-toggle ${highContrast ? 'active' : ''}`}
+                onClick={onToggleHighContrast}
+                title="Toggle High Contrast for Visual Ease"
+                aria-label="Toggle High Contrast Mode"
+              >
+                <Eye size={12} />
+                <span>{highContrast ? 'High Contrast: On' : 'Contrast'}</span>
+              </button>
+
+              <span className="utility-divider hide-on-mobile">|</span>
+
               <span className="utility-item hide-on-mobile">
-                <ShieldCheck size={12} color="#233d2c" />
-                <span>3NF Relational System</span>
+                <ShieldCheck size={12} color="var(--primary-moss)" />
+                <span>Verified 3NF Schema</span>
               </span>
             </div>
           </div>
@@ -80,8 +134,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Building2 size={20} strokeWidth={2.2} />
               </div>
               <div className="brand-title-wrap">
-                <span className="brand-title">Municipal Corporation</span>
-                <span className="brand-subtitle">Civic Grievance &amp; Redressal</span>
+                <span className="brand-title">Karachi Metropolitan Redressal</span>
+                <span className="brand-subtitle">Municipal Complaint &amp; Dispatch Gateway</span>
               </div>
             </div>
 
@@ -93,7 +147,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => handlePortalSwitch('citizen')}
               >
                 <User size={15} strokeWidth={2} />
-                <span>Citizen</span>
+                <span>Citizen Portal</span>
               </button>
               <button
                 id="portal-nav-track"
@@ -104,7 +158,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }}
               >
                 <Search size={15} strokeWidth={2} />
-                <span>Track</span>
+                <span>Live Tracker</span>
               </button>
               <button
                 id="portal-nav-staff"
@@ -112,7 +166,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => handlePortalSwitch('staff')}
               >
                 <Wrench size={15} strokeWidth={2} />
-                <span>Staff</span>
+                <span>Staff Workdesk</span>
               </button>
               <button
                 id="portal-nav-admin"
@@ -120,7 +174,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => handlePortalSwitch('admin')}
               >
                 <BarChart3 size={15} strokeWidth={2} />
-                <span>Admin</span>
+                <span>Command Center</span>
               </button>
             </nav>
 
@@ -132,7 +186,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={onNewComplaintClick}
               >
                 <Plus size={15} strokeWidth={2.5} />
-                <span>File Grievance</span>
+                <span>Lodge Grievance</span>
               </button>
             </div>
 
@@ -158,7 +212,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <Building2 size={16} />
                   </div>
                   <div>
-                    <div className="brand-title" style={{ fontSize: '0.95rem' }}>MCMS Redressal</div>
+                    <div className="brand-title" style={{ fontSize: '0.92rem' }}>Karachi MCMS</div>
                   </div>
                 </div>
                 <button
@@ -172,7 +226,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               <div className="mobile-drawer-body">
                 <div className="mobile-nav-group">
-                  <span className="mobile-group-label">Navigation</span>
+                  <span className="mobile-group-label">Municipal Portals</span>
                   <button
                     className={`mobile-nav-item ${activePortal === 'citizen' ? 'active' : ''}`}
                     onClick={() => handlePortalSwitch('citizen')}
@@ -182,7 +236,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </div>
                     <div className="mobile-item-text">
                       <strong>Citizen Portal</strong>
-                      <span>Submit and review issues</span>
+                      <span>Lodge and review neighborhood issues</span>
                     </div>
                   </button>
 
@@ -198,7 +252,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </div>
                     <div className="mobile-item-text">
                       <strong>Live Tracker</strong>
-                      <span>Check ticket inspection status</span>
+                      <span>Check ticket milestone progress</span>
                     </div>
                   </button>
 
@@ -211,7 +265,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </div>
                     <div className="mobile-item-text">
                       <strong>Field Workdesk</strong>
-                      <span>Technician job dispatches</span>
+                      <span>Field crew assignments &amp; repair logs</span>
                     </div>
                   </button>
 
@@ -224,7 +278,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </div>
                     <div className="mobile-item-text">
                       <strong>Supervisor Center</strong>
-                      <span>Analytics and escalations</span>
+                      <span>Town hall SLA analytics &amp; escalations</span>
                     </div>
                   </button>
                 </div>
@@ -239,17 +293,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     }}
                   >
                     <Plus size={16} strokeWidth={2.5} />
-                    <span>File Grievance</span>
+                    <span>Lodge Grievance</span>
                   </button>
-
-                  <a
-                    href="tel:1122"
-                    className="btn-pill-secondary"
-                    style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem' }}
-                  >
-                    <PhoneCall size={15} />
-                    <span>Emergency: 1122</span>
-                  </a>
                 </div>
               </div>
             </div>
@@ -258,12 +303,12 @@ export const Navbar: React.FC<NavbarProps> = ({
       </header>
 
       {/* Mobile Fixed Bottom Nav (Leafora App Style) */}
-      <nav className="mobile-bottom-nav hide-on-desktop" aria-label="Mobile Navigation">
+      <nav className="mobile-bottom-nav hide-on-desktop" aria-label="Mobile Bottom Navigation">
         <button
           className={`bottom-nav-item ${activePortal === 'citizen' ? 'active' : ''}`}
           onClick={() => setActivePortal('citizen')}
         >
-          <Home size={19} />
+          <Home size={18} />
           <span>Home</span>
         </button>
 
@@ -281,7 +326,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="bottom-nav-item"
           onClick={onTrackClick}
         >
-          <Search size={19} />
+          <Search size={18} />
           <span>Track</span>
         </button>
 
@@ -289,7 +334,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           className={`bottom-nav-item ${activePortal === 'staff' ? 'active' : ''}`}
           onClick={() => setActivePortal('staff')}
         >
-          <Wrench size={19} />
+          <Wrench size={18} />
           <span>Staff</span>
         </button>
 
@@ -297,7 +342,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           className={`bottom-nav-item ${activePortal === 'admin' ? 'active' : ''}`}
           onClick={() => setActivePortal('admin')}
         >
-          <BarChart3 size={19} />
+          <BarChart3 size={18} />
           <span>Admin</span>
         </button>
       </nav>

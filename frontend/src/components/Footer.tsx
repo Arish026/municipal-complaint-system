@@ -4,7 +4,6 @@ import React from 'react';
 import {
   Building2,
   ShieldCheck,
-  PhoneCall,
   MapPin,
   Clock,
   Mail,
@@ -19,27 +18,6 @@ import {
 export const Footer: React.FC = () => {
   return (
     <footer className="footer-wrapper">
-      {/* Helpline CTA Strip */}
-      <div className="footer-cta-banner">
-        <div className="container footer-cta-content">
-          <div className="footer-cta-text">
-            <div className="footer-cta-icon">
-              <PhoneCall size={20} />
-            </div>
-            <div>
-              <h3>24/7 Rapid Response Helpline</h3>
-              <p>For urgent pipeline bursts, road hazards, or electrical faults.</p>
-            </div>
-          </div>
-          <div className="footer-cta-actions">
-            <a href="tel:1122" className="btn-pill-primary">
-              <PhoneCall size={15} />
-              <span>Dial 1122</span>
-            </a>
-          </div>
-        </div>
-      </div>
-
       {/* Main Footer Directory */}
       <div className="container footer-main-grid">
         {/* Column 1: Corporation Identity */}
@@ -49,12 +27,12 @@ export const Footer: React.FC = () => {
               <Building2 size={20} strokeWidth={2.2} />
             </div>
             <div>
-              <span className="footer-brand-title">Municipal Corporation</span>
-              <span className="footer-brand-sub">Civic Redressal Gateway</span>
+              <span className="footer-brand-title">Karachi Metropolitan Corporation</span>
+              <span className="footer-brand-sub">Civic Grievance &amp; Redressal System</span>
             </div>
           </div>
           <p className="footer-brand-desc">
-            Direct municipal care and real-time grievance tracking for residents.
+            Direct municipal care and transparent grievance tracking for Karachi residents across all 7 districts.
           </p>
           <div className="footer-cert-badge">
             <ShieldCheck size={14} color="var(--primary-moss)" />
@@ -64,42 +42,42 @@ export const Footer: React.FC = () => {
 
         {/* Column 2: Civic Services */}
         <div className="footer-col">
-          <h4 className="footer-col-title">Services</h4>
+          <h4 className="footer-col-title">Karachi Agencies</h4>
           <ul className="footer-links-list">
             <li>
               <a href="#portal-nav-citizen">
                 <Droplets size={13} />
-                <span>Water Supply</span>
+                <span>KWSC Water Supply</span>
               </a>
             </li>
             <li>
               <a href="#portal-nav-citizen">
                 <Construction size={13} />
-                <span>Roads &amp; Curbs</span>
+                <span>KMC Roads &amp; Works</span>
               </a>
             </li>
             <li>
               <a href="#portal-nav-citizen">
                 <Trash2 size={13} />
-                <span>Solid Waste</span>
+                <span>SSWMB Solid Waste</span>
               </a>
             </li>
             <li>
               <a href="#portal-nav-citizen">
                 <Lightbulb size={13} />
-                <span>Street Lighting</span>
+                <span>K-Electric Street Lighting</span>
               </a>
             </li>
             <li>
               <a href="#portal-nav-citizen">
                 <ShieldAlert size={13} />
-                <span>Public Health</span>
+                <span>Sindh Health Vector Control</span>
               </a>
             </li>
             <li>
               <a href="#portal-nav-citizen">
                 <Trees size={13} />
-                <span>Urban Parks</span>
+                <span>KMC Parks &amp; Forestry</span>
               </a>
             </li>
           </ul>
@@ -107,19 +85,19 @@ export const Footer: React.FC = () => {
 
         {/* Column 3: Contact & Hours */}
         <div className="footer-col">
-          <h4 className="footer-col-title">Contact</h4>
+          <h4 className="footer-col-title">Municipal Depots</h4>
           <div className="footer-contact-items">
             <div className="footer-contact-item">
               <MapPin size={14} />
-              <span>Metropolitan Civic Center, Main Boulevard</span>
+              <span>Civic Centre, University Road, Gulshan-e-Iqbal, Karachi</span>
             </div>
             <div className="footer-contact-item">
               <Clock size={14} />
-              <span>Mon – Sat: 8:00 AM – 8:00 PM</span>
+              <span>Town Hall Depots: Mon – Sun (24/7 Field Response)</span>
             </div>
             <div className="footer-contact-item">
               <Mail size={14} />
-              <span>complaints@municipal-city.gov.pk</span>
+              <span>grievances@karachicity.gov.pk</span>
             </div>
           </div>
         </div>
@@ -129,10 +107,10 @@ export const Footer: React.FC = () => {
       <div className="footer-bottom-bar">
         <div className="container footer-bottom-content">
           <div className="footer-copy">
-            &copy; 2026 City Municipal Corporation. DBMS Coursework (BSCS).
+            &copy; 2026 Karachi Municipal Corporation. University of Karachi (BSCS) DBMS Coursework.
           </div>
           <div className="footer-status-indicator">
-            <span className="footer-pulse-dot"></span>
+            <span className="footer-pulse-dot" />
             <span>Relational Services Active</span>
           </div>
         </div>

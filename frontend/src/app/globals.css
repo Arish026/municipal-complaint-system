@@ -1,9 +1,13 @@
 :root {
-  --font-main: var(--font-main), 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-serif: var(--font-serif), 'Lora', Georgia, serif;
+  /* ==========================================================================
+     COHESIVE MULTI-TYPOGRAPHY SYSTEM (APTOS + APTOS SERIF / LORA + MONO)
+     ========================================================================== */
+  --font-main: 'Aptos', 'Aptos Display', var(--font-main), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Aptos Serif', var(--font-serif), 'Lora', Georgia, 'Times New Roman', serif;
+  --font-mono: 'Cascadia Code', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
 
   /* ==========================================================================
-     LEAFORA WARM ORGANIC BOTANICAL PALETTE
+     WARM ORGANIC PALETTE
      ========================================================================== */
   --bg-page: #f7f6f2;
   --bg-surface: #ffffff;
@@ -25,14 +29,6 @@
   --primary-moss-active: #15261c;
   --primary-tint: #edf2ee;
   --primary-sage: #4a574d;
-
-  /* Department Semantic Accent Colors */
-  --dept-water: #233d2c;
-  --dept-roads: #8a6523;
-  --dept-sanitation: #2e5a3c;
-  --dept-lighting: #946c1e;
-  --dept-health: #993030;
-  --dept-parks: #1e4d3a;
 
   /* Status Tokens */
   --status-submitted: #4a574d;
@@ -65,7 +61,33 @@
 }
 
 /* ==========================================================================
-   CSS RESETS & REMOVING OS DEFAULTS
+   ACCESSIBILITY FONT SCALING TIERS
+   ========================================================================== */
+.font-scale-normal {
+  font-size: 15px;
+}
+.font-scale-large {
+  font-size: 16.5px;
+}
+.font-scale-larger {
+  font-size: 18px;
+}
+
+/* High Contrast Mode for Ease of Access */
+.theme-high-contrast {
+  --bg-page: #f2f0ea;
+  --bg-surface: #ffffff;
+  --text-main: #000000;
+  --text-body: #111111;
+  --text-muted: #333333;
+  --border-subtle: #000000;
+  --border-medium: #000000;
+  --primary-moss: #0a2012;
+  --shadow-card: 0 0 0 2px #000000;
+}
+
+/* ==========================================================================
+   CSS RESETS & BASE TYPOGRAPHY
    ========================================================================== */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -134,10 +156,13 @@ button {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* ==========================================================================
+   INPUTS & SUBTLE OVERWRITEABLE PLACEHOLDERS
+   ========================================================================== */
 input,
 select,
 textarea {
-  font-family: inherit;
+  font-family: var(--font-main);
   font-size: inherit;
   appearance: none;
   -webkit-appearance: none;
@@ -148,6 +173,33 @@ textarea {
   color: var(--text-main);
   border-radius: var(--radius-sm);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Subtle, barely visible hints that vanish on typing */
+::placeholder {
+  color: #9aa59d;
+  opacity: 0.55;
+  font-weight: 400;
+  transition: opacity 0.15s ease;
+}
+
+input:focus::placeholder,
+textarea:focus::placeholder {
+  opacity: 0.22;
+}
+
+.input-error {
+  border-color: #993030 !important;
+  background-color: #fff9f9 !important;
+  box-shadow: 0 0 0 3px rgba(153, 48, 48, 0.12) !important;
+}
+
+.field-error-msg {
+  font-size: 0.72rem;
+  color: #993030;
+  font-weight: 600;
+  margin-top: 0.2rem;
+  display: block;
 }
 
 select.form-select {
@@ -173,8 +225,18 @@ select.form-select {
 }
 
 /* ==========================================================================
-   TOP UTILITY BAR
+   PERSISTENT TOP NAVBAR & ACCESSIBILITY TRAY
    ========================================================================== */
+.header-wrapper.persistent-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: 0 2px 12px rgba(24, 34, 27, 0.04);
+}
+
 .top-utility-bar {
   background: #1c2b21;
   color: #a4b3a8;
@@ -196,7 +258,7 @@ select.form-select {
 .utility-right {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
 .utility-badge {
@@ -226,32 +288,70 @@ select.form-select {
   color: #c4d1c8;
 }
 
-.helpline-link {
-  color: #fca5a5;
-  font-weight: 600;
-  transition: opacity 0.2s ease;
-}
-
-.helpline-link:hover {
-  opacity: 0.85;
-}
-
 .utility-divider {
   color: rgba(255, 255, 255, 0.15);
+}
+
+/* Accessibility Control Tray */
+.accessibility-tray {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.a11y-control-group {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-full);
+  padding: 0.1rem 0.35rem;
+  gap: 0.2rem;
+}
+
+.a11y-icon {
+  color: #9aa59d;
+  margin-right: 0.15rem;
+}
+
+.a11y-btn {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #c4d1c8;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.a11y-btn:hover {
+  color: #ffffff;
+}
+
+.a11y-btn.active {
+  background: var(--primary-moss);
+  color: #ffffff;
+}
+
+.a11y-contrast-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: #c4d1c8;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.a11y-contrast-toggle.active {
+  background: #ffffff;
+  color: #18221b;
+  font-weight: 700;
 }
 
 /* ==========================================================================
    MAIN NAVBAR
    ========================================================================== */
-.header-wrapper {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border-subtle);
-  box-shadow: 0 1px 4px rgba(24, 34, 27, 0.03);
-}
-
 .nav-container {
   display: flex;
   align-items: center;
@@ -350,7 +450,7 @@ select.form-select {
 }
 
 /* ==========================================================================
-   PILL BUTTONS (LEAFORA AESTHETIC)
+   PILL BUTTONS
    ========================================================================== */
 .btn-pill-primary {
   display: inline-flex;
@@ -406,55 +506,24 @@ select.form-select {
   font-size: 0.78rem;
 }
 
-/* Aliases for legacy component calls */
-.btn-primary {
+.btn-text-action {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  background: var(--primary-moss);
-  color: #ffffff;
-  border-radius: var(--radius-full);
-  padding: 0.6rem 1.25rem;
-  font-weight: 600;
-  font-size: 0.86rem;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover {
-  background: var(--primary-moss-hover);
-}
-
-.btn-primary.btn-sm {
-  padding: 0.45rem 1rem;
-  font-size: 0.8rem;
-}
-
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  background: var(--bg-surface);
-  color: var(--text-body);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
-  padding: 0.6rem 1.25rem;
-  font-weight: 500;
-  font-size: 0.86rem;
-}
-
-.btn-secondary:hover {
-  background: var(--bg-subtle);
-}
-
-.btn-secondary.btn-sm {
-  padding: 0.38rem 0.8rem;
+  gap: 0.35rem;
   font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--primary-moss);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-text-action:hover {
+  text-decoration: underline;
 }
 
 /* ==========================================================================
-   CIVIC HERO SECTION (NO IMAGES, WARM ORGANIC CARD)
+   DYNAMIC CONTEXTUAL HERO SECTION
    ========================================================================== */
 .civic-hero-wrap {
   padding: 2.2rem 1.25rem 1.2rem;
@@ -472,6 +541,19 @@ select.form-select {
   flex-direction: column;
   align-items: center;
   text-align: center;
+  transition: all 0.25s ease;
+}
+
+.hero-portal-citizen {
+  border-top: 3px solid var(--primary-moss);
+}
+
+.hero-portal-staff {
+  border-top: 3px solid #8a6523;
+}
+
+.hero-portal-admin {
+  border-top: 3px solid #993030;
 }
 
 .hero-top-badge {
@@ -517,23 +599,6 @@ select.form-select {
   margin-bottom: 1.75rem;
 }
 
-.helpline-pill-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.65rem 1.2rem;
-  border-radius: var(--radius-full);
-  background: #fbf5f5;
-  border: 1px solid #f3d4d4;
-  color: #993030;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.helpline-pill-link:hover {
-  background: #faeded;
-}
-
 .hero-stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -566,7 +631,7 @@ select.form-select {
 }
 
 /* ==========================================================================
-   CIVIC CARD ARCHITECTURE
+   CIVIC CARD & SEGMENTED TOGGLES
    ========================================================================== */
 .civic-card {
   background: var(--bg-surface);
@@ -613,9 +678,6 @@ select.form-select {
   line-height: 1.45;
 }
 
-/* ==========================================================================
-   SEGMENTED TOGGLES & SUB-NAVS
-   ========================================================================== */
 .citizen-sub-nav {
   display: flex;
   justify-content: space-between;
@@ -732,7 +794,6 @@ select.form-select {
   font-weight: 700;
 }
 
-/* Category Quick Issue Pills */
 .category-pills-wrap {
   margin-top: 0.85rem;
   padding-top: 0.75rem;
@@ -858,19 +919,6 @@ select.form-select {
   box-shadow: 0 0 0 3px rgba(35, 61, 44, 0.12);
 }
 
-.form-error-banner {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.7rem 1rem;
-  border-radius: var(--radius-sm);
-  background: #fbf5f5;
-  border: 1px solid #f3d4d4;
-  color: #993030;
-  font-size: 0.82rem;
-  font-weight: 500;
-}
-
 .form-submit-footer {
   display: flex;
   align-items: center;
@@ -887,6 +935,435 @@ select.form-select {
   gap: 0.35rem;
   font-size: 0.76rem;
   color: var(--text-muted);
+}
+
+/* ==========================================================================
+   KARACHI GPS & MAP PICKER STYLES
+   ========================================================================== */
+.map-picker-card {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.map-picker-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.map-picker-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.btn-gps-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full);
+  background: var(--primary-tint);
+  border: 1px solid #c8d9cc;
+  color: var(--primary-moss);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-gps-trigger:hover {
+  background: #dcece1;
+}
+
+.btn-gps-trigger.locked {
+  background: #235336;
+  color: #ffffff;
+  border-color: #235336;
+}
+
+.btn-gps-trigger .spin {
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.karachi-map-canvas {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background: #eef2ed;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+.map-grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-size: 24px 24px;
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
+
+.map-sea-area {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+  height: 40%;
+  background: #d6e8e8;
+  border-top-right-radius: 80px;
+  display: flex;
+  align-items: flex-end;
+  padding: 0.4rem;
+  font-size: 0.65rem;
+  color: #517a7a;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.map-highway {
+  position: absolute;
+  background: #d8d0c2;
+  pointer-events: none;
+}
+
+.map-highway.shahrah-faisal {
+  top: 50%;
+  left: 20%;
+  width: 65%;
+  height: 4px;
+  transform: rotate(-12deg);
+}
+
+.map-highway.university-road {
+  top: 30%;
+  left: 30%;
+  width: 55%;
+  height: 3px;
+  transform: rotate(8deg);
+}
+
+.map-zone-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-full);
+  padding: 0.15rem 0.45rem;
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--text-body);
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  transition: all 0.15s ease;
+}
+
+.map-zone-node:hover,
+.map-zone-node.active {
+  background: var(--primary-moss);
+  color: #ffffff;
+  border-color: var(--primary-moss);
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+.zone-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.map-active-pin {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  z-index: 20;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pin-icon {
+  color: #c92a2a;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.pin-pulse {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(201, 42, 42, 0.35);
+  animation: pulsePin 1.5s infinite ease-out;
+}
+
+@keyframes pulsePin {
+  0% { transform: translateX(-50%) scale(0.8); opacity: 0.8; }
+  100% { transform: translateX(-50%) scale(2); opacity: 0; }
+}
+
+.map-readout-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.74rem;
+  padding: 0.4rem 0.65rem;
+  background: var(--bg-surface);
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle);
+}
+
+.readout-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--text-muted);
+}
+
+.readout-item strong {
+  color: var(--text-main);
+  font-family: var(--font-mono);
+}
+
+.map-hint-text {
+  font-size: 0.68rem;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.map-hotspots-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.hotspots-caption {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.hotspots-pills {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.hotspot-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-body);
+}
+
+.hotspot-chip:hover {
+  border-color: var(--border-medium);
+}
+
+.hotspot-chip.active {
+  background: var(--primary-tint);
+  border-color: #c4d6c8;
+  color: var(--primary-moss);
+  font-weight: 600;
+}
+
+.hotspot-chip .check-icon {
+  display: none;
+}
+
+.hotspot-chip.active .check-icon {
+  display: inline;
+}
+
+/* ==========================================================================
+   TOAST SYSTEM
+   ========================================================================== */
+.toast-viewport {
+  position: fixed;
+  top: 4.5rem;
+  right: 1.25rem;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  pointer-events: none;
+  max-width: 360px;
+  width: 100%;
+}
+
+.toast-card {
+  pointer-events: auto;
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  box-shadow: 0 8px 24px rgba(24, 34, 27, 0.12);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  overflow: hidden;
+  animation: toastSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toast-icon-wrap {
+  margin-top: 0.1rem;
+  flex-shrink: 0;
+}
+
+.toast-icon.success {
+  color: #235336;
+}
+
+.toast-icon.error {
+  color: #993030;
+}
+
+.toast-icon.info {
+  color: var(--primary-moss);
+}
+
+.toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex-grow: 1;
+}
+
+.toast-title {
+  font-size: 0.82rem;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+
+.toast-subtext {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.toast-close-btn {
+  color: var(--text-light);
+  padding: 0.2rem;
+}
+
+.toast-close-btn:hover {
+  color: var(--text-main);
+}
+
+.toast-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary-moss);
+  animation: toastProgress 4s linear forwards;
+}
+
+@keyframes toastProgress {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+.toast-error .toast-progress-bar {
+  background: #993030;
+}
+
+/* ==========================================================================
+   ERROR POPUP / MODAL
+   ========================================================================== */
+.error-icon-bubble {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #faeded;
+  border: 1px solid #f3cccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-modal-header {
+  border-bottom: 1px solid #f3cccc;
+  background: #fff8f8;
+}
+
+.error-modal-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.error-modal-lead {
+  font-size: 0.82rem;
+  color: var(--text-body);
+}
+
+.error-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  background: #fff8f8;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid #fae3e3;
+}
+
+.error-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  color: #852929;
+}
+
+.error-bullet {
+  color: #993030;
+  font-weight: 700;
 }
 
 /* ==========================================================================
@@ -977,7 +1454,7 @@ select.form-select {
 }
 
 .ticket-code-pill {
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 0.88rem;
   font-weight: 700;
   padding: 0.25rem 0.65rem;
@@ -1277,6 +1754,7 @@ select.form-select {
 }
 
 .work-order-id-code {
+  font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.05em;
   font-weight: 700;
@@ -1431,7 +1909,7 @@ select.form-select {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 110;
   background: rgba(24, 34, 27, 0.45);
   backdrop-filter: blur(3px);
   display: flex;
@@ -1523,7 +2001,7 @@ select.form-select {
 }
 
 .modal-ticket-code {
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 1.6rem;
   font-weight: 700;
   color: var(--primary-moss);
@@ -1577,55 +2055,13 @@ select.form-select {
 }
 
 /* ==========================================================================
-   FOOTER (CONCISE & WARM)
+   FOOTER
    ========================================================================== */
 .footer-wrapper {
   background: #1c2b21;
   color: #c4d1c8;
   margin-top: 3rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.footer-cta-banner {
-  background: #16241a;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 1.25rem 0;
-}
-
-.footer-cta-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.footer-cta-text {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-}
-
-.footer-cta-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fca5a5;
-}
-
-.footer-cta-text h3 {
-  font-family: var(--font-serif);
-  font-size: 1.05rem;
-  color: #ffffff;
-}
-
-.footer-cta-text p {
-  font-size: 0.8rem;
-  color: #a4b3a8;
 }
 
 .footer-main-grid {
@@ -1753,7 +2189,7 @@ select.form-select {
 }
 
 /* ==========================================================================
-   MOBILE FIXED BOTTOM NAV (LEAFORA APP STYLE)
+   MOBILE FIXED BOTTOM NAV
    ========================================================================== */
 .mobile-bottom-nav {
   position: fixed;
@@ -1969,6 +2405,6 @@ select.form-select {
     grid-column: span 1;
   }
   .main-content {
-    padding-bottom: 5rem; /* space for fixed mobile bottom nav */
+    padding-bottom: 5rem;
   }
 }

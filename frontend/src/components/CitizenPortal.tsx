@@ -2,6 +2,8 @@
 
 import React, { useState, useMemo } from 'react';
 import { Department, Complaint, ComplaintStatus } from '../types';
+import { MapPicker } from './MapPicker';
+import { ErrorModal } from './ErrorModal';
 import {
   FileText,
   Search,
@@ -25,7 +27,7 @@ import {
   Filter,
   Eye,
   Activity,
-  Sparkles,
+  Compass,
 } from 'lucide-react';
 
 interface CitizenPortalProps {
@@ -41,6 +43,7 @@ interface CitizenPortalProps {
     location: string;
   }) => void;
   trackedComplaintId?: number | null;
+  onShowToast?: (type: 'success' | 'error' | 'info', message: string, sub?: string) => void;
 }
 
 const STATUS_STEPS: ComplaintStatus[] = [
@@ -60,33 +63,33 @@ interface DeptStyle {
 const DEPT_METADATA: Record<number, DeptStyle> = {
   1: {
     icon: <Droplets size={22} strokeWidth={2} />,
-    label: 'Water',
-    tagline: 'Pipelines & sewage',
+    label: 'Water & Sewerage',
+    tagline: 'KWSC pipeline leaks & sewage overflows',
   },
   2: {
     icon: <Construction size={22} strokeWidth={2} />,
-    label: 'Roads',
-    tagline: 'Paving & potholes',
+    label: 'Roads & Works',
+    tagline: 'KMC potholes, paving & manhole covers',
   },
   3: {
     icon: <Trash2 size={22} strokeWidth={2} />,
-    label: 'Sanitation',
-    tagline: 'Refuse & waste',
+    label: 'Solid Waste',
+    tagline: 'SSWMB kachra kundi & debris removal',
   },
   4: {
     icon: <Lightbulb size={22} strokeWidth={2} />,
-    label: 'Lighting',
-    tagline: 'Poles & wiring',
+    label: 'Street Lighting',
+    tagline: 'K-Electric utility poles & street blackout',
   },
   5: {
     icon: <ShieldAlert size={22} strokeWidth={2} />,
-    label: 'Health',
-    tagline: 'Sanitation & vector',
+    label: 'Health & Vector',
+    tagline: 'Sindh Health dengue/malaria spray',
   },
   6: {
     icon: <Trees size={22} strokeWidth={2} />,
-    label: 'Parks',
-    tagline: 'Greenery & trees',
+    label: 'Parks & Trees',
+    tagline: 'KMC fallen trees & public parks',
   },
 };
 
@@ -95,22 +98,28 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
   complaints,
   onSubmitComplaint,
   trackedComplaintId,
+  onShowToast,
 }) => {
   const [activeTab, setActiveTab] = useState<'submit' | 'track'>(
     trackedComplaintId ? 'track' : 'submit'
   );
 
-  // Form State
+  // Form State: EMPTY by default so subtle, greyed out hints vanish on first stroke
   const [citizenName, setCitizenName] = useState('');
-  const [phone, setPhone] = useState('+1-555-0201');
-  const [address, setAddress] = useState('Flat 102, Building B, Municipal Zone 2');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [selectedDeptId, setSelectedDeptId] = useState<number>(departments[0]?.department_id || 1);
   const [category, setCategory] = useState('Dangerous Deep Pothole');
-  const [location, setLocation] = useState('Main Boulevard near Central Metro Station');
-  const [description, setDescription] = useState(
-    'Deep crater formed after recent rains, causing traffic congestion and pedestrian hazard.'
-  );
-  const [validationError, setValidationError] = useState<string | null>(null);
+  const [location, setLocation] = useState('');
+  const [description, setDescription] = useState('');
+
+  // Field-level error states
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [errorList, setErrorList] = useState<string[]>([]);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+
+  // Map Picker visibility toggle
+  const [showMapPicker, setShowMapPicker] = useState(true);
 
   // Tracking Search State
   const [searchQuery, setSearchQuery] = useState(
@@ -124,40 +133,72 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
     [departments, selectedDeptId]
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setValidationError(null);
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    const list: string[] = [];
 
     if (!citizenName.trim()) {
-      setValidationError('Please enter your full name.');
-      return;
+      errors.name = 'Resident full name is required.';
+      list.push('Full Name: Please enter your complete name.');
+    } else if (citizenName.trim().length < 3) {
+      errors.name = 'Full name must be at least 3 characters.';
+      list.push('Full Name: Must be at least 3 characters.');
     }
-    if (!phone.trim() || phone.trim().length < 8) {
-      setValidationError('Please enter a valid phone number (minimum 8 digits).');
-      return;
+
+    const cleanPhone = phone.trim().replace(/[\s-]/g, '');
+    const pakPhoneRegex = /^((\+92)|(0092)|(0))?3[0-9]{9}$/;
+    if (!cleanPhone) {
+      errors.phone = 'Karachi contact mobile number is required.';
+      list.push('Mobile Phone: Valid 11-digit mobile number required (03XX-XXXXXXX).');
+    } else if (!pakPhoneRegex.test(cleanPhone) && cleanPhone.length < 10) {
+      errors.phone = 'Please enter a valid Pakistani mobile number (03XX-XXXXXXX).';
+      list.push('Mobile Phone: Format should be 0300-1234567 or +923001234567.');
     }
+
     if (!address.trim()) {
-      setValidationError('Residential address is required.');
-      return;
+      errors.address = 'Residential address in Karachi is required.';
+      list.push('Residential Address: Required for municipal inspector verification.');
     }
-    if (location.trim().length < 5) {
-      setValidationError('Incident location must be at least 5 characters.');
-      return;
+
+    if (!location.trim() || location.trim().length < 6) {
+      errors.location = 'Specify landmark or use Karachi Map Picker (min 6 characters).';
+      list.push('Incident Location: Pinpoint location on map or enter landmark (e.g., Near Disco Bakery).');
     }
-    if (description.trim().length < 10) {
-      setValidationError('Please provide a brief description (minimum 10 characters).');
+
+    if (!description.trim() || description.trim().length < 10) {
+      errors.description = 'Provide a brief problem description (min 10 characters).';
+      list.push('Problem Description: Must describe the hazard or severity (minimum 10 characters).');
+    }
+
+    setFieldErrors(errors);
+    setErrorList(list);
+    return list.length === 0;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      setIsErrorModalOpen(true);
+      if (onShowToast) {
+        onShowToast('error', 'Form Incomplete', 'Please correct the highlighted fields.');
+      }
       return;
     }
 
     onSubmitComplaint({
-      citizenName,
-      phone,
-      address,
+      citizenName: citizenName.trim(),
+      phone: phone.trim(),
+      address: address.trim(),
       departmentId: selectedDeptId,
       category,
-      description,
-      location,
+      description: description.trim(),
+      location: location.trim(),
     });
+
+    if (onShowToast) {
+      onShowToast('success', 'Grievance Registered', 'Assigned to Karachi municipal field crew.');
+    }
   };
 
   const searchResults = useMemo(() => {
@@ -216,8 +257,8 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
         </div>
 
         <div className="active-records-counter">
-          <Activity size={13} color="#233d2c" />
-          <span>Active:</span>
+          <Activity size={13} color="var(--primary-moss)" />
+          <span>Active Karachi Registry:</span>
           <strong>{complaints.length} Registered</strong>
         </div>
       </div>
@@ -230,17 +271,10 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               <span className="hero-pill">Citizen Assistance</span>
               <h2 className="civic-card-title">File a Grievance</h2>
               <p className="civic-card-desc">
-                Select your service category, pinpoint the location, and receive an instant tracking ticket.
+                Select target agency, pinpoint Karachi location via map or GPS, and receive an instant tracking ticket.
               </p>
             </div>
           </div>
-
-          {validationError && (
-            <div className="form-error-banner">
-              <AlertCircle size={16} strokeWidth={2} />
-              <span>{validationError}</span>
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {/* Step 1: Resident Info */}
@@ -250,55 +284,73 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                   <User size={15} color="var(--primary-moss)" />
                   <span>1. Contact Details</span>
                 </span>
+                <span className="form-section-subtitle">
+                  Required for SMS notification &amp; inspector site visit
+                </span>
               </div>
 
               <div className="form-grid">
                 <div className="form-group">
-                  <label className="form-label">
+                  <label className="form-label" htmlFor="input-citizen-name">
                     <User size={13} />
                     <span>Full Name *</span>
                   </label>
                   <input
                     id="input-citizen-name"
                     type="text"
-                    className="form-input"
-                    placeholder="e.g. Asad Khan"
+                    className={`form-input ${fieldErrors.name ? 'input-error' : ''}`}
+                    placeholder="e.g. Syed Murtaza Zaidi"
                     value={citizenName}
-                    onChange={(e) => setCitizenName(e.target.value)}
-                    required
+                    onChange={(e) => {
+                      setCitizenName(e.target.value);
+                      if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: '' }));
+                    }}
                   />
+                  {fieldErrors.name && (
+                    <span className="field-error-msg">{fieldErrors.name}</span>
+                  )}
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">
+                  <label className="form-label" htmlFor="input-citizen-phone">
                     <Phone size={13} />
-                    <span>Mobile Phone *</span>
+                    <span>Mobile Phone (03XX-XXXXXXX) *</span>
                   </label>
                   <input
                     id="input-citizen-phone"
-                    type="text"
-                    className="form-input"
+                    type="tel"
+                    className={`form-input ${fieldErrors.phone ? 'input-error' : ''}`}
                     placeholder="0300-1234567"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      if (fieldErrors.phone) setFieldErrors((prev) => ({ ...prev, phone: '' }));
+                    }}
                   />
+                  {fieldErrors.phone && (
+                    <span className="field-error-msg">{fieldErrors.phone}</span>
+                  )}
                 </div>
 
                 <div className="form-group full-width">
-                  <label className="form-label">
+                  <label className="form-label" htmlFor="input-citizen-address">
                     <MapPin size={13} />
-                    <span>Address *</span>
+                    <span>Residential Address *</span>
                   </label>
                   <input
                     id="input-citizen-address"
                     type="text"
-                    className="form-input"
-                    placeholder="House/Flat No., Street, Sector"
+                    className={`form-input ${fieldErrors.address ? 'input-error' : ''}`}
+                    placeholder="e.g. Flat 402, Al-Ghafoor Heights, Block 13-D, Gulshan-e-Iqbal"
                     value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    required
+                    onChange={(e) => {
+                      setAddress(e.target.value);
+                      if (fieldErrors.address) setFieldErrors((prev) => ({ ...prev, address: '' }));
+                    }}
                   />
+                  {fieldErrors.address && (
+                    <span className="field-error-msg">{fieldErrors.address}</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -308,10 +360,10 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               <div className="form-section-heading">
                 <span className="form-section-title">
                   <Building2 size={15} color="var(--primary-moss)" />
-                  <span>2. Select Department</span>
+                  <span>2. Target Municipal Agency</span>
                 </span>
                 <span className="form-section-subtitle">
-                  {activeDept?.department_name} • {activeDept?.office_location}
+                  {activeDept?.department_name}
                 </span>
               </div>
 
@@ -347,7 +399,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               {/* Category Quick Selector Pills */}
               {activeDept && (activeDept.categories || activeDept.category_keywords) && (
                 <div className="category-pills-wrap">
-                  <span className="form-sublabel">Common issues in {activeDept.department_name}:</span>
+                  <span className="form-sublabel">Common issues under {activeDept.department_name}:</span>
                   <div className="category-pills-row">
                     {(activeDept.categories || activeDept.category_keywords || []).map((catName: string) => (
                       <button
@@ -365,46 +417,77 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               )}
             </div>
 
-            {/* Step 3: Location & Problem Description */}
+            {/* Step 3: Location & GPS Map Picker */}
             <div className="form-section-block">
               <div className="form-section-heading">
                 <span className="form-section-title">
                   <MapPin size={15} color="var(--primary-moss)" />
-                  <span>3. Location &amp; Description</span>
+                  <span>3. Location &amp; Problem Description</span>
                 </span>
+                <button
+                  type="button"
+                  className="btn-text-action"
+                  onClick={() => setShowMapPicker(!showMapPicker)}
+                >
+                  <Compass size={13} />
+                  <span>{showMapPicker ? 'Hide Karachi Map' : 'Show Karachi GPS Map'}</span>
+                </button>
               </div>
 
-              <div className="form-grid">
+              {/* Integrated GPS & Map Picker */}
+              {showMapPicker && (
+                <MapPicker
+                  currentLocation={location}
+                  onLocationSelect={(text) => {
+                    setLocation(text);
+                    if (fieldErrors.location) setFieldErrors((prev) => ({ ...prev, location: '' }));
+                  }}
+                  onGpsSuccess={(msg) => onShowToast?.('success', 'GPS Location Locked', msg)}
+                  onGpsError={(err) => onShowToast?.('info', 'GPS Fallback', err)}
+                />
+              )}
+
+              <div className="form-grid" style={{ marginTop: '0.75rem' }}>
                 <div className="form-group full-width">
-                  <label className="form-label">
+                  <label className="form-label" htmlFor="input-incident-location">
                     <MapPin size={13} />
                     <span>Exact Landmark or Street *</span>
                   </label>
                   <input
                     id="input-incident-location"
                     type="text"
-                    className="form-input"
-                    placeholder="e.g. Near Central Hospital Gate 2, Main Boulevard"
+                    className={`form-input ${fieldErrors.location ? 'input-error' : ''}`}
+                    placeholder="e.g. Main University Road near Disco Bakery, Block 13-D Gulshan"
                     value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    required
+                    onChange={(e) => {
+                      setLocation(e.target.value);
+                      if (fieldErrors.location) setFieldErrors((prev) => ({ ...prev, location: '' }));
+                    }}
                   />
+                  {fieldErrors.location && (
+                    <span className="field-error-msg">{fieldErrors.location}</span>
+                  )}
                 </div>
 
                 <div className="form-group full-width">
-                  <label className="form-label">
+                  <label className="form-label" htmlFor="input-incident-description">
                     <FileText size={13} />
-                    <span>Problem Description *</span>
+                    <span>Problem Narrative *</span>
                   </label>
                   <textarea
                     id="input-incident-description"
-                    className="form-textarea"
+                    className={`form-textarea ${fieldErrors.description ? 'input-error' : ''}`}
                     rows={3}
-                    placeholder="Briefly describe the issue and safety impact..."
+                    placeholder="Describe the leak severity, pothole crater depth, or hazard..."
                     value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    required
-                  ></textarea>
+                    onChange={(e) => {
+                      setDescription(e.target.value);
+                      if (fieldErrors.description) setFieldErrors((prev) => ({ ...prev, description: '' }));
+                    }}
+                  />
+                  {fieldErrors.description && (
+                    <span className="field-error-msg">{fieldErrors.description}</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -415,14 +498,14 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                 type="submit"
                 id="btn-submit-complaint"
                 className="btn-pill-primary"
-                style={{ padding: '0.85rem 2rem', fontSize: '0.95rem' }}
+                style={{ padding: '0.85rem 2.2rem', fontSize: '0.95rem' }}
               >
                 <Send size={15} />
-                <span>Submit Grievance</span>
+                <span>Submit Grievance to Municipal Crew</span>
               </button>
               <span className="form-privacy-note">
-                <ShieldCheck size={14} color="#233d2c" />
-                <span>Official Redressal Guarantee</span>
+                <ShieldCheck size={14} color="var(--primary-moss)" />
+                <span>Verified 3NF Relational Municipal Dispatch</span>
               </span>
             </div>
           </form>
@@ -436,10 +519,10 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
           <div className="civic-card">
             <div className="civic-card-header">
               <div>
-                <span className="hero-pill">Status Verification</span>
+                <span className="hero-pill">Real-Time Verification</span>
                 <h2 className="civic-card-title">Live Grievance Tracker</h2>
                 <p className="civic-card-desc">
-                  Enter your ticket ID or phone number to check field inspection notes.
+                  Enter your ticket ID or phone number to check field inspection notes across Karachi.
                 </p>
               </div>
             </div>
@@ -451,7 +534,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                   id="input-track-ticket-search"
                   type="text"
                   className="tracking-search-input"
-                  placeholder="Ticket ID (e.g. 1, CMP-0001) or phone number..."
+                  placeholder="e.g. 1, CMP-0001, or 0300-2415981..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -459,7 +542,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                   <button
                     className="tracking-clear-btn"
                     onClick={() => setSearchQuery('')}
-                    aria-label="Clear search"
+                    aria-label="Clear search query"
                   >
                     Clear
                   </button>
@@ -468,13 +551,16 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
 
               {/* Sample Ticket Chips */}
               <div className="quick-presets-row">
-                <span className="preset-label">Sample Tickets:</span>
+                <span className="preset-label">Sample Karachi Tickets:</span>
                 {complaints.slice(0, 4).map((c) => (
                   <button
                     key={c.complaint_id}
                     type="button"
                     className="preset-ticket-btn"
-                    onClick={() => setSearchQuery(c.complaint_id.toString())}
+                    onClick={() => {
+                      setSearchQuery(c.complaint_id.toString());
+                      onShowToast?.('info', 'Loaded Sample Ticket', `CMP-${c.complaint_id.toString().padStart(4, '0')}`);
+                    }}
                   >
                     <CheckCircle2 size={11} />
                     <span>CMP-000{c.complaint_id} ({c.category.split(' ')[0]})</span>
@@ -493,7 +579,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                     CMP-{selectedComplaint.complaint_id.toString().padStart(4, '0')}
                   </span>
                   <span className={`status-pill status-${selectedComplaint.status.toLowerCase().replace(/\s+/g, '')}`}>
-                    <span className="status-dot-pulse"></span>
+                    <span className="status-dot-pulse" />
                     {selectedComplaint.status}
                   </span>
                 </div>
@@ -501,7 +587,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                 <div className="ticket-dossier-meta">
                   <span className="meta-item">
                     <Calendar size={13} />
-                    <span>{new Date(selectedComplaint.complaint_date).toLocaleDateString()}</span>
+                    <span>Lodged: {new Date(selectedComplaint.complaint_date).toLocaleDateString()}</span>
                   </span>
                 </div>
               </div>
@@ -532,27 +618,27 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               {/* Ticket Details Grid */}
               <div className="ticket-details-grid">
                 <div className="ticket-detail-item">
-                  <span className="detail-lbl">Department</span>
+                  <span className="detail-lbl">Responsible Agency</span>
                   <strong className="detail-val">{selectedComplaint.department_name}</strong>
                 </div>
 
                 <div className="ticket-detail-item">
-                  <span className="detail-lbl">Issue</span>
+                  <span className="detail-lbl">Issue Category</span>
                   <strong className="detail-val">{selectedComplaint.category}</strong>
                 </div>
 
                 <div className="ticket-detail-item">
-                  <span className="detail-lbl">Location</span>
+                  <span className="detail-lbl">Karachi Location</span>
                   <strong className="detail-val">{selectedComplaint.location}</strong>
                 </div>
 
                 <div className="ticket-detail-item">
-                  <span className="detail-lbl">Resident</span>
-                  <strong className="detail-val">{selectedComplaint.citizen_name || 'Citizen'}</strong>
+                  <span className="detail-lbl">Resident Contact</span>
+                  <strong className="detail-val">{selectedComplaint.citizen_name || 'Citizen'} ({selectedComplaint.citizen_phone || 'Verified'})</strong>
                 </div>
 
                 <div className="ticket-detail-item full-width">
-                  <span className="detail-lbl">Description</span>
+                  <span className="detail-lbl">Citizen Narrative</span>
                   <p className="detail-desc">{selectedComplaint.description}</p>
                 </div>
               </div>
@@ -560,8 +646,8 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
           ) : (
             <div className="civic-card empty-search-card">
               <AlertCircle size={32} color="var(--text-muted)" />
-              <h3>No Ticket Found</h3>
-              <p>No complaint found matching &quot;{searchQuery}&quot;. Please check the number.</p>
+              <h3>No Complaint Record Found</h3>
+              <p>No complaint matching &quot;{searchQuery}&quot; was found. Check the ticket ID or mobile number.</p>
             </div>
           )}
 
@@ -569,10 +655,10 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
           <div className="civic-card">
             <div className="civic-card-header">
               <div>
-                <span className="hero-pill">Public Ledger</span>
-                <h3 className="civic-card-title">Recent Neighborhood Complaints</h3>
+                <span className="hero-pill">Public City Ledger</span>
+                <h3 className="civic-card-title">Recent Karachi Complaints</h3>
                 <p className="civic-card-desc">
-                  Transparent municipal registry of active grievances.
+                  Transparent municipal registry of active grievances across Karachi districts.
                 </p>
               </div>
 
@@ -585,10 +671,10 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                     value={filterDept}
                     onChange={(e) => setFilterDept(e.target.value)}
                   >
-                    <option value="all">All Depts</option>
+                    <option value="all">All Karachi Agencies</option>
                     {departments.map((d) => (
                       <option key={d.department_id} value={d.department_name}>
-                        {d.department_name}
+                        {d.department_name.split('—')[0]}
                       </option>
                     ))}
                   </select>
@@ -617,7 +703,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                 <thead>
                   <tr>
                     <th>Ticket</th>
-                    <th>Department</th>
+                    <th>Agency</th>
                     <th>Issue</th>
                     <th>Location</th>
                     <th>Status</th>
@@ -631,7 +717,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                       <td>
                         <strong>CMP-{c.complaint_id.toString().padStart(4, '0')}</strong>
                       </td>
-                      <td>{c.department_name}</td>
+                      <td>{(c.department_name || 'Agency').split('—')[0]}</td>
                       <td>{c.category}</td>
                       <td>{c.location}</td>
                       <td>
@@ -646,6 +732,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                           onClick={() => {
                             setSearchQuery(c.complaint_id.toString());
                             window.scrollTo({ top: 300, behavior: 'smooth' });
+                            onShowToast?.('info', 'Loaded Ticket', `CMP-${c.complaint_id.toString().padStart(4, '0')}`);
                           }}
                         >
                           <Eye size={12} />
@@ -669,7 +756,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                     </div>
 
                     <h4 className="mobile-card-title">{c.category}</h4>
-                    <span className="mobile-card-dept">{c.department_name}</span>
+                    <span className="mobile-card-dept">{(c.department_name || 'Agency').split('—')[0]}</span>
 
                     <div className="mobile-card-meta">
                       <span className="meta-item">
@@ -688,6 +775,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                       onClick={() => {
                         setSearchQuery(c.complaint_id.toString());
                         window.scrollTo({ top: 300, behavior: 'smooth' });
+                        onShowToast?.('info', 'Loaded Ticket', `CMP-${c.complaint_id.toString().padStart(4, '0')}`);
                       }}
                     >
                       <Eye size={13} />
@@ -700,6 +788,13 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
           </div>
         </div>
       )}
+
+      {/* Structured Validation Error Modal */}
+      <ErrorModal
+        isOpen={isErrorModalOpen}
+        errors={errorList}
+        onClose={() => setIsErrorModalOpen(false)}
+      />
     </div>
   );
 };
