@@ -54,52 +54,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <>
       <header className="header-wrapper persistent-navbar">
-        {/* Top Utility Bar with Accessibility Controls & Live Indicators */}
-        <div className="top-utility-bar">
-          <div className="container top-utility-content">
-            <div className="utility-left">
-              <span
-                className={`utility-badge ${backendConnected ? 'badge-api-connected' : 'badge-api-offline'}`}
-                title={backendConnected ? 'Live Django REST API connected (PostgreSQL / SQLite)' : 'Backend API disconnected; operating in local storage mode'}
-              >
-                <span className={`status-dot-pulse ${backendConnected ? 'dot-online' : 'dot-offline'}`} />
-                {backendConnected ? 'Django API Live' : 'Offline Cache Mode'}
-              </span>
-              {!backendConnected && onReconnect && (
-                <button
-                  type="button"
-                  className="reconnect-api-btn"
-                  onClick={onReconnect}
-                  title="Retry connecting to Django backend server"
-                >
-                  Connect API
-                </button>
-              )}
-              <span className="utility-item hide-on-mobile">
-                <MapPin size={12} />
-                <span>Zone: All 7 Karachi Districts</span>
-              </span>
-              <span className="utility-divider hide-on-mobile">|</span>
-              <span className="utility-item hide-on-mobile">
-                <Clock size={12} />
-                <span>Field Depots: 24/7 Mon–Sun</span>
-              </span>
-            </div>
-
-            {/* Operational Summary & Live System Status */}
-            <div className="utility-right">
-              <span className="utility-item hide-on-mobile">
-                <span className="status-dot-pulse" style={{ backgroundColor: '#22c55e', boxShadow: '0 0 6px #22c55e' }} />
-                <span>Multi-Factor Dispatch SLA Engine Active</span>
-              </span>
-              <span className="utility-divider hide-on-mobile">|</span>
-              <span className="utility-item hide-on-mobile" style={{ color: '#e5ede7', fontWeight: 600 }}>
-                High-Contrast Operational Mode
-              </span>
-            </div>
-          </div>
-        </div>
-
         {/* Main Navbar */}
         <div className="main-nav-bar">
           <div className="container nav-container">
@@ -113,7 +67,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Building2 size={20} strokeWidth={2.2} />
               </div>
               <div className="brand-title-wrap">
-                <span className="brand-title">Karachi Metropolitan Redressal</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span className="brand-title">Karachi Metropolitan Redressal</span>
+                  <span
+                    className={`status-dot-pulse ${backendConnected ? 'dot-online' : 'dot-offline'}`}
+                    style={{ width: '7px', height: '7px' }}
+                    title={backendConnected ? 'Django Backend Live' : 'Local Storage Mode'}
+                  />
+                </div>
                 <span className="brand-subtitle">Municipal Complaint &amp; Dispatch Gateway</span>
               </div>
             </div>

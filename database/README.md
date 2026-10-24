@@ -10,6 +10,7 @@ Relational database schemas, constraints, indexes, and synthetic datasets for th
 |---|---|
 | [`schema.sql`](schema.sql) | DDL schema defining all 5 core tables (`CITIZEN`, `DEPARTMENT`, `STAFF`, `COMPLAINT`, `WORK_ORDER`) and `DECISION_AUDIT_LOG` with constraints and indexes. |
 | [`seed_data.sql`](seed_data.sql) | Synthetic population dataset generated via `scripts/seed_synthetic_data.py` for testing and demonstration. |
+| [`queries/`](queries/) | Categorized query repository (DDL, DML, Operational CRUD, KPI Reports, ACID Transactions, Relational Algebra, Connection Traps). |
 
 ---
 
