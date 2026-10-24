@@ -22,9 +22,57 @@ class CitizenSerializer(serializers.ModelSerializer):
         return cleaned
 
 
+DEPARTMENT_KEYWORDS_MAP = {
+    1: [
+        "Water Pipeline Burst",
+        "Sewage Overflow on Main Road",
+        "Contaminated Drinking Line",
+        "Broken Main Trunk Line",
+        "Low Line Pressure",
+    ],
+    2: [
+        "Dangerous Deep Pothole",
+        "Missing Manhole Cover",
+        "Sunken Asphalt Paving",
+        "Broken Road Median & Curb",
+        "Damaged Storm Drain Grating",
+    ],
+    3: [
+        "Overflowing Kachra Kundi",
+        "Illegal Construction Debris Dumping",
+        "Uncollected Market Refuse",
+        "Dead Animal Removal",
+        "Drainage Silt Accumulation",
+    ],
+    4: [
+        "Exposed Live Electric Cable",
+        "Entire Street Blackout",
+        "Leaning Utility Pole Hazard",
+        "Faulty Sodium Lamp Fitting",
+        "Transformer Sparking",
+    ],
+    5: [
+        "Dengue & Malaria Fumigation Request",
+        "Stagnant Rainwater Pool",
+        "Open Gutter Larvae Infestation",
+        "Rodent Outbreak in Commercial Zone",
+        "Hazardous Medical Waste Dumping",
+    ],
+    6: [
+        "Fallen Neem Tree Blocking Traffic",
+        "Damaged Children Swing in Public Park",
+        "Overgrown Median Greenery Obscuring Vision",
+        "Broken Park Boundary Wall",
+        "Park Pathway Erosion",
+    ],
+}
+
+
 class DepartmentSerializer(serializers.ModelSerializer):
     staff_count = serializers.SerializerMethodField()
     active_complaints = serializers.SerializerMethodField()
+    category_keywords = serializers.SerializerMethodField()
+    categories = serializers.SerializerMethodField()
 
     class Meta:
         model = Department
@@ -34,6 +82,8 @@ class DepartmentSerializer(serializers.ModelSerializer):
             "office_location",
             "staff_count",
             "active_complaints",
+            "category_keywords",
+            "categories",
         ]
 
     def get_staff_count(self, obj):
@@ -48,8 +98,15 @@ class DepartmentSerializer(serializers.ModelSerializer):
             ]
         ).count()
 
+    def get_category_keywords(self, obj):
+        return DEPARTMENT_KEYWORDS_MAP.get(obj.department_id, [])
+
+    def get_categories(self, obj):
+        return DEPARTMENT_KEYWORDS_MAP.get(obj.department_id, [])
+
 
 class StaffSerializer(serializers.ModelSerializer):
+    department_id = serializers.ReadOnlyField(source="department.department_id")
     department_name = serializers.ReadOnlyField(source="department.department_name")
 
     class Meta:
@@ -57,6 +114,7 @@ class StaffSerializer(serializers.ModelSerializer):
         fields = [
             "staff_id",
             "department",
+            "department_id",
             "department_name",
             "name",
             "phone",
@@ -66,6 +124,8 @@ class StaffSerializer(serializers.ModelSerializer):
 
 
 class WorkOrderSerializer(serializers.ModelSerializer):
+    complaint_id = serializers.ReadOnlyField(source="complaint.complaint_id")
+    staff_id = serializers.ReadOnlyField(source="staff.staff_id")
     staff_name = serializers.ReadOnlyField(source="staff.name")
     staff_phone = serializers.ReadOnlyField(source="staff.phone")
     department_name = serializers.ReadOnlyField(
@@ -79,7 +139,9 @@ class WorkOrderSerializer(serializers.ModelSerializer):
         fields = [
             "work_order_id",
             "complaint",
+            "complaint_id",
             "staff",
+            "staff_id",
             "staff_name",
             "staff_phone",
             "department_name",
@@ -94,16 +156,23 @@ class WorkOrderSerializer(serializers.ModelSerializer):
 
 
 class ComplaintSerializer(serializers.ModelSerializer):
+    citizen_id = serializers.ReadOnlyField(source="citizen.citizen_id")
     citizen_name = serializers.ReadOnlyField(source="citizen.name")
     citizen_phone = serializers.ReadOnlyField(source="citizen.phone")
+    department_id = serializers.ReadOnlyField(source="department.department_id")
     department_name = serializers.ReadOnlyField(source="department.department_name")
     ticket_code = serializers.SerializerMethodField()
     work_orders = WorkOrderSerializer(many=True, read_only=True)
 
     # Allow writing citizen details directly when creating a complaint (FR-01 + FR-04)
+    # Accepts both snake_case and camelCase inputs from frontend
     citizen_name_input = serializers.CharField(write_only=True, required=False)
     citizen_phone_input = serializers.CharField(write_only=True, required=False)
     citizen_address_input = serializers.CharField(write_only=True, required=False)
+    citizenName = serializers.CharField(write_only=True, required=False)
+    phone = serializers.CharField(write_only=True, required=False)
+    address = serializers.CharField(write_only=True, required=False)
+    departmentId = serializers.IntegerField(write_only=True, required=False)
 
     class Meta:
         model = Complaint
@@ -111,12 +180,18 @@ class ComplaintSerializer(serializers.ModelSerializer):
             "complaint_id",
             "ticket_code",
             "citizen",
+            "citizen_id",
             "citizen_name",
             "citizen_phone",
             "citizen_name_input",
             "citizen_phone_input",
             "citizen_address_input",
+            "citizenName",
+            "phone",
+            "address",
             "department",
+            "department_id",
+            "departmentId",
             "department_name",
             "complaint_date",
             "category",
@@ -129,6 +204,20 @@ class ComplaintSerializer(serializers.ModelSerializer):
 
     def get_ticket_code(self, obj):
         return f"CMP-{str(obj.complaint_id).zfill(4)}"
+
+    def to_internal_value(self, data):
+        # Normalize frontend camelCase field names to internal serializer fields
+        if hasattr(data, "copy"):
+            data = data.copy()
+        else:
+            data = dict(data)
+
+        if "departmentId" in data and "department" not in data:
+            data["department"] = data["departmentId"]
+        if "citizenId" in data and "citizen" not in data:
+            data["citizen"] = data["citizenId"]
+
+        return super().to_internal_value(data)
 
     def validate_description(self, value):
         if len(value.strip()) < 10:
@@ -145,22 +234,37 @@ class ComplaintSerializer(serializers.ModelSerializer):
         return value.strip()
 
     def create(self, validated_data):
-        # Extract direct citizen creation inputs if provided
-        citizen_name = validated_data.pop("citizen_name_input", None)
-        citizen_phone = validated_data.pop("citizen_phone_input", None)
-        citizen_address = validated_data.pop("citizen_address_input", None)
+        # Extract direct citizen creation inputs if provided (supporting both snake_case and camelCase)
+        c_name = (
+            validated_data.pop("citizen_name_input", None)
+            or validated_data.pop("citizenName", None)
+        )
+        c_phone = (
+            validated_data.pop("citizen_phone_input", None)
+            or validated_data.pop("phone", None)
+        )
+        c_addr = (
+            validated_data.pop("citizen_address_input", None)
+            or validated_data.pop("address", None)
+        )
+
+        dept_id_alt = validated_data.pop("departmentId", None)
+        if dept_id_alt and not validated_data.get("department"):
+            dept_obj = Department.objects.filter(department_id=dept_id_alt).first()
+            if dept_obj:
+                validated_data["department"] = dept_obj
 
         citizen = validated_data.get("citizen")
-        if not citizen and citizen_phone:
+        if not citizen and c_phone:
             # Check or create citizen atomically (FR-01)
             citizen, _ = Citizen.objects.get_or_create(
-                phone=citizen_phone.strip(),
+                phone=c_phone.strip(),
                 defaults={
-                    "name": citizen_name.strip() if citizen_name else "Citizen",
+                    "name": c_name.strip() if c_name else "Citizen",
                     "address": (
-                        citizen_address.strip()
-                        if citizen_address
-                        else "Registered Address"
+                        c_addr.strip()
+                        if c_addr
+                        else "Karachi Municipal Jurisdiction"
                     ),
                 },
             )
@@ -175,6 +279,11 @@ class ComplaintSerializer(serializers.ModelSerializer):
 
 
 class DecisionAuditLogSerializer(serializers.ModelSerializer):
+    complaint_id = serializers.ReadOnlyField(source="complaint.complaint_id")
+    work_order_id = serializers.ReadOnlyField(source="work_order.work_order_id")
+    decided_by_staff_id = serializers.ReadOnlyField(
+        source="decided_by_staff.staff_id"
+    )
     complaint_category = serializers.ReadOnlyField(source="complaint.category")
     decided_by_name = serializers.ReadOnlyField(source="decided_by_staff.name")
 
@@ -183,13 +292,16 @@ class DecisionAuditLogSerializer(serializers.ModelSerializer):
         fields = [
             "audit_id",
             "complaint",
+            "complaint_id",
             "complaint_category",
             "work_order",
+            "work_order_id",
             "alert_type",
             "explanation",
             "suggested_action",
             "supervisor_decision",
             "decided_by_staff",
+            "decided_by_staff_id",
             "decided_by_name",
             "decision_timestamp",
             "created_at",
@@ -217,39 +329,56 @@ class ComplaintCategorizationSerializer(serializers.Serializer):
 
     category = serializers.CharField(max_length=100)
 
-    # Static categorization routing table from SRS
+    # Categorization routing table matching Karachi municipal responsibilities
     ROUTING_MAP = {
-        "water": "Water Supply & Sanitation",
-        "leak": "Water Supply & Sanitation",
-        "contamination": "Water Supply & Sanitation",
-        "pipeline": "Water Supply & Sanitation",
-        "pothole": "Roads & Infrastructure Maintenance",
-        "road": "Roads & Infrastructure Maintenance",
-        "drain": "Roads & Infrastructure Maintenance",
-        "crossing": "Roads & Infrastructure Maintenance",
+        "water": "Karachi Water & Sewerage",
+        "leak": "Karachi Water & Sewerage",
+        "contamination": "Karachi Water & Sewerage",
+        "pipeline": "Karachi Water & Sewerage",
+        "sewage": "Karachi Water & Sewerage",
+        "burst": "Karachi Water & Sewerage",
+        "pothole": "Roads & Civil Infrastructure",
+        "road": "Roads & Civil Infrastructure",
+        "drain": "Roads & Civil Infrastructure",
+        "crossing": "Roads & Civil Infrastructure",
+        "manhole": "Roads & Civil Infrastructure",
+        "asphalt": "Roads & Civil Infrastructure",
         "garbage": "Solid Waste Management",
         "waste": "Solid Waste Management",
         "debris": "Solid Waste Management",
         "dumpster": "Solid Waste Management",
-        "light": "Street Lighting & Electricity",
-        "lamp": "Street Lighting & Electricity",
-        "wire": "Street Lighting & Electricity",
-        "electricity": "Street Lighting & Electricity",
-        "mosquito": "Public Health & Vector Control",
-        "fumigation": "Public Health & Vector Control",
-        "stagnant": "Public Health & Vector Control",
+        "kachra": "Solid Waste Management",
+        "rubble": "Solid Waste Management",
+        "light": "Street Lighting",
+        "lamp": "Street Lighting",
+        "wire": "Street Lighting",
+        "cable": "Street Lighting",
+        "electricity": "Street Lighting",
+        "blackout": "Street Lighting",
+        "pole": "Street Lighting",
+        "transformer": "Street Lighting",
+        "mosquito": "Vector & Malaria Control",
+        "fumigation": "Vector & Malaria Control",
+        "stagnant": "Vector & Malaria Control",
+        "dengue": "Vector & Malaria Control",
+        "malaria": "Vector & Malaria Control",
         "tree": "Parks & Urban Forestry",
         "park": "Parks & Urban Forestry",
         "playground": "Parks & Urban Forestry",
+        "neem": "Parks & Urban Forestry",
+        "branch": "Parks & Urban Forestry",
     }
 
     def get_department(self):
         cat = self.validated_data["category"].lower()
-        matched_dept_name = "Water Supply & Sanitation"
+        matched_dept_name = "Karachi Water & Sewerage"
         for keyword, dept_name in self.ROUTING_MAP.items():
             if keyword in cat:
                 matched_dept_name = dept_name
                 break
-        return Department.objects.filter(
+        matched_dept = Department.objects.filter(
             department_name__icontains=matched_dept_name
         ).first()
+        if not matched_dept:
+            matched_dept = Department.objects.first()
+        return matched_dept

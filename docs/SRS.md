@@ -56,11 +56,19 @@
 - **Response**: Immediate structured JSON acknowledgment with tracking URL and formatted ticket ID (e.g. `K101`).
 
 #### FR-05 & FR-06: Work Order Dispatch & Lifecycle Transitions
+- **Multi-Factor Decision Assignment Engine**: Rather than static round-robin assignment, field technicians are evaluated on a 4-factor composite fit score:
+  $$\text{Composite Fit Score} = 0.35 \times \text{Workload} + 0.30 \times \text{SkillMatch} + 0.20 \times \text{Proximity} + 0.15 \times \text{SLA Urgency}$$
+  - *Workload Queue (35%)*: Dynamic capacity penalty based on active jobs in progress.
+  - *Skill Specialization (30%)*: Domain keyword match against complaint hazard category.
+  - *Depot Proximity (20%)*: Spatial proximity from technician field station to complaint coordinate.
+  - *SLA Urgency (15%)*: Senior technician prioritization for critical/high-severity hazards.
+- **Dispatch Execution**: Atomic dispatch via `POST /api/complaints/{id}/assign/` creates a `WorkOrder` and updates `Complaint.status` to `Assigned` in a single transaction.
+
 ```mermaid
 stateDiagram-v2
     [*] --> Submitted : Citizen Registers
     Submitted --> Categorized : Department Identified
-    Categorized --> Assigned : Supervisor Creates Work Order
+    Categorized --> Assigned : Multi-Factor Work Order Dispatch
     Assigned --> In_Progress : Staff Inspects Site
     In_Progress --> Completed : Repairs Executed
     Completed --> Resolved : Department Confirms
@@ -98,7 +106,7 @@ stateDiagram-v2
 | **FR-02** | `2.0 REGISTER COMPLAINTS` | `2.1, 2.2` | `D1: CITIZEN` | `POST /api/complaints/validate/` |
 | **FR-03** | `2.0 REGISTER COMPLAINTS` | `2.3, 2.4` | `D3: DEPARTMENT` | `POST /api/complaints/categorize/` |
 | **FR-04** | `2.0 REGISTER COMPLAINTS` | `2.5, 2.6` | `D2: COMPLAINT` | `POST /api/complaints/` |
-| **FR-05** | `3.0 ASSIGN DEPT & WORK` | N/A | `D4: STAFF`, `D5: WORK_ORDER` | `POST /api/work-orders/` |
+| **FR-05** | `3.0 ASSIGN DEPT & WORK` | N/A | `D4: STAFF`, `D5: WORK_ORDER` | `POST /api/complaints/{id}/assign/`, `POST /api/work-orders/` |
 | **FR-06** | `4.0 UPDATE STATUS` | N/A | `D2: COMPLAINT`, `D5: WORK_ORDER` | `PATCH /api/work-orders/{id}/` |
 | **FR-07** | `4.0 UPDATE STATUS` | N/A | `D2: COMPLAINT` | `GET /api/complaints/track/` |
 | **FR-08** | `5.0 GENERATE REPORTS` | N/A | `D1`, `D2`, `D3`, `D4`, `D5` | `GET /api/reports/` |

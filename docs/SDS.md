@@ -216,3 +216,27 @@ The decision-support agent executes transparent heuristics without autonomous ex
 
 ### 5.2 Supervisor Approval Workflow
 All consequential actions (e.g., job reassignment, expedited escalation) require human supervisor sign-off. Every decision is recorded immutably in `DECISION_AUDIT_LOG` with supervisor staff ID and timestamp.
+
+### 5.3 Multi-Factor Decision Assignment Engine
+To prevent static bottlenecks and subjective dispatch, the field technician assignment system evaluates all active staff in the target department using a composite weighted score:
+
+$$\text{Composite Fit Score} = W_w \cdot S_{\text{workload}} + W_s \cdot S_{\text{skill}} + W_p \cdot S_{\text{proximity}} + W_u \cdot S_{\text{urgency}}$$
+
+Where weights are calibrated to operational priorities:
+- **Workload Capacity ($W_w = 0.35$)**: Prevents officer overload:
+  $$S_{\text{workload}} = \begin{cases} 1.00, & \text{active jobs} = 0 \\ 0.85, & \text{active jobs} = 1 \\ 0.60, & \text{active jobs} = 2 \\ 0.35, & \text{active jobs} = 3 \\ 0.15, & \text{active jobs} \ge 4 \end{cases}$$
+- **Skill Specialization ($W_s = 0.30$)**: Matches category keywords to staff designation:
+  $$S_{\text{skill}} = \begin{cases} 1.00, & \text{direct specialty match (e.g. Pipeline Specialist for burst mains)} \\ 0.70, & \text{general departmental technician} \\ 0.40, & \text{adjacent field role} \end{cases}$$
+- **Geographic Proximity ($W_p = 0.20$)**: Evaluates depot distance from complaint coordinate:
+  $$S_{\text{proximity}} = \begin{cases} 1.00, & \text{distance} < 1.5\text{ km} \\ 0.75, & 1.5\text{ km} \le \text{distance} \le 3.0\text{ km} \\ 0.45, & \text{distance} > 3.0\text{ km} \end{cases}$$
+- **SLA Urgency Rating ($W_u = 0.15$)**: Matches complaint hazard level with officer seniority:
+  $$S_{\text{urgency}} = \begin{cases} 1.00, & \text{Senior / Lead officer assigned to High/Urgent hazard} \\ 0.80, & \text{Standard field technician} \\ 0.50, & \text{Junior / Assistant technician} \end{cases}$$
+
+#### Atomic Dispatch Execution
+When the supervisor triggers dispatch via `POST /api/complaints/{id}/assign/`:
+1. System validates that the complaint status is `'Submitted'` or `'Categorized'`.
+2. Verifies that the designated `staff_id` belongs to the responsible `department_id` and `is_active = TRUE`.
+3. Inside a `transaction.atomic()` block:
+   - Creates a new `WORK_ORDER` row (`work_status = 'Assigned'`).
+   - Updates `COMPLAINT.status` to `'Assigned'`.
+4. Returns the composite payload with HTTP 201 Created.

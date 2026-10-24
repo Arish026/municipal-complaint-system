@@ -85,10 +85,14 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         if phone_param:
             raw_phone = phone_param.strip()
             plus_phone = raw_phone.replace(" ", "+")
-            qs = qs.filter(
+            digits_only = "".join(ch for ch in raw_phone if ch.isdigit())
+            q_filter = (
                 Q(citizen__phone__icontains=raw_phone)
                 | Q(citizen__phone__icontains=plus_phone)
             )
+            if len(digits_only) >= 7:
+                q_filter |= Q(citizen__phone__icontains=digits_only[-7:])
+            qs = qs.filter(q_filter)
         return qs
 
     @action(detail=False, methods=["post"], url_path="validate")
@@ -145,7 +149,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         qs = self.get_queryset()
         if complaint_id:
             # Strip prefixes like CMP- if passed
-            clean_id = complaint_id.upper().replace("CMP-", "").replace("#", "")
+            clean_id = str(complaint_id).upper().replace("CMP-", "").replace("#", "").strip()
             try:
                 qs = qs.filter(complaint_id=int(clean_id))
             except ValueError:
@@ -157,10 +161,14 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         if phone:
             raw_phone = phone.strip()
             plus_phone = raw_phone.replace(" ", "+")
-            qs = qs.filter(
+            digits_only = "".join(ch for ch in raw_phone if ch.isdigit())
+            q_filter = (
                 Q(citizen__phone__icontains=raw_phone)
                 | Q(citizen__phone__icontains=plus_phone)
             )
+            if len(digits_only) >= 7:
+                q_filter |= Q(citizen__phone__icontains=digits_only[-7:])
+            qs = qs.filter(q_filter)
 
         complaints = qs[:10]
         if not complaints.exists():
@@ -171,6 +179,50 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(complaints, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"], url_path="assign")
+    @transaction.atomic
+    def assign_staff(self, request, pk=None):
+        """FR-05: Multi-factor dispatch assignment of staff to complaint."""
+        complaint = self.get_object()
+        staff_id = request.data.get("staff_id")
+        action_notes = request.data.get(
+            "action_notes", "Dispatched via Multi-Factor Decision Engine."
+        )
+
+        if not staff_id:
+            return Response(
+                {"detail": "Staff ID is required for assignment."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        staff = Staff.objects.filter(staff_id=staff_id, is_active=True).first()
+        if not staff:
+            return Response(
+                {"detail": "Selected field technician is not found or inactive."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        work_order = WorkOrder.objects.create(
+            complaint=complaint,
+            staff=staff,
+            work_status=WorkOrder.STATUS_ASSIGNED,
+            action_taken=action_notes,
+            assigned_date=timezone.now(),
+        )
+
+        complaint.status = Complaint.STATUS_ASSIGNED
+        complaint.save(update_fields=["status"])
+
+        return Response(
+            {
+                "success": True,
+                "message": f"Assigned to {staff.name} ({staff.designation}).",
+                "work_order": WorkOrderSerializer(work_order).data,
+                "complaint": ComplaintSerializer(complaint).data,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class WorkOrderViewSet(viewsets.ModelViewSet):

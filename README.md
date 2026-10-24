@@ -48,7 +48,46 @@ graph TD
 
 ---
 
-## 2. Entity-Relationship Diagram (ERD)
+## 2. End-to-End Operational Lifecycle & Multi-Factor Dispatch
+
+The system digitizes the complete municipal redressal lifecycle across four discrete phases:
+
+```mermaid
+flowchart LR
+    subgraph Phase1["1. Intake & Routing"]
+        A["Citizen lodges grievance (GPS + Phone)"] --> B["Atomic Profile Match (FR-01)"]
+        B --> C["Agency Routing (FR-03)"]
+    end
+
+    subgraph Phase2["2. Multi-Factor Dispatch"]
+        C --> D["Multi-Factor Assignment Engine"]
+        D --> E["Work Order Created (FR-05)"]
+    end
+
+    subgraph Phase3["3. Field Execution"]
+        E --> F["Technician Workdesk (FR-06)"]
+        F --> G["Field Repairs & Status Sync"]
+    end
+
+    subgraph Phase4["4. Surveillance & Tracking"]
+        G --> H["Citizen Live Tracking (FR-07)"]
+        E -.->|SLA > 72h| I["Decision Agent Alert (FR-09)"]
+    end
+```
+
+### Multi-Factor Decision Formula
+Work order allocation evaluates all active department technicians on a composite fit score:
+
+$$\text{Composite Fit Score} = 0.35 \times \text{Workload} + 0.30 \times \text{SkillMatch} + 0.20 \times \text{Proximity} + 0.15 \times \text{SLA Urgency}$$
+
+1. **Workload Queue (35%)**: Penalizes overloaded officers ($0\text{ jobs} \to 100\%$, $1\text{ job} \to 85\%$, $2\text{ jobs} \to 60\%$, $\ge 4\text{ jobs} \to 15\%$).
+2. **Skill Specialization (30%)**: Matches hazard type to specialist designations (e.g. *Lead Pipeline Inspector* for burst mains vs *Asphalt Technician* for potholes).
+3. **Geographic Proximity (20%)**: Estimates distance from technician field depot to the incident coordinate.
+4. **SLA Urgency Rating (15%)**: Ensures high-severity hazards (exposed live wires, contaminated water) are matched with Senior/Lead staff.
+
+---
+
+## 3. Entity-Relationship Diagram (ERD)
 
 Core five-entity design using Crow's foot notation:
 
@@ -112,7 +151,7 @@ erDiagram
 
 ---
 
-## 3. Semantic Net (Occurrence Level)
+## 4. Semantic Net (Occurrence Level)
 
 Illustrates declared `1:N` relationships through sample populations rather than abstract rules:
 
@@ -173,7 +212,7 @@ graph LR
 
 ---
 
-## 4. Data Flow Diagrams (DFD)
+## 5. Data Flow Diagrams (DFD)
 
 ### Level 0: Context Diagram
 *Global boundary with one central process, external entities only, and no data stores.*
@@ -287,7 +326,7 @@ flowchart TD
 
 ---
 
-## 5. Repository Structure
+## 6. Repository Structure
 
 ```
 ├── .github/
@@ -333,7 +372,7 @@ flowchart TD
 
 ---
 
-## 6. Functional Requirements Matrix
+## 7. Functional Requirements Matrix
 
 | Requirement | Module | DFD Process | Implementation Target |
 |---|---|---|---|
@@ -341,15 +380,16 @@ flowchart TD
 | **FR-02** | Validation | `2.2 VALIDATE DETAILS` | DRF Serializers & Next.js form errors |
 | **FR-03** | Categorization | `2.3 & 2.4 CATEGORIZE` | `POST /api/complaints/categorize/` |
 | **FR-04** | Registration | `2.5 & 2.6 SAVE & ACK` | `POST /api/complaints/` |
-| **FR-05** | Work Orders | `3.0 ASSIGN DEPT & WORK` | `POST /api/work-orders/` |
+| **FR-05** | Multi-Factor Dispatch | `3.0 ASSIGN DEPT & WORK` | `POST /api/complaints/{id}/assign/` & `/api/work-orders/` |
 | **FR-06** | Status Updates | `4.0 UPDATE STATUS` | `PATCH /api/work-orders/{id}/` |
 | **FR-07** | Inquiry | `4.0 LIVE TRACKING` | `GET /api/complaints/track/?id=...` |
 | **FR-08** | Reporting | `5.0 GENERATE REPORTS` | `GET /api/reports/` |
 | **FR-09** | Decision Support | Agent / Rules Engine | `GET /api/agent/alerts/` |
+| **Health** | System Monitor | `Diagnostics` | `GET /api/health/` |
 
 ---
 
-## 7. Quickstart Guide
+## 8. Quickstart Guide
 
 ### Option A: One-Command Start (Docker Compose)
 
@@ -388,6 +428,8 @@ python -m venv venv
 pip install -r requirements.txt
 cp .env.example .env
 python manage.py migrate
+python manage.py seed_db
+python manage.py test
 python manage.py runserver
 ```
 
@@ -401,7 +443,7 @@ npm run dev
 
 ---
 
-## 8. Synthetic Data Generator
+## 9. Synthetic Data Generator
 
 Generate fresh synthetic test data across Citizens, Departments, Staff, Complaints, Work Orders, and Audit Logs:
 

@@ -19,12 +19,16 @@ SECRET_KEY = os.getenv(
 
 DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 
-DEFAULT_HOSTS = "localhost,127.0.0.1,backend"
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv("ALLOWED_HOSTS", DEFAULT_HOSTS).split(",")
-    if host.strip()
-]
+DEFAULT_HOSTS = "localhost,127.0.0.1,backend,testserver"
+ALLOWED_HOSTS = (
+    ["*"]
+    if DEBUG
+    else [
+        host.strip()
+        for host in os.getenv("ALLOWED_HOSTS", DEFAULT_HOSTS).split(",")
+        if host.strip()
+    ]
+)
 
 # Application definition
 INSTALLED_APPS = [

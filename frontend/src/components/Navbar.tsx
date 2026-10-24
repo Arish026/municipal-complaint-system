@@ -27,6 +27,8 @@ interface NavbarProps {
   onFontSizeChange: (level: 'normal' | 'large' | 'larger') => void;
   highContrast: boolean;
   onToggleHighContrast: () => void;
+  backendConnected?: boolean;
+  onReconnect?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -38,6 +40,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onFontSizeChange,
   highContrast,
   onToggleHighContrast,
+  backendConnected = false,
+  onReconnect,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -49,14 +53,27 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <>
       <header className="header-wrapper persistent-navbar">
-        {/* Top Utility Bar with Accessibility Controls & Live Indicators (NO HELPLINES/NUMBERS) */}
+        {/* Top Utility Bar with Accessibility Controls & Live Indicators */}
         <div className="top-utility-bar">
           <div className="container top-utility-content">
             <div className="utility-left">
-              <span className="utility-badge">
-                <span className="status-dot-pulse" />
-                Karachi Municipal Grid Live
+              <span
+                className={`utility-badge ${backendConnected ? 'badge-api-connected' : 'badge-api-offline'}`}
+                title={backendConnected ? 'Live Django REST API connected (PostgreSQL / SQLite)' : 'Backend API disconnected; operating in local storage mode'}
+              >
+                <span className={`status-dot-pulse ${backendConnected ? 'dot-online' : 'dot-offline'}`} />
+                {backendConnected ? 'Django API Live' : 'Offline Cache Mode'}
               </span>
+              {!backendConnected && onReconnect && (
+                <button
+                  type="button"
+                  className="reconnect-api-btn"
+                  onClick={onReconnect}
+                  title="Retry connecting to Django backend server"
+                >
+                  Connect API
+                </button>
+              )}
               <span className="utility-item hide-on-mobile">
                 <MapPin size={12} />
                 <span>Zone: All 7 Karachi Districts</span>
@@ -68,54 +85,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               </span>
             </div>
 
-            {/* Ease of Access Controls: Font Scaling & High Contrast */}
-            <div className="utility-right accessibility-tray">
-              <div className="a11y-control-group" title="Adjust Interface Text Size">
-                <Type size={12} className="a11y-icon" />
-                <button
-                  type="button"
-                  className={`a11y-btn ${fontSizeLevel === 'normal' ? 'active' : ''}`}
-                  onClick={() => onFontSizeChange('normal')}
-                  aria-label="Standard Font Size"
-                >
-                  A
-                </button>
-                <button
-                  type="button"
-                  className={`a11y-btn ${fontSizeLevel === 'large' ? 'active' : ''}`}
-                  onClick={() => onFontSizeChange('large')}
-                  aria-label="Large Font Size"
-                >
-                  A+
-                </button>
-                <button
-                  type="button"
-                  className={`a11y-btn ${fontSizeLevel === 'larger' ? 'active' : ''}`}
-                  onClick={() => onFontSizeChange('larger')}
-                  aria-label="Extra Large Font Size"
-                >
-                  A++
-                </button>
-              </div>
-
-              <span className="utility-divider">|</span>
-
-              <button
-                type="button"
-                className={`a11y-contrast-toggle ${highContrast ? 'active' : ''}`}
-                onClick={onToggleHighContrast}
-                title="Toggle High Contrast for Visual Ease"
-                aria-label="Toggle High Contrast Mode"
-              >
-                <Eye size={12} />
-                <span>{highContrast ? 'High Contrast: On' : 'Contrast'}</span>
-              </button>
-
-              <span className="utility-divider hide-on-mobile">|</span>
-
+            {/* Operational Summary & Live System Status */}
+            <div className="utility-right">
               <span className="utility-item hide-on-mobile">
-                <ShieldCheck size={12} color="var(--primary-moss)" />
-                <span>Verified 3NF Schema</span>
+                <span className="status-dot-pulse" style={{ backgroundColor: '#22c55e', boxShadow: '0 0 6px #22c55e' }} />
+                <span>Multi-Factor Dispatch SLA Engine Active</span>
+              </span>
+              <span className="utility-divider hide-on-mobile">|</span>
+              <span className="utility-item hide-on-mobile" style={{ color: '#e5ede7', fontWeight: 600 }}>
+                High-Contrast Operational Mode
               </span>
             </div>
           </div>
@@ -174,7 +152,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => handlePortalSwitch('admin')}
               >
                 <BarChart3 size={15} strokeWidth={2} />
-                <span>Command Center</span>
+                <span>Dispatch &amp; Command</span>
               </button>
             </nav>
 

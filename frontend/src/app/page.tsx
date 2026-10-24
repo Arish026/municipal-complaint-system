@@ -17,10 +17,12 @@ import {
   getStoredComplaints,
   getStoredWorkOrders,
   getStoredAuditLogs,
-  registerComplaint,
-  updateWorkOrderStatus,
-  resolveAuditDecision,
   calculateStats,
+  loadInitialAppData,
+  syncRegisterComplaint,
+  syncUpdateWorkOrder,
+  syncResolveAuditDecision,
+  syncAssignComplaint,
 } from '../lib/store';
 import { Navbar } from '../components/Navbar';
 import { CitizenPortal } from '../components/CitizenPortal';
@@ -54,6 +56,10 @@ export default function Home() {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>(getStoredWorkOrders);
   const [auditLogs, setAuditLogs] = useState<DecisionAuditLog[]>(getStoredAuditLogs);
 
+  // Backend Connectivity
+  const [backendConnected, setBackendConnected] = useState<boolean>(false);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+
   // Ticket Receipt Modal
   const [recentTicket, setRecentTicket] = useState<Complaint | null>(null);
   const [trackedId, setTrackedId] = useState<number | null>(null);
@@ -74,20 +80,48 @@ export default function Home() {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  // Initialize data on mount
+  // Synchronize data from backend API or local cache
+  const refreshData = async (notify: boolean = false) => {
+    setIsSyncing(true);
+    try {
+      const res = await loadInitialAppData();
+      setBackendConnected(res.connected);
+      setDepartments(res.departments);
+      setStaffList(res.staff);
+      setComplaints(res.complaints);
+      setWorkOrders(res.workOrders);
+      setAuditLogs(res.auditLogs);
+
+      if (notify) {
+        if (res.connected) {
+          addToast(
+            'success',
+            'Connected to Live Django REST API',
+            `Synced with SQLite/Postgres backend (${res.health.latencyMs || 25}ms latency)`
+          );
+        } else {
+          addToast(
+            'info',
+            'Operating in Local Storage Mode',
+            'Django API unreachable. Using persistent local cache.'
+          );
+        }
+      }
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // Mount effect: initial sync
   useEffect(() => {
-    setDepartments(getStoredDepartments());
-    setStaffList(getStoredStaff());
-    setComplaints(getStoredComplaints());
-    setWorkOrders(getStoredWorkOrders());
-    setAuditLogs(getStoredAuditLogs());
+    refreshData(false);
   }, []);
 
   // Compute live KPI metrics
   const stats: SystemStats = calculateStats(complaints, workOrders, auditLogs);
 
   // Handlers
-  const handleRegisterComplaint = (data: {
+  const handleRegisterComplaint = async (data: {
     citizenName: string;
     phone: string;
     address: string;
@@ -96,39 +130,51 @@ export default function Home() {
     description: string;
     location: string;
   }) => {
-    const newRecord = registerComplaint(data);
-    const updated = getStoredComplaints();
-    setComplaints(updated);
+    const { complaint: newRecord, isLive } = await syncRegisterComplaint(data);
+    setComplaints(getStoredComplaints());
     setRecentTicket(newRecord);
     addToast(
       'success',
       `Grievance CMP-${newRecord.complaint_id.toString().padStart(4, '0')} Lodged!`,
-      `${(newRecord.department_name || 'Municipal Agency').split('—')[0]} crew alerted.`
+      isLive
+        ? `Persisted to Django database & ${(newRecord.department_name || 'Municipal Agency').split('—')[0]} crew alerted.`
+        : `Saved to local storage cache.`
     );
   };
 
-  const handleUpdateWorkOrder = (
+  const handleUpdateWorkOrder = async (
     workOrderId: number,
     status: WorkOrderStatus,
     actionNotes?: string
   ) => {
-    updateWorkOrderStatus(workOrderId, status, actionNotes);
+    const { updatedOrder, isLive } = await syncUpdateWorkOrder(workOrderId, status, actionNotes);
     setWorkOrders(getStoredWorkOrders());
     setComplaints(getStoredComplaints());
     addToast(
       'success',
       `Work Order #${workOrderId} Updated`,
-      `Status set to ${status}.`
+      `Status set to ${status}${isLive ? ' (synced with Django API)' : ''}.`
     );
   };
 
-  const handleResolveDecision = (auditId: number, decision: SupervisorDecision) => {
-    const updated = resolveAuditDecision(auditId, decision);
+  const handleResolveDecision = async (auditId: number, decision: SupervisorDecision) => {
+    const { auditLogs: updated, isLive } = await syncResolveAuditDecision(auditId, decision);
     setAuditLogs([...updated]);
     addToast(
       'info',
       `Escalation Decision Recorded`,
-      `Alert #${auditId} has been ${decision.toLowerCase()}.`
+      `Alert #${auditId} has been ${decision.toLowerCase()}${isLive ? ' on Django server' : ''}.`
+    );
+  };
+
+  const handleAssignStaff = async (complaintId: number, staffId: number, notes?: string) => {
+    const { newWorkOrder, isLive } = await syncAssignComplaint(complaintId, staffId, notes);
+    setComplaints(getStoredComplaints());
+    setWorkOrders(getStoredWorkOrders());
+    addToast(
+      'success',
+      `Assigned to ${newWorkOrder.staff_name || 'Technician'}`,
+      isLive ? 'Work order created and synced with live Django API.' : 'Work order created in local cache.'
     );
   };
 
@@ -138,7 +184,7 @@ export default function Home() {
   };
 
   return (
-    <div className={`app-shell font-scale-${fontSizeLevel} ${highContrast ? 'theme-high-contrast' : ''}`}>
+    <div className="app-shell font-scale-normal theme-high-contrast">
       {/* Toast Notification Viewport */}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
 
@@ -150,6 +196,8 @@ export default function Home() {
         onFontSizeChange={setFontSizeLevel}
         highContrast={highContrast}
         onToggleHighContrast={() => setHighContrast(!highContrast)}
+        backendConnected={backendConnected}
+        onReconnect={() => refreshData(true)}
         onNewComplaintClick={() => {
           setActivePortal('citizen');
           setTrackedId(null);
@@ -378,8 +426,11 @@ export default function Home() {
               stats={stats}
               departments={departments}
               complaints={complaints}
+              staffList={staffList}
+              workOrders={workOrders}
               auditLogs={auditLogs}
               onResolveDecision={handleResolveDecision}
+              onAssignStaff={handleAssignStaff}
             />
           )}
         </div>

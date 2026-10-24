@@ -1,5 +1,5 @@
 """
-Management command to seed MCMS database with realistic municipal test data.
+Management command to seed MCMS database with realistic municipal test data for Karachi.
 Populates Departments, Staff, Citizens, Complaints, Work Orders, and Audit Logs.
 Usage: python manage.py seed_db
 """
@@ -18,19 +18,43 @@ from complaints.models import (
 
 
 class Command(BaseCommand):
-    help = "Seeds database with synthetic municipal seed data from SRS/DDL."
+    help = "Seeds database with synthetic Karachi municipal seed data matching frontend."
 
     def handle(self, *args, **options):
-        self.stdout.write("Seeding municipal database...")
+        self.stdout.write("Seeding municipal database with Karachi dataset...")
 
         # 1. Departments
         departments_data = [
-            (1, "Water Supply & Sanitation", "Town Hall Block A, Level 1"),
-            (2, "Roads & Infrastructure Maintenance", "Town Hall Block B, Level 2"),
-            (3, "Solid Waste Management", "Municipal Depot 4, East Ward"),
-            (4, "Street Lighting & Electricity", "Town Hall Block A, Level 3"),
-            (5, "Public Health & Vector Control", "Civic Hospital Complex, Block C"),
-            (6, "Parks & Urban Forestry", "Civic Center North, Level 1"),
+            (
+                1,
+                "KWSC — Karachi Water & Sewerage Corporation",
+                "9th Mile Karsaz, Main Shahrah-e-Faisal, Karachi",
+            ),
+            (
+                2,
+                "KMC — Roads & Civil Infrastructure",
+                "KMC Head Office, M.A. Jinnah Road, Saddar, Karachi",
+            ),
+            (
+                3,
+                "SSWMB — Sindh Solid Waste Management Board",
+                "Civic Center Wing, Gulshan-e-Iqbal Block 14, Karachi",
+            ),
+            (
+                4,
+                "K-Electric & Municipal Street Lighting Wing",
+                "KMC Electrical Depot, Nishtar Road, Karachi",
+            ),
+            (
+                5,
+                "Sindh Health Dept — Vector & Malaria Control",
+                "Civil Hospital Complex, Baba-e-Urdu Road, Karachi",
+            ),
+            (
+                6,
+                "KMC — Parks & Urban Forestry Department",
+                "Bagh-e-Jinnah (Frere Hall), Fatima Jinnah Road, Karachi",
+            ),
         ]
         dept_map = {}
         for dept_id, name, location in departments_data:
@@ -43,24 +67,18 @@ class Command(BaseCommand):
 
         # 2. Staff Members
         staff_data = [
-            (1, 1, "Ananya Gupta", "+1-555-0901", "Senior Supervisor"),
-            (2, 1, "Ananya Patel", "+1-555-0902", "Lead Field Technician"),
-            (3, 1, "Sneha Verma", "+1-555-0903", "Junior Inspector"),
-            (4, 2, "Pooja Verma", "+1-555-0904", "Senior Supervisor"),
-            (5, 2, "Divya Nair", "+1-555-0905", "Lead Field Technician"),
-            (6, 2, "Aarav Verma", "+1-555-0906", "Junior Inspector"),
-            (7, 3, "Divya Singh", "+1-555-0907", "Senior Supervisor"),
-            (8, 3, "Rohan Singh", "+1-555-0908", "Lead Field Technician"),
-            (9, 3, "Karan Reddy", "+1-555-0909", "Junior Inspector"),
-            (10, 4, "Ananya Das", "+1-555-0910", "Senior Supervisor"),
-            (11, 4, "Sneha Joshi", "+1-555-0911", "Lead Field Technician"),
-            (12, 4, "Ananya Patel", "+1-555-0912", "Junior Inspector"),
-            (13, 5, "Ananya Choudhury", "+1-555-0913", "Senior Supervisor"),
-            (14, 5, "Aditya Reddy", "+1-555-0914", "Lead Field Technician"),
-            (15, 5, "Meera Choudhury", "+1-555-0915", "Junior Inspector"),
-            (16, 6, "Divya Joshi", "+1-555-0916", "Senior Supervisor"),
-            (17, 6, "Pooja Khan", "+1-555-0917", "Lead Field Technician"),
-            (18, 6, "Rahul Nair", "+1-555-0918", "Junior Inspector"),
+            (1, 1, "Engr. Zulfiqar Haider", "0300-2419081", "Senior Executive Engineer"),
+            (2, 1, "Tariq Mehmood Alvi", "0321-9876541", "Lead Pipeline Inspector"),
+            (3, 1, "Kashif Raza", "0333-8761234", "Field Sub-Engineer"),
+            (4, 2, "Engr. Kamran Akram", "0345-2109876", "Chief Works Supervisor"),
+            (5, 2, "Shahid Hussain", "0312-3456789", "Pothole & Asphalt Technician"),
+            (6, 2, "Sub-Inspector Noman Ali", "0301-7654321", "Civil Field Inspector"),
+            (7, 3, "Muhammad Asif", "0302-8877665", "Zonal Sanitation Officer"),
+            (8, 3, "Rashid Minhas", "0334-5544332", "Compactor Fleet Lead"),
+            (9, 4, "Farhan Siddiqui", "0346-1122334", "Senior Grid Technician"),
+            (10, 4, "Owais Qureshi", "0322-9988776", "Street Light Inspector"),
+            (11, 5, "Dr. Irfan Hashmi", "0300-5566778", "Public Health Epidemiologist"),
+            (12, 6, "Zeeshan Abbasi", "0313-4455667", "Horticulture Field Officer"),
         ]
         staff_map = {}
         for s_id, d_id, name, phone, desig in staff_data:
@@ -81,19 +99,34 @@ class Command(BaseCommand):
         citizens_data = [
             (
                 1,
-                "Priya Sharma",
-                "+1-555-0201",
-                "Flat 102, Building B, Municipal Zone 2",
+                "Syed Murtaza Zaidi",
+                "0300-2415981",
+                "Flat 402, Al-Ghafoor Heights, Block 13-D, Gulshan-e-Iqbal",
             ),
-            (2, "Rohan Iyer", "+1-555-0202", "Flat 204, Building C, Municipal Zone 3"),
-            (3, "Aarav Nair", "+1-555-0203", "Flat 306, Building D, Municipal Zone 4"),
+            (
+                2,
+                "Ayesha Farooq",
+                "0321-8849120",
+                "House 84-B, Khayaban-e-Shahbaz, DHA Phase 6",
+            ),
+            (
+                3,
+                "Bilal Ahmed Qureshi",
+                "0333-5129480",
+                "Apartment 12, Clifton View Tower, Block 4, Clifton",
+            ),
             (
                 4,
-                "Vikram Choudhury",
-                "+1-555-0204",
-                "Flat 408, Building E, Municipal Zone 1",
+                "Dr. Samina Parveen",
+                "0345-3108742",
+                "B-14, Block H, Near Five Star Chowrangi, North Nazimabad",
             ),
-            (5, "Meera Verma", "+1-555-0205", "Flat 510, Building F, Municipal Zone 2"),
+            (
+                5,
+                "Malik Jahangir",
+                "0312-9014522",
+                "Shop 18, Regal Trade Square, Preedy Street, Saddar",
+            ),
         ]
         citizen_map = {}
         for c_id, name, phone, addr in citizens_data:
@@ -110,101 +143,101 @@ class Command(BaseCommand):
                 1,
                 1,
                 2,
-                "Damaged Stormwater Drain Cover",
-                "Missing storm drain grate posing pedestrian hazard near walkway.",
-                "Civic Park Walkway, Gate 2",
+                "Missing Manhole Cover",
+                "Deep open circular manhole without cover near school crossing. Extremely hazardous in dark.",
+                "Main University Road near Disco Bakery, Gulshan Block 13-D",
                 "Submitted",
-                2,
-            ),
-            (
-                2,
-                2,
-                2,
-                "Damaged Stormwater Drain Cover",
-                "Cracked concrete cover along main road edge.",
-                "Civic Park Walkway, Gate 2",
-                "Assigned",
-                5,
-            ),
-            (
-                3,
-                3,
-                5,
-                "Fumigation Request",
-                "High mosquito density following recent monsoon rains.",
-                "East End Apartments",
-                "Categorized",
-                8,
-            ),
-            (
-                4,
-                4,
                 6,
-                "Fallen Tree Branch",
-                "Large bough blocking two lanes after windstorm.",
-                "Nehru Park Outer Perimeter",
-                "Categorized",
-                1,
             ),
             (
-                5,
-                5,
-                3,
-                "Overflowing Garbage Dumpster",
-                "Community waste container not cleared for over 48 hours.",
-                "Subhash Nagar Market",
-                "In Progress",
-                12,
-            ),
-            (
-                6,
-                1,
+                2,
+                2,
                 2,
                 "Dangerous Deep Pothole",
-                "Large pothole causing vehicle damage and traffic bottleneck.",
-                "Main Boulevard near Central Metro",
-                "Verified",
-                4,
-            ),
-            (
-                7,
-                2,
-                4,
-                "Flickering Sodium Lamp",
-                "High mast lighting fluctuating constantly at night.",
-                "Station Road Crossing",
-                "Categorized",
-                9,
-            ),
-            (
-                8,
-                3,
-                4,
-                "Dark Streetlights",
-                "Consecutive 6 streetlights non-operational on main street.",
-                "Silver Oak Avenue",
-                "Resolved",
+                "Heavy crater formed after stormwater pipeline collapse, damaging vehicles and causing traffic bottleneck.",
+                "Shahrah-e-Faisal near Baloch Colony Flyover ramp",
+                "Assigned",
                 14,
             ),
             (
-                9,
+                5,
+                3,
+                3,
+                "Overflowing Kachra Kundi",
+                "Garbage dump spilling onto road edge. Waste collection vehicle has not visited for 4 days.",
+                "Boat Basin Food Street, Block 5, Clifton",
+                "In Progress",
+                22,
+            ),
+            (
+                6,
                 4,
                 1,
                 "Water Pipeline Burst",
-                "Clean water overflowing onto roadway for 6+ hours.",
-                "Corner of 5th Ave & Market St",
-                "In Progress",
-                3,
+                "High pressure drinking water line ruptured under road surface, flooding adjacent residential street.",
+                "Block H, Five Star Chowrangi, North Nazimabad",
+                "Verified",
+                11,
             ),
             (
                 10,
                 5,
                 4,
-                "Exposed Electric Wiring",
-                "Loose electric wire hanging near playground pole.",
-                "Ward 4 Community Park",
+                "Exposed Live Electric Cable",
+                "Open utility wire dangling from rusted pole at pedestrian eye level near commercial plaza.",
+                "Preedy Street near Empress Market, Saddar",
                 "Resolved",
-                10,
+                15,
+            ),
+            (
+                11,
+                1,
+                5,
+                "Dengue & Malaria Fumigation Request",
+                "Severe mosquito breeding from stagnant sewer pool behind residential market. Urgent fogging needed.",
+                "Allama Shabbir Ahmed Usmani Road, Gulshan Block 4",
+                "Submitted",
+                17,
+            ),
+            (
+                28,
+                2,
+                1,
+                "Contaminated Drinking Line",
+                "Tap water emitting foul odor and dark sediment. Suspected cross-leakage with adjacent sewer conduit.",
+                "Street 14, Khayaban-e-Mujahid, DHA Phase 5",
+                "Categorized",
+                9,
+            ),
+            (
+                29,
+                3,
+                6,
+                "Fallen Neem Tree Blocking Traffic",
+                "Large mature tree snapped during storm wind, blocking both lanes of inner residential road.",
+                "Near Hilal Park, Khayaban-e-Hilal, DHA Phase 6",
+                "Resolved",
+                8,
+            ),
+            (
+                30,
+                4,
+                3,
+                "Illegal Construction Debris Dumping",
+                "Truck unloaded concrete rubble on public pedestrian sidewalk, completely obstructing foot traffic.",
+                "Main Korangi Road near CBM / IoBM Gate",
+                "Assigned",
+                18,
+            ),
+            (
+                40,
+                5,
+                2,
+                "Sunken Asphalt Paving",
+                "Road surface subsided over underground storm drain after recent monsoon run-off.",
+                "Shahrah-e-Liaquat near Burns Road food street",
+                "In Progress",
+                23,
             ),
         ]
         complaint_map = {}
@@ -223,57 +256,63 @@ class Command(BaseCommand):
                 },
             )
             complaint_map[cmp_id] = cmp_obj
-        self.stdout.write(
-            self.style.SUCCESS(f"Loaded {len(complaint_map)} complaints.")
-        )
+        self.stdout.write(self.style.SUCCESS(f"Loaded {len(complaint_map)} complaints."))
 
         # 5. Work Orders
         orders_data = [
-            (1, 2, 6, "Assigned", "Under field assessment; parts scheduled.", 4, None),
             (
+                101,
                 2,
-                5,
-                8,
+                6,
                 "In Progress",
-                "Dispatched sanitation compactor truck to site.",
-                10,
-                None,
-            ),
-            (
-                3,
-                6,
-                6,
-                "Completed",
-                "Site excavated, asphalt applied and roller compacted.",
-                3,
-                2,
-            ),
-            (
-                4,
-                8,
-                11,
-                "Completed",
-                "Installed replacement luminaire and ballast.",
+                "Inspection completed by Sub-Inspector Noman Ali. Asphalt cold mix and road roller dispatched.",
                 13,
-                12,
-            ),
-            (
-                5,
-                9,
-                2,
-                "In Progress",
-                "Shut off sector valve; cutting damaged section.",
-                2,
                 None,
             ),
             (
-                6,
+                102,
+                5,
+                8,
+                "In Progress",
+                "SSWMB mechanical compactor unit en route to Boat Basin garbage point.",
+                21,
+                None,
+            ),
+            (
+                103,
                 10,
+                9,
+                "Completed",
+                "Cable isolated, elevated to pole junction box and insulated with weather-proof conduit.",
+                15,
+                15,
+            ),
+            (
+                104,
+                29,
                 12,
                 "Completed",
-                "Exposed wiring sleeved, conduit secured and pole grounded.",
-                9,
+                "Trunk cut into sections with chainsaw, loaded onto KMC flatbed truck, and thoroughfare cleared.",
                 8,
+                8,
+            ),
+            (
+                105,
+                30,
+                7,
+                "Assigned",
+                "Site notice issued. Front-loader truck assigned for rubble lifting tomorrow morning.",
+                17,
+                None,
+            ),
+            (
+                106,
+                40,
+                5,
+                "In Progress",
+                "Excavation completed. Sub-base gravel compaction underway before final hot asphalt layer.",
+                22,
+                None,
             ),
         ]
         wo_map = {}
@@ -298,46 +337,39 @@ class Command(BaseCommand):
         audit_data = [
             (
                 1,
-                6,
-                3,
-                "Workload Check",
-                "Staff member assigned 4 active tickets in 24 hours.",
-                "Recommend reallocating non-critical work order.",
-                "Approved",
-                1,
+                40,
+                106,
+                "Overdue Alert",
+                "Work Order #106 has remained in In-Progress status for over 72 hours without asphalt laying completion.",
+                "Authorize additional asphalt crew and heavy roller dispatch to Burns Road site.",
+                "Pending",
+                None,
+                timedelta(days=7),
             ),
             (
                 2,
-                1,
+                11,
                 None,
-                "Overdue Alert",
-                "Complaint pending department assignment for over 72 hours.",
-                "Escalate to Department Head for immediate queue assignment.",
+                "Workload Check",
+                "Gulshan Block 4 has logged multiple vector breeding complaints. Health spray team workload is critical.",
+                "Coordinate with Sindh Health District East for dual-vehicle fumigation sweep.",
                 "Pending",
                 None,
+                timedelta(days=6),
             ),
             (
                 3,
-                7,
-                None,
-                "Overdue Alert",
-                "Complaint pending department assignment for over 72 hours.",
-                "Escalate to Department Head for immediate queue assignment.",
-                "Pending",
-                None,
-            ),
-            (
-                4,
-                9,
-                5,
+                10,
+                103,
                 "Workload Check",
-                "Staff member assigned 4 active tickets in 24 hours.",
-                "Recommend reallocating non-critical work order.",
+                "Exposed live wire hazard reported in high-density pedestrian zone (Saddar).",
+                "Priority dispatch approved and emergency insulated tape applied.",
                 "Approved",
-                1,
+                9,
+                timedelta(days=15),
             ),
         ]
-        for a_id, cmp_id, wo_id, a_type, expl, sugg, dec, s_id in audit_data:
+        for a_id, cmp_id, wo_id, a_type, expl, sugg, dec, s_id, delta in audit_data:
             DecisionAuditLog.objects.update_or_create(
                 audit_id=a_id,
                 defaults={
@@ -348,10 +380,10 @@ class Command(BaseCommand):
                     "suggested_action": sugg,
                     "supervisor_decision": dec,
                     "decided_by_staff": staff_map.get(s_id) if s_id else None,
-                    "decision_timestamp": now if dec != "Pending" else None,
-                    "created_at": now - timedelta(hours=24),
+                    "decision_timestamp": now - delta if dec != "Pending" else None,
+                    "created_at": now - delta,
                 },
             )
         self.stdout.write(
-            self.style.SUCCESS("Database seeding completed successfully!")
+            self.style.SUCCESS("Database seeding completed successfully with Karachi municipal dataset!")
         )
