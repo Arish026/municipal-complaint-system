@@ -385,6 +385,7 @@ flowchart TD
 | **FR-07** | Inquiry | `4.0 LIVE TRACKING` | `GET /api/complaints/track/?id=...` |
 | **FR-08** | Reporting | `5.0 GENERATE REPORTS` | `GET /api/reports/` |
 | **FR-09** | Decision Support | Agent / Rules Engine | `GET /api/agent/alerts/` |
+| **DBMS-Lab** | Relational Theory | `Theory Studio` | Interactive 3NF Normalization, ANSI-SPARC, Relational Algebra, ACID |
 | **Health** | System Monitor | `Diagnostics` | `GET /api/health/` |
 
 ---

@@ -16,6 +16,7 @@ import {
   User,
   Activity,
   Layers,
+  Database,
 } from 'lucide-react';
 
 interface StaffPortalProps {
@@ -171,9 +172,14 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
               <div key={order.work_order_id} className="civic-card work-order-card">
                 <div className="work-order-top">
                   <div>
-                    <span className="work-order-id-code">
-                      ORDER #{order.work_order_id.toString().padStart(4, '0')}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+                      <span className="work-order-id-code">
+                        ORDER #{order.work_order_id.toString().padStart(4, '0')}
+                      </span>
+                      <span style={{ fontSize: '0.68rem', fontFamily: 'var(--font-mono)', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', padding: '0.1rem 0.4rem', borderRadius: '4px', border: '1px solid rgba(56, 189, 248, 0.25)' }}>
+                        FK: CMP-{order.complaint_id.toString().padStart(4, '0')}
+                      </span>
+                    </div>
                     <h3 className="work-order-title">
                       {linkedComplaint?.category || 'Repair Task'}
                     </h3>

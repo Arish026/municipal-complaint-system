@@ -26,6 +26,14 @@ Client-side municipal operations portal for the Municipal Complaint Management S
 - **Two-Way Status Synchronization**: Marking orders "In Progress" or "Completed" syncs the linked citizen complaint in real time.
 - **Action Remarks Logging**: Field repair documentation.
 
+### 4. DBMS 3NF Architecture & Theory Lab (Dr. S. M. Khalid Syllabus)
+- **Normalization & Anomaly Simulator**: Demonstrates the step-by-step 1NF $\to$ 2NF $\to$ 3NF decomposition and simulates Insertion, Deletion, and Modification/Update anomalies on unnormalized flat tables (0NF).
+- **ANSI-SPARC 3-Level Architecture**: Visual exploration of External Level (role-tailored projections), Conceptual Level (5 3NF relations + audit log), and Internal Level (PostgreSQL/SQLite B-Tree indexes, WAL, and 8KB pages).
+- **Live Relational Algebra Workbench**: Interactive query generator translating business operations into formal Relational Algebra ($\sigma, \pi, \bowtie, \gamma$) and SQL, with real-time execution against loaded data.
+- **Referential Integrity & Cascades**: Foreign key delete rules matrix (`ON DELETE RESTRICT` for Citizen/Department/Staff vs. `ON DELETE CASCADE` for Work Orders) proving zero orphaned records.
+- **ACID Transaction Execution**: Step-by-step atomicity visualizer of concurrent work order dispatch.
+- **Connection Traps Audit**: Mathematical verification proving the schema avoids Fan Traps (§ 4.7.5) and Chasm Traps (§ 4.7.6).
+
 ---
 
 ## Architecture & Integration

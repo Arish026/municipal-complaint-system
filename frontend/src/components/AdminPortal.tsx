@@ -36,6 +36,7 @@ import {
   Sparkles,
   Sliders,
   Compass,
+  Database,
 } from 'lucide-react';
 
 interface AdminPortalProps {
@@ -190,9 +191,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       <div className="civic-card dispatch-station-card">
         <div className="civic-card-header" style={{ flexWrap: 'wrap', gap: '1rem', borderBottom: '2px solid var(--border-medium)', paddingBottom: '1rem' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
               <span className="hero-pill" style={{ background: '#064e3b', color: '#ffffff' }}>
                 Multi-Factor Assignment Engine
+              </span>
+              <span className="hero-pill" style={{ background: '#0284c7', color: '#ffffff', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                <Database size={11} />
+                <span>ACID Atomic Dispatch</span>
               </span>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>
                 FR-04 &amp; FR-05

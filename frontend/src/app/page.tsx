@@ -29,6 +29,7 @@ import { CitizenPortal } from '../components/CitizenPortal';
 import { StaffPortal } from '../components/StaffPortal';
 import { AdminPortal } from '../components/AdminPortal';
 import { TicketModal } from '../components/TicketModal';
+import { DbmsLabView } from '../components/DbmsLabView';
 import { Footer } from '../components/Footer';
 import { ToastContainer, ToastItem } from '../components/Toast';
 import {
@@ -44,10 +45,11 @@ import {
   CheckCircle2,
   Clock,
   Compass,
+  Database,
 } from 'lucide-react';
 
 export default function Home() {
-  const [activePortal, setActivePortal] = useState<'citizen' | 'staff' | 'admin'>('citizen');
+  const [activePortal, setActivePortal] = useState<'citizen' | 'staff' | 'admin' | 'dbms-lab'>('citizen');
 
   // Application Data States (Karachi dataset)
   const [departments, setDepartments] = useState<Department[]>(getStoredDepartments);
@@ -398,6 +400,46 @@ export default function Home() {
               </div>
             </div>
           )}
+
+          {/* TAB 4: DBMS 3NF LAB HERO */}
+          {activePortal === 'dbms-lab' && (
+            <div className="civic-hero-card hero-portal-dbms">
+              <div className="hero-top-badge" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.35)' }}>
+                <Database size={13} color="#38bdf8" />
+                <span>ACADEMIC &amp; ENGINEERING FOUNDATIONS • DR. S. M. KHALID</span>
+              </div>
+
+              <h1 className="civic-hero-title">
+                Relational DBMS 3NF Architecture &amp; Theory Lab
+              </h1>
+
+              <p className="civic-hero-desc">
+                Formal verification of 3rd Normal Form (3NF), ANSI-SPARC 3-tier architecture, Relational Algebra queries, and zero-loss referential integrity.
+              </p>
+
+              <div className="hero-stats-row">
+                <div className="hero-stat-chip">
+                  <span className="hero-stat-number" style={{ color: '#38bdf8' }}>5 Relations</span>
+                  <span className="hero-stat-label">3NF Normalized Tables</span>
+                </div>
+
+                <div className="hero-stat-chip">
+                  <span className="hero-stat-number" style={{ color: '#34d399' }}>100%</span>
+                  <span className="hero-stat-label">Lossless Decomposition</span>
+                </div>
+
+                <div className="hero-stat-chip">
+                  <span className="hero-stat-number" style={{ color: '#a78bfa' }}>0 Anomaly</span>
+                  <span className="hero-stat-label">Insert / Delete / Update</span>
+                </div>
+
+                <div className="hero-stat-chip">
+                  <span className="hero-stat-number" style={{ color: '#f59e0b' }}>ACID</span>
+                  <span className="hero-stat-label">Atomic Dispatch Guarantees</span>
+                </div>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Portal Views Container */}
@@ -431,6 +473,16 @@ export default function Home() {
               auditLogs={auditLogs}
               onResolveDecision={handleResolveDecision}
               onAssignStaff={handleAssignStaff}
+            />
+          )}
+
+          {activePortal === 'dbms-lab' && (
+            <DbmsLabView
+              departments={departments}
+              staffList={staffList}
+              complaints={complaints}
+              workOrders={workOrders}
+              auditLogs={auditLogs}
             />
           )}
         </div>

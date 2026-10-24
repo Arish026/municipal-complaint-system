@@ -16,11 +16,12 @@ import {
   Eye,
   Type,
   MapPin,
+  Database,
 } from 'lucide-react';
 
 interface NavbarProps {
-  activePortal: 'citizen' | 'staff' | 'admin';
-  setActivePortal: (portal: 'citizen' | 'staff' | 'admin') => void;
+  activePortal: 'citizen' | 'staff' | 'admin' | 'dbms-lab';
+  setActivePortal: (portal: 'citizen' | 'staff' | 'admin' | 'dbms-lab') => void;
   onNewComplaintClick: () => void;
   onTrackClick: () => void;
   fontSizeLevel: 'normal' | 'large' | 'larger';
@@ -45,7 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handlePortalSwitch = (portal: 'citizen' | 'staff' | 'admin') => {
+  const handlePortalSwitch = (portal: 'citizen' | 'staff' | 'admin' | 'dbms-lab') => {
     setActivePortal(portal);
     setMobileMenuOpen(false);
   };
@@ -154,6 +155,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <BarChart3 size={15} strokeWidth={2} />
                 <span>Dispatch &amp; Command</span>
               </button>
+              <button
+                id="portal-nav-dbms"
+                className={`portal-tab-btn portal-tab-dbms ${activePortal === 'dbms-lab' ? 'active' : ''}`}
+                onClick={() => handlePortalSwitch('dbms-lab')}
+                title="Curriculum Database Theory & 3NF Schema Lab"
+              >
+                <Database size={15} strokeWidth={2} />
+                <span>DBMS 3NF Lab</span>
+              </button>
             </nav>
 
             {/* Desktop Actions */}
@@ -257,6 +267,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <div className="mobile-item-text">
                       <strong>Supervisor Center</strong>
                       <span>Town hall SLA analytics &amp; escalations</span>
+                    </div>
+                  </button>
+
+                  <button
+                    className={`mobile-nav-item ${activePortal === 'dbms-lab' ? 'active' : ''}`}
+                    onClick={() => handlePortalSwitch('dbms-lab')}
+                  >
+                    <div className="mobile-item-icon" style={{ color: '#38bdf8' }}>
+                      <Database size={16} />
+                    </div>
+                    <div className="mobile-item-text">
+                      <strong style={{ color: '#38bdf8' }}>DBMS 3NF Architecture Lab</strong>
+                      <span>Normalization, ANSI-SPARC, Relational Algebra</span>
                     </div>
                   </button>
                 </div>
