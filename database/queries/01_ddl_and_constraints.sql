@@ -96,6 +96,9 @@ CREATE TABLE WORK_ORDER (
             'On Hold',
             'Cancelled'
         )
+    ),
+    CONSTRAINT chk_workorder_completion_date CHECK (
+        completion_date IS NULL OR completion_date >= assigned_date
     )
 );
 

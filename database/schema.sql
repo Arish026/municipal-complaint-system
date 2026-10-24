@@ -84,6 +84,8 @@ CREATE TABLE WORK_ORDER (
     action_taken TEXT NULL,
     CONSTRAINT chk_work_status 
         CHECK (work_status IN ('Assigned', 'In Progress', 'Completed', 'On Hold', 'Cancelled')),
+    CONSTRAINT chk_workorder_completion_date
+        CHECK (completion_date IS NULL OR completion_date >= assigned_date),
     CONSTRAINT fk_workorder_complaint
         FOREIGN KEY (complaint_id) 
         REFERENCES COMPLAINT(complaint_id) 
@@ -104,10 +106,12 @@ CREATE TABLE DECISION_AUDIT_LOG (
     alert_type VARCHAR(100) NOT NULL, -- 'Overdue', 'Workload Imbalance', 'Recurring Issue', 'Failure'
     explanation TEXT NOT NULL,
     suggested_action TEXT NOT NULL,
-    supervisor_decision VARCHAR(50) DEFAULT 'Pending' NOT NULL, -- 'Pending', 'Approved', 'Rejected'
+    supervisor_decision VARCHAR(50) DEFAULT 'Pending' NOT NULL,
     decided_by_staff_id INT NULL,
     decision_timestamp TIMESTAMP WITH TIME ZONE NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT chk_supervisor_decision
+        CHECK (supervisor_decision IN ('Pending', 'Approved', 'Rejected')),
     CONSTRAINT fk_audit_complaint
         FOREIGN KEY (complaint_id) 
         REFERENCES COMPLAINT(complaint_id) 

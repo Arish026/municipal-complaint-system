@@ -112,6 +112,23 @@ class Complaint(models.Model):
         ordering = ["-complaint_date"]
         verbose_name = "Complaint"
         verbose_name_plural = "Complaints"
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(
+                    status__in=[
+                        "Submitted",
+                        "Categorized",
+                        "Assigned",
+                        "In Progress",
+                        "Resolved",
+                        "Verified",
+                        "Closed",
+                        "Rejected",
+                    ]
+                ),
+                name="chk_complaint_status",
+            )
+        ]
 
     def __str__(self):
         return f"CMP-{self.complaint_id}: {self.category} ({self.status})"
@@ -160,6 +177,25 @@ class WorkOrder(models.Model):
         ordering = ["-assigned_date"]
         verbose_name = "Work Order"
         verbose_name_plural = "Work Orders"
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(
+                    work_status__in=[
+                        "Assigned",
+                        "In Progress",
+                        "Completed",
+                        "On Hold",
+                        "Cancelled",
+                    ]
+                ),
+                name="chk_work_status",
+            ),
+            models.CheckConstraint(
+                check=models.Q(completion_date__isnull=True)
+                | models.Q(completion_date__gte=models.F("assigned_date")),
+                name="chk_workorder_completion_date",
+            ),
+        ]
 
     def __str__(self):
         return (
@@ -223,6 +259,18 @@ class DecisionAuditLog(models.Model):
         ordering = ["-created_at"]
         verbose_name = "Decision Audit Log"
         verbose_name_plural = "Decision Audit Logs"
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(
+                    supervisor_decision__in=[
+                        "Pending",
+                        "Approved",
+                        "Rejected",
+                    ]
+                ),
+                name="chk_supervisor_decision",
+            )
+        ]
 
     def __str__(self):
         return f"Audit-{self.audit_id}: {self.alert_type} ({self.supervisor_decision})"

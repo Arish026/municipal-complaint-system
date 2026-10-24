@@ -216,230 +216,51 @@ export default function Home() {
 
       {/* Main Content Area */}
       <main className="main-content">
-        {/* Dynamic Contextual Hero Section (Different for each Portal Tab) */}
-        <section className="civic-hero-wrap">
-          {/* TAB 1: CITIZEN PORTAL HERO */}
-          {activePortal === 'citizen' && (
-            <div className="civic-hero-card hero-portal-citizen">
-              <div className="hero-top-badge">
-                <Sparkles size={13} color="var(--primary-moss)" />
-                <span>MUNICIPAL CARE &amp; REDRESSAL</span>
-              </div>
-
-              <h1 className="civic-hero-title">
-                Direct Civic Care for Every Neighborhood
-              </h1>
-
-              <p className="civic-hero-desc">
-                Report infrastructure issues across Karachi, pinpoint on map, and verify repairs in real time.
-              </p>
-
-              <div className="civic-hero-actions">
-                <button
-                  id="hero-btn-file-grievance"
-                  className="btn-pill-primary"
-                  onClick={() => {
-                    setTrackedId(null);
-                    const el = document.getElementById('citizen-form-section');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  <Plus size={16} strokeWidth={2.5} />
-                  <span>Lodge Grievance</span>
-                </button>
-
-                <button
-                  id="hero-btn-track-status"
-                  className="btn-pill-secondary"
-                  onClick={() => {
-                    setTrackedId(complaints[0]?.complaint_id || null);
-                    const el = document.getElementById('citizen-tracking-section');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  <Search size={16} strokeWidth={2.2} />
-                  <span>Track Ticket</span>
-                </button>
-              </div>
-
-              {/* Quick Metrics Strip */}
-              <div className="hero-stats-row">
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number">{stats.totalComplaints}</span>
-                  <span className="hero-stat-label">Total Logged</span>
-                </div>
-
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number" style={{ color: '#235336' }}>{stats.resolvedCount}</span>
-                  <span className="hero-stat-label">Resolved</span>
-                </div>
-
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number" style={{ color: '#8a6523' }}>{stats.inProgressCount}</span>
-                  <span className="hero-stat-label">In Progress</span>
-                </div>
-
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number">{stats.avgResolutionHours}h</span>
-                  <span className="hero-stat-label">Avg. Resolution</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: STAFF WORKDESK HERO */}
-          {activePortal === 'staff' && (
-            <div className="civic-hero-card hero-portal-staff">
-              <div className="hero-top-badge" style={{ background: '#f5efe4', color: '#8a6523', borderColor: '#ecdac2' }}>
-                <Wrench size={13} color="#8a6523" />
-                <span>FIELD CREW &amp; DISPATCH OPERATIONS</span>
-              </div>
-
-              <h1 className="civic-hero-title">
-                Karachi Municipal Crew Workdesk
-              </h1>
-
-              <p className="civic-hero-desc">
-                Review assigned work orders, update repair milestones, and record physical on-site diagnostic remarks.
-              </p>
-
-              <div className="civic-hero-actions">
-                <button
-                  className="btn-pill-primary"
-                  onClick={() => {
-                    const el = document.getElementById('select-active-technician');
-                    if (el) el.focus();
-                  }}
-                >
-                  <Wrench size={16} strokeWidth={2.2} />
-                  <span>Select Active Technician</span>
-                </button>
-              </div>
-
-              {/* Staff Workdesk Metrics */}
-              <div className="hero-stats-row">
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number">{workOrders.length}</span>
-                  <span className="hero-stat-label">Active Orders</span>
-                </div>
-
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number" style={{ color: '#8a6523' }}>
-                    {workOrders.filter((w) => w.work_status === 'In Progress').length}
+        {/* Simplified DBMS Context Header */}
+        <section className="civic-hero-wrap" style={{ marginBottom: '1.25rem' }}>
+          <div className="civic-hero-card" style={{ padding: '1.25rem 1.75rem', background: '#0b1329', borderColor: '#1e293b' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
+                  <span className="hero-pill" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.35)' }}>
+                    {activePortal === 'citizen' && 'CITIZEN INTAKE (DFD PROCESS 1.0 & 2.0)'}
+                    {activePortal === 'staff' && 'FIELD CREW OPERATIONS (DFD PROCESS 4.0)'}
+                    {activePortal === 'admin' && 'MUNICIPAL COMMAND & DISPATCH (DFD 3.0 & 5.0)'}
+                    {activePortal === 'dbms-lab' && 'RELATIONAL THEORY & 3NF LAB (DR. S. M. KHALID SYLLABUS)'}
                   </span>
-                  <span className="hero-stat-label">Under Repair</span>
-                </div>
-
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number" style={{ color: '#235336' }}>
-                    {workOrders.filter((w) => w.work_status === 'Completed').length}
+                  <span style={{ fontSize: '0.74rem', color: '#94a3b8', fontFamily: 'var(--font-mono)' }}>
+                    Schema: 3NF Relational (PostgreSQL 16)
                   </span>
-                  <span className="hero-stat-label">Completed Jobs</span>
                 </div>
+                <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+                  {activePortal === 'citizen' && 'Civic Grievance Lodging & Real-Time Tracking'}
+                  {activePortal === 'staff' && 'Field Technician Inspection & Repair Desk'}
+                  {activePortal === 'admin' && 'Municipal Command & Multi-Factor Dispatch Station'}
+                  {activePortal === 'dbms-lab' && 'Relational Foundations, Normalization & Query Studio'}
+                </h1>
+              </div>
 
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number">{staffList.length}</span>
-                  <span className="hero-stat-label">Field Technicians</span>
+              {/* Compact Database Entity Count Strip */}
+              <div className="hero-stats-row" style={{ marginTop: 0, gap: '0.65rem' }}>
+                <div className="hero-stat-chip" style={{ padding: '0.35rem 0.75rem' }}>
+                  <span className="hero-stat-number" style={{ fontSize: '1.05rem', color: '#38bdf8' }}>{stats.totalComplaints}</span>
+                  <span className="hero-stat-label" style={{ fontSize: '0.66rem' }}>Complaints (D2)</span>
+                </div>
+                <div className="hero-stat-chip" style={{ padding: '0.35rem 0.75rem' }}>
+                  <span className="hero-stat-number" style={{ fontSize: '1.05rem', color: '#34d399' }}>{workOrders.length}</span>
+                  <span className="hero-stat-label" style={{ fontSize: '0.66rem' }}>Work Orders (D5)</span>
+                </div>
+                <div className="hero-stat-chip" style={{ padding: '0.35rem 0.75rem' }}>
+                  <span className="hero-stat-number" style={{ fontSize: '1.05rem', color: '#a78bfa' }}>{departments.length}</span>
+                  <span className="hero-stat-label" style={{ fontSize: '0.66rem' }}>Agencies (D3)</span>
+                </div>
+                <div className="hero-stat-chip" style={{ padding: '0.35rem 0.75rem' }}>
+                  <span className="hero-stat-number" style={{ fontSize: '1.05rem', color: '#fbbf24' }}>{staffList.length}</span>
+                  <span className="hero-stat-label" style={{ fontSize: '0.66rem' }}>Staff (D4)</span>
                 </div>
               </div>
             </div>
-          )}
-
-          {/* TAB 3: ADMIN COMMAND CENTER HERO */}
-          {activePortal === 'admin' && (
-            <div className="civic-hero-card hero-portal-admin">
-              <div className="hero-top-badge" style={{ background: '#fbeeee', color: '#993030', borderColor: '#f2cccc' }}>
-                <BarChart3 size={13} color="#993030" />
-                <span>TOWN HALL DECISION INTELLIGENCE</span>
-              </div>
-
-              <h1 className="civic-hero-title">
-                Municipal Command &amp; Escalation Hub
-              </h1>
-
-              <p className="civic-hero-desc">
-                Real-time town hall oversight, cross-agency SLA audit alerts, and Karachi zonal resolution velocity.
-              </p>
-
-              <div className="civic-hero-actions">
-                <button
-                  className="btn-pill-primary"
-                  onClick={() => {
-                    const el = document.getElementById('btn-alert-tab-pending');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  <AlertTriangle size={15} />
-                  <span>Review Escalations</span>
-                </button>
-              </div>
-
-              {/* Supervisor SLA Metrics */}
-              <div className="hero-stats-row">
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number">{stats.totalComplaints}</span>
-                  <span className="hero-stat-label">Total Grievances</span>
-                </div>
-
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number" style={{ color: '#235336' }}>
-                    {stats.totalComplaints > 0 ? Math.round((stats.resolvedCount / stats.totalComplaints) * 100) : 0}%
-                  </span>
-                  <span className="hero-stat-label">SLA Compliance</span>
-                </div>
-
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number" style={{ color: '#993030' }}>{stats.overdueCount}</span>
-                  <span className="hero-stat-label">Active Escalations</span>
-                </div>
-
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number">{departments.length}</span>
-                  <span className="hero-stat-label">Karachi Agencies</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 4: DBMS 3NF LAB HERO */}
-          {activePortal === 'dbms-lab' && (
-            <div className="civic-hero-card hero-portal-dbms">
-              <div className="hero-top-badge" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.35)' }}>
-                <Database size={13} color="#38bdf8" />
-                <span>ACADEMIC &amp; ENGINEERING FOUNDATIONS • DR. S. M. KHALID</span>
-              </div>
-
-              <h1 className="civic-hero-title">
-                Relational DBMS 3NF Architecture &amp; Theory Lab
-              </h1>
-
-              <p className="civic-hero-desc">
-                Formal verification of 3rd Normal Form (3NF), ANSI-SPARC 3-tier architecture, Relational Algebra queries, and zero-loss referential integrity.
-              </p>
-
-              <div className="hero-stats-row">
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number" style={{ color: '#38bdf8' }}>5 Relations</span>
-                  <span className="hero-stat-label">3NF Normalized Tables</span>
-                </div>
-
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number" style={{ color: '#34d399' }}>100%</span>
-                  <span className="hero-stat-label">Lossless Decomposition</span>
-                </div>
-
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number" style={{ color: '#a78bfa' }}>0 Anomaly</span>
-                  <span className="hero-stat-label">Insert / Delete / Update</span>
-                </div>
-
-                <div className="hero-stat-chip">
-                  <span className="hero-stat-number" style={{ color: '#f59e0b' }}>ACID</span>
-                  <span className="hero-stat-label">Atomic Dispatch Guarantees</span>
-                </div>
-              </div>
-            </div>
-          )}
+          </div>
         </section>
 
         {/* Portal Views Container */}
