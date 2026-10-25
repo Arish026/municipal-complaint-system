@@ -176,7 +176,7 @@ export const StaffPortal: React.FC<StaffPortalProps> = ({
                       <span className="work-order-id-code">
                         ORDER #{order.work_order_id.toString().padStart(4, '0')}
                       </span>
-                      <span style={{ fontSize: '0.68rem', fontFamily: 'var(--font-mono)', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', padding: '0.1rem 0.4rem', borderRadius: '4px', border: '1px solid rgba(56, 189, 248, 0.25)' }}>
+                      <span style={{ fontSize: '0.68rem', fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#0369a1', background: '#e0f2fe', padding: '0.15rem 0.45rem', borderRadius: '4px', border: '1px solid #bae6fd' }}>
                         FK: CMP-{order.complaint_id.toString().padStart(4, '0')}
                       </span>
                     </div>

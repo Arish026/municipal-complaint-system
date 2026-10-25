@@ -68,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
               <div className="brand-title-wrap">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span className="brand-title">Karachi Metropolitan Redressal</span>
+                  <span className="brand-title">Karachi Metropolitan <span style={{ color: '#d97706' }}>Redressal</span></span>
                   <span
                     className={`status-dot-pulse ${backendConnected ? 'dot-online' : 'dot-offline'}`}
                     style={{ width: '7px', height: '7px' }}

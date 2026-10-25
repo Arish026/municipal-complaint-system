@@ -130,7 +130,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       <div className="civic-card">
         <div className="civic-card-header">
           <div>
-            <span className="hero-pill" style={{ background: '#0f2b18', color: '#ffffff' }}>
+            <span className="hero-pill" style={{ background: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0' }}>
               Command Center
             </span>
             <h2 className="civic-card-title">Municipal Dispatch &amp; Operations Center</h2>
@@ -192,10 +192,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         <div className="civic-card-header" style={{ flexWrap: 'wrap', gap: '1rem', borderBottom: '2px solid var(--border-medium)', paddingBottom: '1rem' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
-              <span className="hero-pill" style={{ background: '#064e3b', color: '#ffffff' }}>
+              <span className="hero-pill" style={{ background: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0' }}>
                 Multi-Factor Assignment Engine
               </span>
-              <span className="hero-pill" style={{ background: '#0284c7', color: '#ffffff', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+              <span className="hero-pill" style={{ background: '#e0f2fe', color: '#0369a1', border: '1px solid #bae6fd', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
                 <Database size={11} />
                 <span>ACID Atomic Dispatch</span>
               </span>
@@ -416,7 +416,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       <div className="civic-card">
         <div className="civic-card-header" style={{ flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <span className="hero-pill" style={{ background: '#7f1d1d', color: '#ffffff' }}>
+            <span className="hero-pill" style={{ background: '#fee2e2', color: '#991b1b', border: '1px solid #fecaca' }}>
               Decision Intelligence
             </span>
             <h3 className="civic-card-title">Supervisory Escalation &amp; Audit Feed</h3>

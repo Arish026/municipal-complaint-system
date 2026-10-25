@@ -20,21 +20,45 @@ async function fetchWithTimeout(
   options: RequestInit = {},
   timeoutMs: number = DEFAULT_TIMEOUT_MS
 ): Promise<Response> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  const tryFetch = async (targetUrl: string): Promise<Response> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(targetUrl, {
+        ...options,
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          ...(options.headers || {}),
+        },
+      });
+      return response;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  };
+
   try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        ...(options.headers || {}),
-      },
-    });
-    return response;
-  } finally {
-    clearTimeout(timeoutId);
+    const res = await tryFetch(url);
+    if (res.ok) return res;
+    // If relative /api returned error and we're in the browser, fallback to direct Django port 8000
+    if (url.startsWith('/api') && typeof window !== 'undefined') {
+      const directUrl = url.replace('/api', 'http://127.0.0.1:8000/api');
+      const directRes = await tryFetch(directUrl);
+      if (directRes.ok) return directRes;
+    }
+    return res;
+  } catch (err) {
+    if (url.startsWith('/api') && typeof window !== 'undefined') {
+      try {
+        const directUrl = url.replace('/api', 'http://127.0.0.1:8000/api');
+        return await tryFetch(directUrl);
+      } catch {
+        // rethrow initial error
+      }
+    }
+    throw err;
   }
 }
 

@@ -594,12 +594,12 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               </div>
 
               {/* 3NF Relational Query Plan Breadcrumb */}
-              <div style={{ padding: '0.45rem 0.85rem', background: '#090d18', border: '1px solid #1e293b', borderRadius: 'var(--radius-sm)', margin: '0.5rem 0 0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#38bdf8', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ padding: '0.45rem 0.85rem', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 'var(--radius-sm)', margin: '0.5rem 0 0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#047857', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontFamily: 'var(--font-mono)' }}>
                   <Database size={12} />
                   <span>3NF Relational Plan:</span>
                 </span>
-                <code style={{ fontSize: '0.72rem', color: '#34d399', fontFamily: 'var(--font-mono)' }}>
+                <code style={{ fontSize: '0.72rem', color: '#0f172a', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
                   COMPLAINT(id: {selectedComplaint.complaint_id}) ⨝ DEPARTMENT(id: {selectedComplaint.department_id}) ⨝ WORK_ORDER ⨝ STAFF
                 </code>
               </div>

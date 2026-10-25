@@ -229,7 +229,7 @@ FROM COMPLAINT;`,
                 Strict 3NF Verified
               </span>
             </div>
-            <p className="text-sm text-slate-300 leading-relaxed mb-4">
+            <p className="text-sm text-slate-700 leading-relaxed mb-4">
               Normalization is the systematic decomposition of relations to minimize data redundancy and eliminate
               anomalies during insert, update, and delete operations. MCMS decomposes what would otherwise be an
               unmanageable, error-prone flat file into <strong>5 cohesive 3NF relations</strong> without information loss.
@@ -272,9 +272,9 @@ FROM COMPLAINT;`,
                 <AlertTriangle size={18} className="text-amber-400" />
                 <h3 className="dbms-card-title">Interactive Anomaly Simulator: The Unnormalized (0NF) Disaster</h3>
               </div>
-              <span className="text-xs text-slate-400 font-mono">Simulate File-System Pitfalls</span>
+              <span className="text-xs text-slate-600 font-semibold font-mono">Simulate File-System Pitfalls</span>
             </div>
-            <p className="text-sm text-slate-300 mb-4">
+            <p className="text-sm text-slate-700 mb-4">
               Click an anomaly button below to see why maintaining a single flat spreadsheet table fails in enterprise municipal governance:
             </p>
 
@@ -355,7 +355,7 @@ FROM COMPLAINT;`,
             )}
 
             {/* Flat Table Preview */}
-            <div className="overflow-x-auto border border-slate-700/80 rounded-lg">
+            <div className="overflow-x-auto border border-slate-200 rounded-lg">
               <table className="dbms-data-table">
                 <thead>
                   <tr>
@@ -363,9 +363,9 @@ FROM COMPLAINT;`,
                     <th>Citizen_Name</th>
                     <th>Phone</th>
                     <th>Category</th>
-                    <th className="bg-red-950/40 text-red-200">Dept_Name (Redundant)</th>
-                    <th className="bg-red-950/40 text-red-200">Dept_Location (Redundant)</th>
-                    <th className="bg-red-950/40 text-red-200">Staff_Name (Redundant)</th>
+                    <th className="bg-red-50 text-red-900 border-b border-red-200">Dept_Name (Redundant)</th>
+                    <th className="bg-red-50 text-red-900 border-b border-red-200">Dept_Location (Redundant)</th>
+                    <th className="bg-red-50 text-red-900 border-b border-red-200">Staff_Name (Redundant)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -374,27 +374,27 @@ FROM COMPLAINT;`,
                     <td>Ali Raza</td>
                     <td className="font-mono">0300-1234567</td>
                     <td>Pipeline Burst</td>
-                    <td className="text-red-400">KWSC Water &amp; Sewerage</td>
-                    <td className="text-red-400">9th Mile Karsaz, Shahrah-e-Faisal</td>
-                    <td className="text-red-400">Tariq Mahmood</td>
+                    <td className="text-red-700 font-medium">KWSC Water &amp; Sewerage</td>
+                    <td className="text-red-700 font-medium">9th Mile Karsaz, Shahrah-e-Faisal</td>
+                    <td className="text-red-700 font-medium">Tariq Mahmood</td>
                   </tr>
                   <tr>
                     <td className="font-mono">K102</td>
                     <td>Sara Khan</td>
                     <td className="font-mono">0321-7654321</td>
                     <td>Sewage Overflow</td>
-                    <td className="text-red-400 font-bold">KWSC Water &amp; Sewerage [DUPLICATE]</td>
-                    <td className="text-red-400 font-bold">9th Mile Karsaz [DUPLICATE]</td>
-                    <td className="text-red-400">Kamran Akram</td>
+                    <td className="text-red-700 font-bold">KWSC Water &amp; Sewerage [DUPLICATE]</td>
+                    <td className="text-red-700 font-bold">9th Mile Karsaz [DUPLICATE]</td>
+                    <td className="text-red-700 font-medium">Kamran Akram</td>
                   </tr>
                   <tr>
                     <td className="font-mono">K103</td>
                     <td>Bilal Ahmed</td>
                     <td className="font-mono">0333-9876543</td>
                     <td>Water Contamination</td>
-                    <td className="text-red-400 font-bold">KWSC Water &amp; Sewerage [DUPLICATE]</td>
-                    <td className="text-red-400 font-bold">9th Mile Karsaz [DUPLICATE]</td>
-                    <td className="text-red-400">Tariq Mahmood</td>
+                    <td className="text-red-700 font-bold">KWSC Water &amp; Sewerage [DUPLICATE]</td>
+                    <td className="text-red-700 font-bold">9th Mile Karsaz [DUPLICATE]</td>
+                    <td className="text-red-700 font-medium">Tariq Mahmood</td>
                   </tr>
                 </tbody>
               </table>
@@ -408,46 +408,46 @@ FROM COMPLAINT;`,
                 <BookOpen size={18} className="text-sky-400" />
                 <h3 className="dbms-card-title">Functional Dependencies (FDs) &amp; Lossless Join Decomposition</h3>
               </div>
-              <span className="text-xs text-slate-400 font-mono">Mathematical Proof</span>
+              <span className="text-xs text-slate-600 font-semibold font-mono">Mathematical Proof</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="fd-box">
                 <div className="fd-title">1. Citizen Relation Functional Dependency</div>
-                <div className="font-mono text-xs text-sky-300 mb-1">
+                <div className="font-mono text-xs text-emerald-800 font-bold mb-1">
                   Citizen_ID → Name, Phone, Address
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-600">
                   Candidate Keys: <code>{`{Citizen_ID}`}</code>, <code>{`{Phone}`}</code>. No non-prime attribute determines any other non-prime attribute.
                 </p>
               </div>
 
               <div className="fd-box">
                 <div className="fd-title">2. Department Relation Functional Dependency</div>
-                <div className="font-mono text-xs text-sky-300 mb-1">
+                <div className="font-mono text-xs text-emerald-800 font-bold mb-1">
                   Department_ID → Department_Name, Office_Location
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-600">
                   Candidate Key: <code>{`{Department_ID}`}</code>, <code>{`{Department_Name}`}</code>. Eliminates transitive path from Complaint to Department metadata.
                 </p>
               </div>
 
               <div className="fd-box">
                 <div className="fd-title">3. Staff Relation Functional Dependency</div>
-                <div className="font-mono text-xs text-sky-300 mb-1">
+                <div className="font-mono text-xs text-emerald-800 font-bold mb-1">
                   Staff_ID → Department_ID, Name, Phone, Designation, is_active
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-600">
                   Foreign key <code>Department_ID</code> establishes parent relationship without repeating agency headquarters addresses.
                 </p>
               </div>
 
               <div className="fd-box">
                 <div className="fd-title">4. Complaint Relation Functional Dependency</div>
-                <div className="font-mono text-xs text-sky-300 mb-1">
+                <div className="font-mono text-xs text-emerald-800 font-bold mb-1">
                   Complaint_ID → Citizen_ID, Department_ID, Complaint_Date, Category, Description, Location, Status
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-600">
                   Strictly isolates the grievance transaction from field repair execution (handled in WORK_ORDER).
                 </p>
               </div>
@@ -455,10 +455,10 @@ FROM COMPLAINT;`,
 
             <div className="lossless-proof-box mt-4">
               <strong>Lossless-Join Decomposition Theorem:</strong>
-              <p className="font-mono text-xs text-emerald-300 my-1">
+              <p className="font-mono text-xs text-emerald-800 font-bold my-1">
                 Decomposition of R into (R1, R2) is lossless if and only if: (R1 ∩ R2) → R1  OR  (R1 ∩ R2) → R2
               </p>
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-slate-700">
                 For <code>COMPLAINT ⨝ DEPARTMENT</code>: The intersection attribute is <code>{`{department_id}`}</code>.
                 Since <code>department_id</code> is the primary key of <code>DEPARTMENT</code>, it functionally determines all attributes of <code>DEPARTMENT</code>.
                 Therefore, the natural join is <strong>guaranteed lossless</strong> with zero spurious tuples generated!
@@ -484,7 +484,7 @@ FROM COMPLAINT;`,
                 Logical &amp; Physical Independence
               </span>
             </div>
-            <p className="text-sm text-slate-300 leading-relaxed mb-4">
+            <p className="text-sm text-slate-700 leading-relaxed mb-4">
               Proposed in 1975 by the American National Standards Institute, the ANSI-SPARC architecture partitions database
               systems into three distinct conceptual tiers. This separation shields end-user presentations from database schema
               changes (Logical Data Independence) and protects the schema from storage and indexing migrations (Physical Data Independence).
@@ -501,24 +501,24 @@ FROM COMPLAINT;`,
                   <div className="view-card">
                     <span className="view-title">Citizen External View</span>
                     <p className="view-desc">Masked public tracker. Hides staff cell numbers and other citizen private addresses.</p>
-                    <code className="text-xs text-sky-300 font-mono">π_id, category, status</code>
+                    <code className="text-xs text-sky-800 font-bold font-mono">π_id, category, status</code>
                   </div>
                   <div className="view-card">
                     <span className="view-title">Staff External View</span>
                     <p className="view-desc">Field technician workdesk. Displays assigned repair orders, site location, and remarks.</p>
-                    <code className="text-xs text-amber-300 font-mono">σ_staff_id(WORK_ORDER)</code>
+                    <code className="text-xs text-amber-800 font-bold font-mono">σ_staff_id(WORK_ORDER)</code>
                   </div>
                   <div className="view-card">
                     <span className="view-title">Supervisor View</span>
                     <p className="view-desc">Town hall command hub. Full cross-department KPIs, SLA alerts, and multi-factor dispatch.</p>
-                    <code className="text-xs text-emerald-300 font-mono">γ_dept(COMPLAINT ⨝ STAFF)</code>
+                    <code className="text-xs text-emerald-850 font-bold font-mono" style={{ color: '#047857' }}>γ_dept(COMPLAINT ⨝ STAFF)</code>
                   </div>
                 </div>
               </div>
 
               <div className="ansi-connector">
                 <ArrowRight size={16} className="rotate-90 text-slate-500" />
-                <span className="text-xs text-slate-400 font-mono">External / Conceptual Mapping (Logical Data Independence)</span>
+                <span className="text-xs text-slate-600 font-semibold font-mono">External / Conceptual Mapping (Logical Data Independence)</span>
               </div>
 
               {/* Conceptual Level */}
@@ -539,7 +539,7 @@ FROM COMPLAINT;`,
 
               <div className="ansi-connector">
                 <ArrowRight size={16} className="rotate-90 text-slate-500" />
-                <span className="text-xs text-slate-400 font-mono">Conceptual / Internal Mapping (Physical Data Independence)</span>
+                <span className="text-xs text-slate-600 font-semibold font-mono">Conceptual / Internal Mapping (Physical Data Independence)</span>
               </div>
 
               {/* Internal Level */}
@@ -579,9 +579,9 @@ FROM COMPLAINT;`,
                 <Code2 size={18} className="text-emerald-400" />
                 <h3 className="dbms-card-title">Live Relational Algebra Query Workbench</h3>
               </div>
-              <span className="text-xs text-slate-400 font-mono">Theoretical &amp; Executable Bridge</span>
+              <span className="text-xs text-slate-600 font-semibold font-mono">Theoretical &amp; Executable Bridge</span>
             </div>
-            <p className="text-sm text-slate-300 leading-relaxed mb-4">
+            <p className="text-sm text-slate-700 leading-relaxed mb-4">
               Relational Algebra is the formal procedural mathematical query language underlying SQL execution plans.
               Select a query below to inspect its mathematical notation, equivalent ANSI SQL, and live output executed against our database:
             </p>
@@ -594,8 +594,8 @@ FROM COMPLAINT;`,
                   className={`algebra-selector-btn ${selectedAlgebraQuery === q.id ? 'active' : ''}`}
                   onClick={() => setSelectedAlgebraQuery(q.id)}
                 >
-                  <span className="font-mono text-xs text-sky-400">Query #{q.id}</span>
-                  <strong className="block text-xs mt-1 text-slate-200">{q.title}</strong>
+                  <span className="font-mono text-xs text-emerald-700 font-bold">Query #{q.id}</span>
+                  <strong className="block text-xs mt-1 text-slate-900 font-semibold">{q.title}</strong>
                 </button>
               ))}
             </div>
@@ -606,15 +606,15 @@ FROM COMPLAINT;`,
               return (
                 <div className="query-inspector-panel">
                   <div className="mb-3">
-                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Formal Relational Algebra Expression:</span>
-                    <div className="math-algebra-box font-mono text-emerald-300 text-sm mt-1 p-3 bg-slate-950/80 rounded border border-emerald-900/50">
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Formal Relational Algebra Expression:</span>
+                    <div className="math-algebra-box font-mono text-sm mt-1 p-3 rounded">
                       {q.algebra}
                     </div>
                   </div>
 
                   <div className="mb-4">
-                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Equivalent Declarative SQL Translation:</span>
-                    <pre className="sql-code-box font-mono text-xs text-sky-300 mt-1 p-3 bg-slate-950/80 rounded border border-slate-800 overflow-x-auto">
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Equivalent Declarative SQL Translation:</span>
+                    <pre className="sql-code-box font-mono text-xs mt-1 p-3 rounded overflow-x-auto">
                       {q.sql}
                     </pre>
                   </div>
@@ -622,13 +622,13 @@ FROM COMPLAINT;`,
                   {/* Live Execution Output Table */}
                   <div className="mt-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-semibold text-slate-300">
+                      <span className="text-xs font-bold text-slate-800">
                         Live Relational Tuple Output ({currentAlgebraResult.length} tuples returned):
                       </span>
-                      <span className="text-xs text-emerald-400 font-mono">✓ Executed in 1.4ms</span>
+                      <span className="text-xs text-emerald-700 font-bold font-mono">✓ Executed in 1.4ms</span>
                     </div>
 
-                    <div className="overflow-x-auto border border-slate-700/80 rounded-lg">
+                    <div className="overflow-x-auto border border-slate-200 rounded-lg">
                       <table className="dbms-data-table">
                         <thead>
                           <tr>
@@ -644,7 +644,7 @@ FROM COMPLAINT;`,
                           {currentAlgebraResult.map((row, idx) => (
                             <tr key={idx}>
                               {Object.values(row).map((val, cellIdx) => (
-                                <td key={cellIdx} className={cellIdx === 0 ? 'font-mono text-sky-300' : ''}>
+                                <td key={cellIdx} className={cellIdx === 0 ? 'font-mono text-emerald-800 font-bold' : ''}>
                                   {String(val)}
                                 </td>
                               ))}
@@ -677,12 +677,12 @@ FROM COMPLAINT;`,
                 Zero Orphan Guarantee
               </span>
             </div>
-            <p className="text-sm text-slate-300 leading-relaxed mb-4">
+            <p className="text-sm text-slate-700 leading-relaxed mb-4">
               Referential integrity guarantees that foreign key references always point to valid, existing parent tuples.
               MCMS deliberately selects delete actions (<code>RESTRICT</code> vs. <code>CASCADE</code>) based on municipal compliance:
             </p>
 
-            <div className="overflow-x-auto border border-slate-700/80 rounded-lg mb-6">
+            <div className="overflow-x-auto border border-slate-200 rounded-lg mb-6">
               <table className="dbms-data-table">
                 <thead>
                   <tr>
@@ -695,57 +695,57 @@ FROM COMPLAINT;`,
                 </thead>
                 <tbody>
                   <tr>
-                    <td className="font-mono text-sky-300">COMPLAINT</td>
+                    <td className="font-mono text-emerald-800 font-bold">COMPLAINT</td>
                     <td className="font-mono">citizen_id</td>
-                    <td className="font-mono text-amber-300">CITIZEN</td>
+                    <td className="font-mono text-amber-800 font-bold">CITIZEN</td>
                     <td>
                       <span className="rule-badge restrict">ON DELETE RESTRICT</span>
                     </td>
-                    <td className="text-xs text-slate-300">
+                    <td className="text-xs text-slate-700">
                       Prevents municipal records from losing citizen identity. A citizen with active complaints cannot be purged from the registry.
                     </td>
                   </tr>
                   <tr>
-                    <td className="font-mono text-sky-300">COMPLAINT</td>
+                    <td className="font-mono text-emerald-800 font-bold">COMPLAINT</td>
                     <td className="font-mono">department_id</td>
-                    <td className="font-mono text-amber-300">DEPARTMENT</td>
+                    <td className="font-mono text-amber-800 font-bold">DEPARTMENT</td>
                     <td>
                       <span className="rule-badge restrict">ON DELETE RESTRICT</span>
                     </td>
-                    <td className="text-xs text-slate-300">
+                    <td className="text-xs text-slate-700">
                       A municipal agency (e.g. KWSC) cannot be deleted if active grievances remain assigned to it.
                     </td>
                   </tr>
                   <tr>
-                    <td className="font-mono text-sky-300">STAFF</td>
+                    <td className="font-mono text-emerald-800 font-bold">STAFF</td>
                     <td className="font-mono">department_id</td>
-                    <td className="font-mono text-amber-300">DEPARTMENT</td>
+                    <td className="font-mono text-amber-800 font-bold">DEPARTMENT</td>
                     <td>
                       <span className="rule-badge restrict">ON DELETE RESTRICT</span>
                     </td>
-                    <td className="text-xs text-slate-300">
+                    <td className="text-xs text-slate-700">
                       Guarantees every technician belongs to a valid department. No orphaned staff members.
                     </td>
                   </tr>
                   <tr>
-                    <td className="font-mono text-sky-300">WORK_ORDER</td>
+                    <td className="font-mono text-emerald-800 font-bold">WORK_ORDER</td>
                     <td className="font-mono">complaint_id</td>
-                    <td className="font-mono text-amber-300">COMPLAINT</td>
+                    <td className="font-mono text-amber-800 font-bold">COMPLAINT</td>
                     <td>
                       <span className="rule-badge cascade">ON DELETE CASCADE</span>
                     </td>
-                    <td className="text-xs text-slate-300">
+                    <td className="text-xs text-slate-700">
                       Work orders are life-cycle child entities of a complaint. If a rejected complaint is purged, its dependent work orders are cleaned up automatically.
                     </td>
                   </tr>
                   <tr>
-                    <td className="font-mono text-sky-300">WORK_ORDER</td>
+                    <td className="font-mono text-emerald-800 font-bold">WORK_ORDER</td>
                     <td className="font-mono">staff_id</td>
-                    <td className="font-mono text-amber-300">STAFF</td>
+                    <td className="font-mono text-amber-800 font-bold">STAFF</td>
                     <td>
                       <span className="rule-badge restrict">ON DELETE RESTRICT</span>
                     </td>
-                    <td className="text-xs text-slate-300">
+                    <td className="text-xs text-slate-700">
                       A technician with ongoing field repair duties cannot be removed from the system without reassigning the order.
                     </td>
                   </tr>
@@ -772,7 +772,7 @@ FROM COMPLAINT;`,
                 Strict Atomicity Guaranteed
               </span>
             </div>
-            <p className="text-sm text-slate-300 leading-relaxed mb-4">
+            <p className="text-sm text-slate-700 leading-relaxed mb-4">
               When a town hall supervisor clicks <strong>&ldquo;Dispatch Technician&rdquo;</strong>, the operation modifies
               two separate relational tables. Under the <strong>ACID Atomicity</strong> guarantee, both writes succeed or both roll back completely:
             </p>
@@ -849,24 +849,24 @@ FROM COMPLAINT;`,
                 Zero Fan or Chasm Traps
               </span>
             </div>
-            <p className="text-sm text-slate-300 leading-relaxed mb-4">
+            <p className="text-sm text-slate-700 leading-relaxed mb-4">
               Connection traps are structural flaws in ERD designs where paths between entities lead to ambiguous or broken associations.
               Our schema underwent rigorous verification to ensure zero fan traps and zero chasm traps:
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="trap-audit-box">
-                <div className="trap-title text-amber-300">
+                <div className="trap-title text-amber-800">
                   <ShieldCheck size={16} />
                   <span>1. Fan Trap Prevention (§ 4.7.5)</span>
                 </div>
-                <p className="text-xs text-slate-300 mb-2">
+                <p className="text-xs text-slate-700 mb-2">
                   <strong>What is a Fan Trap?</strong> Occurs when two 1:N relationships fan out from the same parent entity, making it ambiguous which child from the first set belongs to a child in the second set.
                 </p>
                 <div className="trap-proof-tag">
                   <strong>MCMS Proof:</strong> We do NOT link <code>CITIZEN</code> and <code>WORK_ORDER</code> independently to <code>DEPARTMENT</code>.
                   Instead, the path is strictly sequential:
-                  <div className="font-mono text-emerald-300 text-xs my-1">
+                  <div className="font-mono text-emerald-800 font-bold text-xs my-1">
                     CITIZEN (1) ── (N) COMPLAINT (1) ── (N) WORK_ORDER
                   </div>
                   Every work order maps unambiguously to exactly one complaint, and that complaint maps to exactly one citizen!
@@ -874,16 +874,16 @@ FROM COMPLAINT;`,
               </div>
 
               <div className="trap-audit-box">
-                <div className="trap-title text-sky-300">
+                <div className="trap-title text-sky-800">
                   <ShieldCheck size={16} />
                   <span>2. Chasm Trap Prevention (§ 4.7.6)</span>
                 </div>
-                <p className="text-xs text-slate-300 mb-2">
+                <p className="text-xs text-slate-700 mb-2">
                   <strong>What is a Chasm Trap?</strong> Occurs when an intermediate entity with partial (optional) participation breaks the query traversal pathway between two related entities.
                 </p>
                 <div className="trap-proof-tag">
                   <strong>MCMS Proof:</strong> The participation of <code>COMPLAINT</code> in the relationship with <code>DEPARTMENT</code> is <strong>MANDATORY (Total)</strong>:
-                  <div className="font-mono text-emerald-300 text-xs my-1">
+                  <div className="font-mono text-emerald-800 font-bold text-xs my-1">
                     {'DEPARTMENT ||────o{ COMPLAINT'}
                   </div>
                   There can never exist an orphaned complaint without a responsible department. Therefore, traversing from any work order back to its municipal department is 100% complete and lossless!

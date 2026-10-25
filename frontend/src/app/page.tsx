@@ -218,21 +218,21 @@ export default function Home() {
       <main className="main-content">
         {/* Simplified DBMS Context Header */}
         <section className="civic-hero-wrap" style={{ marginBottom: '1.25rem' }}>
-          <div className="civic-hero-card" style={{ padding: '1.25rem 1.75rem', background: '#0b1329', borderColor: '#1e293b' }}>
+          <div className="civic-hero-card" style={{ padding: '1.25rem 1.75rem', background: '#ffffff', borderColor: '#e2e8f0', boxShadow: '0 4px 16px rgba(0, 0, 0, 0.05)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
-                  <span className="hero-pill" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.35)' }}>
+                  <span className="hero-pill" style={{ background: '#ecfdf5', color: '#047857', borderColor: '#a7f3d0' }}>
                     {activePortal === 'citizen' && 'CITIZEN INTAKE (DFD PROCESS 1.0 & 2.0)'}
                     {activePortal === 'staff' && 'FIELD CREW OPERATIONS (DFD PROCESS 4.0)'}
                     {activePortal === 'admin' && 'MUNICIPAL COMMAND & DISPATCH (DFD 3.0 & 5.0)'}
                     {activePortal === 'dbms-lab' && 'RELATIONAL THEORY & 3NF LAB (DR. S. M. KHALID SYLLABUS)'}
                   </span>
-                  <span style={{ fontSize: '0.74rem', color: '#94a3b8', fontFamily: 'var(--font-mono)' }}>
+                  <span style={{ fontSize: '0.74rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
                     Schema: 3NF Relational (PostgreSQL 16)
                   </span>
                 </div>
-                <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+                <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#06110a', margin: 0 }}>
                   {activePortal === 'citizen' && 'Civic Grievance Lodging & Real-Time Tracking'}
                   {activePortal === 'staff' && 'Field Technician Inspection & Repair Desk'}
                   {activePortal === 'admin' && 'Municipal Command & Multi-Factor Dispatch Station'}
@@ -242,21 +242,21 @@ export default function Home() {
 
               {/* Compact Database Entity Count Strip */}
               <div className="hero-stats-row" style={{ marginTop: 0, gap: '0.65rem' }}>
-                <div className="hero-stat-chip" style={{ padding: '0.35rem 0.75rem' }}>
-                  <span className="hero-stat-number" style={{ fontSize: '1.05rem', color: '#38bdf8' }}>{stats.totalComplaints}</span>
-                  <span className="hero-stat-label" style={{ fontSize: '0.66rem' }}>Complaints (D2)</span>
+                <div className="hero-stat-chip" style={{ padding: '0.35rem 0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                  <span className="hero-stat-number" style={{ fontSize: '1.05rem', color: '#047857' }}>{stats.totalComplaints}</span>
+                  <span className="hero-stat-label" style={{ fontSize: '0.66rem', color: '#64748b', fontWeight: 600 }}>Complaints (D2)</span>
                 </div>
-                <div className="hero-stat-chip" style={{ padding: '0.35rem 0.75rem' }}>
-                  <span className="hero-stat-number" style={{ fontSize: '1.05rem', color: '#34d399' }}>{workOrders.length}</span>
-                  <span className="hero-stat-label" style={{ fontSize: '0.66rem' }}>Work Orders (D5)</span>
+                <div className="hero-stat-chip" style={{ padding: '0.35rem 0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                  <span className="hero-stat-number" style={{ fontSize: '1.05rem', color: '#d97706' }}>{workOrders.length}</span>
+                  <span className="hero-stat-label" style={{ fontSize: '0.66rem', color: '#64748b', fontWeight: 600 }}>Work Orders (D5)</span>
                 </div>
-                <div className="hero-stat-chip" style={{ padding: '0.35rem 0.75rem' }}>
-                  <span className="hero-stat-number" style={{ fontSize: '1.05rem', color: '#a78bfa' }}>{departments.length}</span>
-                  <span className="hero-stat-label" style={{ fontSize: '0.66rem' }}>Agencies (D3)</span>
+                <div className="hero-stat-chip" style={{ padding: '0.35rem 0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                  <span className="hero-stat-number" style={{ fontSize: '1.05rem', color: '#059669' }}>{departments.length}</span>
+                  <span className="hero-stat-label" style={{ fontSize: '0.66rem', color: '#64748b', fontWeight: 600 }}>Agencies (D3)</span>
                 </div>
-                <div className="hero-stat-chip" style={{ padding: '0.35rem 0.75rem' }}>
-                  <span className="hero-stat-number" style={{ fontSize: '1.05rem', color: '#fbbf24' }}>{staffList.length}</span>
-                  <span className="hero-stat-label" style={{ fontSize: '0.66rem' }}>Staff (D4)</span>
+                <div className="hero-stat-chip" style={{ padding: '0.35rem 0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                  <span className="hero-stat-number" style={{ fontSize: '1.05rem', color: '#b45309' }}>{staffList.length}</span>
+                  <span className="hero-stat-label" style={{ fontSize: '0.66rem', color: '#64748b', fontWeight: 600 }}>Staff (D4)</span>
                 </div>
               </div>
             </div>
