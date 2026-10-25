@@ -45,6 +45,8 @@ interface CitizenPortalProps {
   }) => void;
   trackedComplaintId?: number | null;
   onShowToast?: (type: 'success' | 'error' | 'info', message: string, sub?: string) => void;
+  activeTab?: 'submit' | 'track';
+  onTabChange?: (tab: 'submit' | 'track') => void;
 }
 
 const STATUS_STEPS: ComplaintStatus[] = [
@@ -100,10 +102,30 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
   onSubmitComplaint,
   trackedComplaintId,
   onShowToast,
+  activeTab: controlledTab,
+  onTabChange,
 }) => {
-  const [activeTab, setActiveTab] = useState<'submit' | 'track'>(
-    trackedComplaintId ? 'track' : 'submit'
+  const [internalTab, setInternalTab] = useState<'submit' | 'track'>(
+    controlledTab || (trackedComplaintId ? 'track' : 'submit')
   );
+  const activeTab = controlledTab ?? internalTab;
+  const setActiveTab = (tab: 'submit' | 'track') => {
+    setInternalTab(tab);
+    onTabChange?.(tab);
+  };
+
+  React.useEffect(() => {
+    if (controlledTab) {
+      setInternalTab(controlledTab);
+    }
+  }, [controlledTab]);
+
+  React.useEffect(() => {
+    if (trackedComplaintId) {
+      setActiveTab('track');
+      setSearchQuery(trackedComplaintId.toString());
+    }
+  }, [trackedComplaintId]);
 
   // Form State: EMPTY by default so subtle, greyed out hints vanish on first stroke
   const [citizenName, setCitizenName] = useState('');

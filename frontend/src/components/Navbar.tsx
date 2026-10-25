@@ -10,18 +10,18 @@ import {
   Search,
   Menu,
   X,
-  ShieldCheck,
-  Clock,
-  Home,
-  Eye,
-  Type,
-  MapPin,
   Database,
+  CheckCircle2,
+  AlertCircle,
+  Home,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface NavbarProps {
   activePortal: 'citizen' | 'staff' | 'admin' | 'dbms-lab';
   setActivePortal: (portal: 'citizen' | 'staff' | 'admin' | 'dbms-lab') => void;
+  citizenTab?: 'submit' | 'track';
+  setCitizenTab?: (tab: 'submit' | 'track') => void;
   onNewComplaintClick: () => void;
   onTrackClick: () => void;
   fontSizeLevel: 'normal' | 'large' | 'larger';
@@ -35,6 +35,8 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   activePortal,
   setActivePortal,
+  citizenTab = 'submit',
+  setCitizenTab,
   onNewComplaintClick,
   onTrackClick,
   fontSizeLevel,
@@ -46,36 +48,40 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handlePortalSwitch = (portal: 'citizen' | 'staff' | 'admin' | 'dbms-lab') => {
+  const handlePortalSwitch = (portal: 'citizen' | 'staff' | 'admin' | 'dbms-lab', tab?: 'submit' | 'track') => {
     setActivePortal(portal);
+    if (portal === 'citizen' && tab && setCitizenTab) {
+      setCitizenTab(tab);
+    }
     setMobileMenuOpen(false);
   };
 
   return (
     <>
       <header className="header-wrapper persistent-navbar">
-        {/* Main Navbar */}
+        {/* Main Navigation Bar */}
         <div className="main-nav-bar">
           <div className="container nav-container">
-            {/* Brand Logo & Name */}
+            {/* Brand Logo & Authority Label */}
             <div
               className="brand-section"
-              onClick={() => handlePortalSwitch('citizen')}
-              style={{ cursor: 'pointer' }}
+              onClick={() => handlePortalSwitch('citizen', 'submit')}
+              role="button"
+              tabIndex={0}
+              aria-label="Navigate to Home"
             >
               <div className="brand-icon-box">
-                <Building2 size={20} strokeWidth={2.2} />
+                <Building2 size={22} strokeWidth={2.2} />
               </div>
               <div className="brand-title-wrap">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span className="brand-title">Karachi Metropolitan <span style={{ color: '#d97706' }}>Redressal</span></span>
-                  <span
-                    className={`status-dot-pulse ${backendConnected ? 'dot-online' : 'dot-offline'}`}
-                    style={{ width: '7px', height: '7px' }}
-                    title={backendConnected ? 'Django Backend Live' : 'Local Storage Mode'}
-                  />
+                <div className="brand-title-row">
+                  <span className="brand-title">
+                    Karachi Metropolitan <span className="brand-accent">Redressal</span>
+                  </span>
                 </div>
-                <span className="brand-subtitle">Municipal Complaint &amp; Dispatch Gateway</span>
+                <span className="brand-subtitle">
+                  Municipal Grievance &amp; Field Dispatch Authority
+                </span>
               </div>
             </div>
 
@@ -83,52 +89,67 @@ export const Navbar: React.FC<NavbarProps> = ({
             <nav className="portal-tabs-nav" aria-label="Portal Selection">
               <button
                 id="portal-nav-citizen"
-                className={`portal-tab-btn ${activePortal === 'citizen' ? 'active' : ''}`}
-                onClick={() => handlePortalSwitch('citizen')}
+                className={`portal-tab-btn ${activePortal === 'citizen' && citizenTab === 'submit' ? 'active' : ''}`}
+                onClick={() => handlePortalSwitch('citizen', 'submit')}
               >
-                <User size={15} strokeWidth={2} />
+                <User size={15} strokeWidth={2.2} />
                 <span>Citizen Portal</span>
               </button>
+
               <button
                 id="portal-nav-track"
-                className="portal-tab-btn"
+                className={`portal-tab-btn ${activePortal === 'citizen' && citizenTab === 'track' ? 'active' : ''}`}
                 onClick={() => {
                   onTrackClick();
                   setMobileMenuOpen(false);
                 }}
               >
-                <Search size={15} strokeWidth={2} />
+                <Search size={15} strokeWidth={2.2} />
                 <span>Live Tracker</span>
               </button>
+
               <button
                 id="portal-nav-staff"
                 className={`portal-tab-btn ${activePortal === 'staff' ? 'active' : ''}`}
                 onClick={() => handlePortalSwitch('staff')}
               >
-                <Wrench size={15} strokeWidth={2} />
+                <Wrench size={15} strokeWidth={2.2} />
                 <span>Staff Workdesk</span>
               </button>
+
               <button
                 id="portal-nav-admin"
                 className={`portal-tab-btn ${activePortal === 'admin' ? 'active' : ''}`}
                 onClick={() => handlePortalSwitch('admin')}
               >
-                <BarChart3 size={15} strokeWidth={2} />
-                <span>Dispatch &amp; Command</span>
+                <BarChart3 size={15} strokeWidth={2.2} />
+                <span>Dispatch Center</span>
               </button>
+
               <button
                 id="portal-nav-dbms"
                 className={`portal-tab-btn portal-tab-dbms ${activePortal === 'dbms-lab' ? 'active' : ''}`}
                 onClick={() => handlePortalSwitch('dbms-lab')}
                 title="Curriculum Database Theory & 3NF Schema Lab"
               >
-                <Database size={15} strokeWidth={2} />
+                <Database size={15} strokeWidth={2.2} />
                 <span>DBMS 3NF Lab</span>
               </button>
             </nav>
 
-            {/* Desktop Actions */}
+            {/* Desktop Actions & Status */}
             <div className="nav-actions-desktop">
+              {/* Database Live Connectivity Badge */}
+              <div
+                className={`nav-status-chip ${backendConnected ? 'connected' : 'cached'}`}
+                title={backendConnected ? 'PostgreSQL Database Live & Synced' : 'Offline Local Storage Cache'}
+                onClick={onReconnect}
+              >
+                <span className={`status-dot-pulse ${backendConnected ? 'dot-online' : 'dot-offline'}`} />
+                <span className="nav-status-label">{backendConnected ? 'DB Live' : 'Cached'}</span>
+              </div>
+
+              {/* Primary Call to Action Button */}
               <button
                 id="btn-quick-file-complaint"
                 className="btn-pill-primary btn-sm"
@@ -139,7 +160,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </div>
 
-            {/* Mobile Hamburger Toggle */}
+            {/* Mobile Hamburger Button */}
             <button
               id="mobile-nav-toggle"
               className="mobile-hamburger-btn"
@@ -158,10 +179,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="mobile-drawer-header">
                 <div className="brand-section">
                   <div className="brand-icon-box sm">
-                    <Building2 size={16} />
+                    <Building2 size={18} />
                   </div>
                   <div>
-                    <div className="brand-title" style={{ fontSize: '0.92rem' }}>Karachi MCMS</div>
+                    <div className="brand-title" style={{ fontSize: '1rem' }}>
+                      Karachi Metropolitan <span style={{ color: '#047857' }}>Redressal</span>
+                    </div>
+                    <span className="brand-subtitle" style={{ fontSize: '0.68rem' }}>
+                      MCMS Civic Portal
+                    </span>
                   </div>
                 </div>
                 <button
@@ -169,7 +195,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onClick={() => setMobileMenuOpen(false)}
                   aria-label="Close Menu"
                 >
-                  <X size={18} />
+                  <X size={20} />
                 </button>
               </div>
 
@@ -177,31 +203,31 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <div className="mobile-nav-group">
                   <span className="mobile-group-label">Municipal Portals</span>
                   <button
-                    className={`mobile-nav-item ${activePortal === 'citizen' ? 'active' : ''}`}
-                    onClick={() => handlePortalSwitch('citizen')}
+                    className={`mobile-nav-item ${activePortal === 'citizen' && citizenTab === 'submit' ? 'active' : ''}`}
+                    onClick={() => handlePortalSwitch('citizen', 'submit')}
                   >
                     <div className="mobile-item-icon">
-                      <User size={16} />
+                      <User size={18} />
                     </div>
                     <div className="mobile-item-text">
                       <strong>Citizen Portal</strong>
-                      <span>Lodge and review neighborhood issues</span>
+                      <span>Lodge civic issues &amp; verify tickets</span>
                     </div>
                   </button>
 
                   <button
-                    className="mobile-nav-item"
+                    className={`mobile-nav-item ${activePortal === 'citizen' && citizenTab === 'track' ? 'active' : ''}`}
                     onClick={() => {
                       onTrackClick();
                       setMobileMenuOpen(false);
                     }}
                   >
                     <div className="mobile-item-icon">
-                      <Search size={16} />
+                      <Search size={18} />
                     </div>
                     <div className="mobile-item-text">
                       <strong>Live Tracker</strong>
-                      <span>Check ticket milestone progress</span>
+                      <span>Real-time milestone progress &amp; 3NF audit</span>
                     </div>
                   </button>
 
@@ -210,11 +236,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onClick={() => handlePortalSwitch('staff')}
                   >
                     <div className="mobile-item-icon">
-                      <Wrench size={16} />
+                      <Wrench size={18} />
                     </div>
                     <div className="mobile-item-text">
-                      <strong>Field Workdesk</strong>
-                      <span>Field crew assignments &amp; repair logs</span>
+                      <strong>Staff Workdesk</strong>
+                      <span>Field crew assignments &amp; repair orders</span>
                     </div>
                   </button>
 
@@ -223,11 +249,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onClick={() => handlePortalSwitch('admin')}
                   >
                     <div className="mobile-item-icon">
-                      <BarChart3 size={16} />
+                      <BarChart3 size={18} />
                     </div>
                     <div className="mobile-item-text">
-                      <strong>Supervisor Center</strong>
-                      <span>Town hall SLA analytics &amp; escalations</span>
+                      <strong>Dispatch Center</strong>
+                      <span>Multi-factor technician allocation &amp; SLAs</span>
                     </div>
                   </button>
 
@@ -235,11 +261,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                     className={`mobile-nav-item ${activePortal === 'dbms-lab' ? 'active' : ''}`}
                     onClick={() => handlePortalSwitch('dbms-lab')}
                   >
-                    <div className="mobile-item-icon" style={{ color: '#38bdf8' }}>
-                      <Database size={16} />
+                    <div className="mobile-item-icon" style={{ color: '#047857' }}>
+                      <Database size={18} />
                     </div>
                     <div className="mobile-item-text">
-                      <strong style={{ color: '#38bdf8' }}>DBMS 3NF Architecture Lab</strong>
+                      <strong style={{ color: '#047857' }}>DBMS 3NF Architecture Lab</strong>
                       <span>Normalization, ANSI-SPARC, Relational Algebra</span>
                     </div>
                   </button>
@@ -264,11 +290,11 @@ export const Navbar: React.FC<NavbarProps> = ({
         )}
       </header>
 
-      {/* Mobile Fixed Bottom Nav (Leafora App Style) */}
-      <nav className="mobile-bottom-nav hide-on-desktop" aria-label="Mobile Bottom Navigation">
+      {/* Mobile Fixed Bottom Navigation Bar */}
+      <nav className="mobile-bottom-nav hide-on-desktop" aria-label="Mobile Navigation">
         <button
-          className={`bottom-nav-item ${activePortal === 'citizen' ? 'active' : ''}`}
-          onClick={() => setActivePortal('citizen')}
+          className={`bottom-nav-item ${activePortal === 'citizen' && citizenTab === 'submit' ? 'active' : ''}`}
+          onClick={() => handlePortalSwitch('citizen', 'submit')}
         >
           <Home size={18} />
           <span>Home</span>
@@ -285,7 +311,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </button>
 
         <button
-          className="bottom-nav-item"
+          className={`bottom-nav-item ${activePortal === 'citizen' && citizenTab === 'track' ? 'active' : ''}`}
           onClick={onTrackClick}
         >
           <Search size={18} />
@@ -306,6 +332,14 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           <BarChart3 size={18} />
           <span>Admin</span>
+        </button>
+
+        <button
+          className={`bottom-nav-item ${activePortal === 'dbms-lab' ? 'active' : ''}`}
+          onClick={() => setActivePortal('dbms-lab')}
+        >
+          <Database size={18} />
+          <span>Lab</span>
         </button>
       </nav>
     </>

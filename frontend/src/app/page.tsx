@@ -65,6 +65,7 @@ export default function Home() {
   // Ticket Receipt Modal
   const [recentTicket, setRecentTicket] = useState<Complaint | null>(null);
   const [trackedId, setTrackedId] = useState<number | null>(null);
+  const [citizenTab, setCitizenTab] = useState<'submit' | 'track'>('submit');
 
   // Accessibility States
   const [fontSizeLevel, setFontSizeLevel] = useState<'normal' | 'large' | 'larger'>('normal');
@@ -182,7 +183,30 @@ export default function Home() {
 
   const handleTrackComplaint = (complaintId: number) => {
     setActivePortal('citizen');
+    setCitizenTab('track');
     setTrackedId(complaintId);
+  };
+
+  const handleNewComplaintClick = () => {
+    setActivePortal('citizen');
+    setCitizenTab('submit');
+    setTrackedId(null);
+    setTimeout(() => {
+      const el = document.getElementById('citizen-form-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
+  };
+
+  const handleTrackClick = () => {
+    setActivePortal('citizen');
+    setCitizenTab('track');
+    if (!trackedId && complaints.length > 0) {
+      setTrackedId(complaints[0].complaint_id);
+    }
+    setTimeout(() => {
+      const el = document.getElementById('citizen-tracking-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
   };
 
   return (
@@ -194,24 +218,16 @@ export default function Home() {
       <Navbar
         activePortal={activePortal}
         setActivePortal={setActivePortal}
+        citizenTab={citizenTab}
+        setCitizenTab={setCitizenTab}
         fontSizeLevel={fontSizeLevel}
         onFontSizeChange={setFontSizeLevel}
         highContrast={highContrast}
         onToggleHighContrast={() => setHighContrast(!highContrast)}
         backendConnected={backendConnected}
         onReconnect={() => refreshData(true)}
-        onNewComplaintClick={() => {
-          setActivePortal('citizen');
-          setTrackedId(null);
-          const el = document.getElementById('citizen-form-section');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }}
-        onTrackClick={() => {
-          setActivePortal('citizen');
-          setTrackedId(complaints[0]?.complaint_id || null);
-          const el = document.getElementById('citizen-tracking-section');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }}
+        onNewComplaintClick={handleNewComplaintClick}
+        onTrackClick={handleTrackClick}
       />
 
       {/* Main Content Area */}
@@ -223,7 +239,7 @@ export default function Home() {
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
                   <span className="hero-pill" style={{ background: '#ecfdf5', color: '#047857', borderColor: '#a7f3d0' }}>
-                    {activePortal === 'citizen' && 'CITIZEN INTAKE (DFD PROCESS 1.0 & 2.0)'}
+                    {activePortal === 'citizen' && (citizenTab === 'track' ? 'REAL-TIME TRACKING (DFD PROCESS 2.0)' : 'CITIZEN INTAKE (DFD PROCESS 1.0)')}
                     {activePortal === 'staff' && 'FIELD CREW OPERATIONS (DFD PROCESS 4.0)'}
                     {activePortal === 'admin' && 'MUNICIPAL COMMAND & DISPATCH (DFD 3.0 & 5.0)'}
                     {activePortal === 'dbms-lab' && 'RELATIONAL THEORY & 3NF LAB (DR. S. M. KHALID SYLLABUS)'}
@@ -233,7 +249,7 @@ export default function Home() {
                   </span>
                 </div>
                 <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#06110a', margin: 0 }}>
-                  {activePortal === 'citizen' && 'Civic Grievance Lodging & Real-Time Tracking'}
+                  {activePortal === 'citizen' && (citizenTab === 'track' ? 'Live Grievance Tracking & Lifecycle Audit' : 'Civic Grievance Lodging & Registration')}
                   {activePortal === 'staff' && 'Field Technician Inspection & Repair Desk'}
                   {activePortal === 'admin' && 'Municipal Command & Multi-Factor Dispatch Station'}
                   {activePortal === 'dbms-lab' && 'Relational Foundations, Normalization & Query Studio'}
@@ -272,6 +288,8 @@ export default function Home() {
               onSubmitComplaint={handleRegisterComplaint}
               trackedComplaintId={trackedId}
               onShowToast={addToast}
+              activeTab={citizenTab}
+              onTabChange={setCitizenTab}
             />
           )}
 
